@@ -58,7 +58,7 @@ fun Header(headerColor: Color) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "ArcgisKt",
+            text = "OpenWeatherKt",
             color = Color.White,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(16.dp)
