@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 
 val PurpleColor = Color(0xFF6200EE)
+val ProjectName = "OpenWeatherKt"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ fun Header(headerColor: Color) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "OpenWeatherKt",
+            text = ProjectName,
             color = Color.White,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(16.dp)
