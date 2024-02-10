@@ -18,7 +18,6 @@ import com.example.mad_2024_app.ui.theme.MAD_2024_AppTheme
 
 
 val PurpleColor = Color(0xFF6200EE)
-val ProjectName = "OpenWeatherKt"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
