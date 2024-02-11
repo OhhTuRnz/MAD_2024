@@ -3,26 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/light_gray">
 
     <TextView
         android:id="@+id/message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Second Activity"
+        android:text="Hello! This is the second activity"
+        android:padding="24dp"
         android:textSize="24sp" />
+
     <Button
         android:id="@+id/next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Next"
+        android:text="@string/button_next"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:onClick="onNextButtonClick"
+        android:backgroundTint="@color/purple_200"
+        android:backgroundTintMode="src_atop"/>
     <Button
-        android:id="@+id/undo"
+        android:id="@+id/prev"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="undo"
+        android:text="@string/button_previous"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:onClick="onPrevButtonClick"
+        android:backgroundTint="@color/purple_200"
+        android:backgroundTintMode="src_atop"/>
 </LinearLayout>
