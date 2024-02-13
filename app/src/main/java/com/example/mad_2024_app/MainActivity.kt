@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity(), LocationListener {
         Log.d(TAG, "onCreate: Main activity is being created")
 
 
-        /*
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         // Check for location permissions
@@ -50,7 +50,10 @@ class MainActivity : ComponentActivity(), LocationListener {
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
                 locationPermissionCode
             )
         } else {
@@ -60,12 +63,28 @@ class MainActivity : ComponentActivity(), LocationListener {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == locationPermissionCode) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        5000,
+                        5f,
+                        this
+                    )
                 }
             }
         }
@@ -80,16 +99,30 @@ class MainActivity : ComponentActivity(), LocationListener {
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onProviderDisabled(provider: String) {}
-}*/
+}
 
-    fun onNextButtonClick(view: View) {
-        // This is the handler
-        Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
+fun onNextButtonClick(view: View) {
+    // This is the handler
+    Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
 
-        // go to another activity
-        val intent = Intent(this, SecondActivity::class.java)
+    // go to another activity
+    val intent = Intent(this, SecondActivity::class.java)
+    startActivity(intent)
+}
+
+val buttonOsm: Button = findViewById(R.id.osmButton)
+buttonOsm.setOnClickListener {
+    if (latestLocation != null) {
+        val intent = Intent(this, OpenStreetMapActivity::class.java)
+        val bundle = Bundle()
+        bundle.putParcelable("location", latestLocation)
+        intent.putExtra("locationBundle", bundle)
         startActivity(intent)
+    } else {
+        Log.e(TAG, "Location not set yet.")
     }
+}
+
 }
 
 
