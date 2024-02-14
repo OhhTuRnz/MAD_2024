@@ -8,9 +8,10 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
-class OpenStreetMapActivity : AppCompatActivity() {
-    private val TAG = "btaOpenStreetMapActivity"
+class OpenStreetMap : AppCompatActivity() {
+    private val TAG = "LogoGPSOpenStreetMapActivity"
     private lateinit var map: MapView
     val gymkhanaCoords = listOf(
         GeoPoint(40.38779608214728, -3.627687914352839), // Tennis
