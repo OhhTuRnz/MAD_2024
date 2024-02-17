@@ -1,14 +1,19 @@
 package com.example.mad_2024_app
 
+import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 
 class OpenStreetMap : AppCompatActivity() {
     private val TAG = "LogoGPSOpenStreetMapActivity"
@@ -50,13 +55,23 @@ class OpenStreetMap : AppCompatActivity() {
                 .load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
             map = findViewById(R.id.map)
             map.setTileSource(TileSourceFactory.MAPNIK)
-            map.controller.setZoom(15.0)
+            map.controller.setZoom(18.0)
             val startPoint = GeoPoint(location.latitude, location.longitude)
             //val startPoint = GeoPoint(40.416775, -3.703790) in case you want to test it mannualy
             map.controller.setCenter(startPoint)
             addMarker(startPoint, "My current location")
             addMarkers(map, gymkhanaCoords, gymkhanaNames)
+            addMarkersAndRoute(map, gymkhanaCoords, gymkhanaNames)
         };
+    }
+
+    fun onPrevButtonClick(view: View){
+        // This is the handler
+        Toast.makeText(this, "Going to the main layer!", Toast.LENGTH_SHORT).show()
+
+        // go to another activity
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private fun addMarker(point: GeoPoint, title: String) {
@@ -73,10 +88,34 @@ class OpenStreetMap : AppCompatActivity() {
             val marker = Marker(mapView)
             marker.position = location
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.title = "Marker at ${locationsNames.get(locationsCoords.indexOf(location))} ${location.latitude}, ${location.longitude}"
+            marker.icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.ic_m3_chip_checked_circle)
             mapView.overlays.add(marker)
         }
         mapView.invalidate() // Refresh the map to display the new markers
     }
+
+    fun addMarkersAndRoute(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {
+        if (locationsCoords.size != locationsNames.size) {
+            Log.e("addMarkersAndRoute", "Locations and names lists must have the same number of items.")
+            return
+        }
+        val route = Polyline()
+        route.setPoints(locationsCoords)
+        route.color = ContextCompat.getColor(this, R.color.teal_700)
+        mapView.overlays.add(route)
+        for (location in locationsCoords) {
+            val marker = Marker(mapView)
+            marker.position = location
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            val locationIndex = locationsCoords.indexOf(location)
+            marker.title = "Marker at ${locationsNames[locationIndex]} ${location.latitude}, ${location.longitude}"
+            marker.icon = ContextCompat.getDrawable(this, org.osmdroid.library.R.drawable.ic_menu_compass)
+            mapView.overlays.add(marker)
+        }
+        mapView.invalidate()
+    }
+
 
     override fun onResume() {
         super.onResume()
