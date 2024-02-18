@@ -19,7 +19,7 @@ Here are some snapshots of LogoGPS in action:
   <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" width="300" /> 
 </p>
 <p>
-  <span style="margin-right: 220px;">*LogoGPS Map Interface*</span>
+  <span">*LogoGPS Map Interface*</span>
   <span style="margin-left: 220px;>*LogoGPS Main Menu*</span>
 </p>
 
