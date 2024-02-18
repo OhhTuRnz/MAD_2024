@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity(), LocationListener {
     }
     fun onNextOSMButtonClick(view: View) {
         if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Going to the OpenStreetMaps!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, OpenStreetMap::class.java).apply {
                 putExtra("locationBundle", Bundle().apply {
                     putParcelable("location", latestLocation)
@@ -86,6 +86,12 @@ class MainActivity : ComponentActivity(), LocationListener {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+        }
+
+        // Get last known location immediately
+        val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (lastKnownLocation != null) {
+            onLocationChanged(lastKnownLocation)
         }
     }
     private fun requestLocationPermissions(){
@@ -128,8 +134,10 @@ class MainActivity : ComponentActivity(), LocationListener {
 
     override fun onLocationChanged(location: Location) {
         latestLocation = location
-        val textView: TextView = findViewById(R.id.mainTextView)
-        textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
+        runOnUiThread {
+            val textView: TextView = findViewById(R.id.mainTextView)
+            textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
+        }
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}

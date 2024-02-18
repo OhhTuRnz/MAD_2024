@@ -22,12 +22,18 @@
         android:id="@+id/mainButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/purple_200"
         android:backgroundTintMode="src_atop"
         android:onClick="onNextOSMButtonClick"
-        android:text="@string/button_next" />
+        android:text="@string/OpenMapsTitle"
+        android:layout_centerHorizontal="true"
+        android:drawableStart="@drawable/map"
+        android:textAllCaps="false"
+        android:drawablePadding="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="70dp"
+        android:layout_marginEnd="50dp"/>
 
     <TextView
         android:id="@+id/headerTextView"
@@ -52,6 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Hello_World"
+        android:layout_centerHorizontal="true"
         android:layout_above="@id/mainButton"
         />
 

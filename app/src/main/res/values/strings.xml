@@ -3,4 +3,5 @@
     <string name="button_next">Next Activity</string>
     <string name="button_previous">Prev Activity</string>
     <string name="Hello_World">Hello World!</string>
+    <string name="OpenMapsTitle">OpenStreetMaps</string>
 </resources>

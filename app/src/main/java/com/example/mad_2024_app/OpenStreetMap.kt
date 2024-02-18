@@ -42,7 +42,7 @@ class OpenStreetMap : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_open_street_map)
-        Log.d(TAG, "onCreate: The activity is being created.");
+        Log.d(TAG, "onCreate: The activity OpenMaps is being created.");
 
         val bundle = intent.getBundleExtra("locationBundle")
         val location: Location? = bundle?.getParcelable("location")
@@ -89,7 +89,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.position = location
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             marker.title = "Marker at ${locationsNames.get(locationsCoords.indexOf(location))} ${location.latitude}, ${location.longitude}"
-            marker.icon = ContextCompat.getDrawable(this, com.google.android.material.R.drawable.ic_m3_chip_checked_circle)
+            marker.icon = ContextCompat.getDrawable(this, R.drawable.ic_m3_chip_checked_circle)
             mapView.overlays.add(marker)
         }
         mapView.invalidate() // Refresh the map to display the new markers
