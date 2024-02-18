@@ -14,10 +14,10 @@ Welcome to **LogoGPS**, a state-of-the-art mobile application designed for enhan
 
 Here are some snapshots of LogoGPS in action:
 
-![LogoGPS Map Interface](https://gyazo.com/82e9977c6d9dbf2ab73e331950b113b1)
+![LogoGPS Map Interface](https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png)
 *LogoGPS Map Interface*
 
-![LogoGPS Main Menu](https://gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea)
+![LogoGPS Main Menu](https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png)
 *LogoGPS Main Menu*
 
 ## Installation
