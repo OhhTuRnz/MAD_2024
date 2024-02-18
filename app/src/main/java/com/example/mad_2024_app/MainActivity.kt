@@ -59,6 +59,19 @@ class MainActivity : ComponentActivity(), LocationListener {
             Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
     }
+    fun onNextOSMButtonClick(view: View) {
+        if (::latestLocation.isInitialized) {
+            Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, OpenStreetMap::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private fun checkPermissionsAndStartLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
