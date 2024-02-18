@@ -37,7 +37,15 @@ class MainActivity : ComponentActivity(), LocationListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Toast.makeText(this, Greeting(name = "User"), Toast.LENGTH_SHORT).show()
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isFirstOpen = sharedPreferences.getBoolean("isFirstOpen", true)
+
+        if (isFirstOpen) {
+            Toast.makeText(this, Greeting(name = "User"), Toast.LENGTH_SHORT).show()
+            // Set isFirstOpen to false
+            sharedPreferences.edit().putBoolean("isFirstOpen", false).apply()
+        }
+
         Log.d(TAG, "onCreate: Main activity is being created")
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
