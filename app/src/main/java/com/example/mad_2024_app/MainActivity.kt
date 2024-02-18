@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity(), LocationListener {
     }
     fun onNextOSMButtonClick(view: View) {
         if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Going to the OpenStreetMaps!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, OpenStreetMap::class.java).apply {
                 putExtra("locationBundle", Bundle().apply {
                     putParcelable("location", latestLocation)
