@@ -74,6 +74,12 @@ class MainActivity : ComponentActivity(), LocationListener {
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
         }
+
+        // Get last known location immediately
+        val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (lastKnownLocation != null) {
+            onLocationChanged(lastKnownLocation)
+        }
     }
     private fun requestLocationPermissions(){
         requestPermissionLauncher.launch(arrayOf(
@@ -115,8 +121,10 @@ class MainActivity : ComponentActivity(), LocationListener {
 
     override fun onLocationChanged(location: Location) {
         latestLocation = location
-        val textView: TextView = findViewById(R.id.mainTextView)
-        textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
+        runOnUiThread {
+            val textView: TextView = findViewById(R.id.mainTextView)
+            textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
+        }
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
