@@ -17,18 +17,18 @@ Here are some snapshots of LogoGPS in action:
 <table>
   <tr>
     <td>
-      <img src="https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png" alt="LogoGPS Map Interface" style="width: 100%;"/>
+      <img src="https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png" alt="LogoGPS Main Menu" style="width: 100%;"/>
     </td>
     <td>
-      <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" alt="LogoGPS Main Menu" style="width: 100%;"/>
+      <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" alt="LogoGPS Map Interface" style="width: 100%;"/>
     </td>
   </tr>
   <tr>
     <td style="text-align:center;">
-      LogoGPS Map Interface
+      LogoGPS Main Menu
     </td>
     <td style="text-align:center;">
-      LogoGPS Main Menu
+      LogoGPS Map Interface
     </td>
   </tr>
 </table>
