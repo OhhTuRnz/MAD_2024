@@ -14,14 +14,25 @@ Welcome to **LogoGPS**, a state-of-the-art mobile application designed for enhan
 
 Here are some snapshots of LogoGPS in action:
 
-<p float="left">
-  <img src="https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png" width="300" />
-  <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" width="300" /> 
-</p>
-<p>
-  <span">*LogoGPS Map Interface*</span>
-  <span>*LogoGPS Main Menu*</span>
-</p>
+<table>
+  <tr>
+    <td>
+      <img src="https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png" alt="LogoGPS Map Interface" style="width: 100%;"/>
+    </td>
+    <td>
+      <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" alt="LogoGPS Main Menu" style="width: 100%;"/>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">
+      LogoGPS Map Interface
+    </td>
+    <td style="text-align:center;">
+      LogoGPS Main Menu
+    </td>
+  </tr>
+</table>
+
 
 ## Installation
 
