@@ -2,6 +2,7 @@ package com.example.mad_2024_app
 
 import android.Manifest
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -14,111 +15,143 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import androidx.core.content.ContextCompat
+import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import com.example.mad_2024_app.ui.theme.MAD_2024_AppTheme
-
-
-val PurpleColor = Color(0xFF6200EE)
 
 class MainActivity : ComponentActivity(), LocationListener {
 
     private lateinit var locationManager: LocationManager
+    private lateinit var latestLocation: Location
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private val locationPermissionCode = 2
+    private val TAG = "LogoGPSMainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isFirstOpen = sharedPreferences.getBoolean("isFirstOpen", true)
+
+        if (isFirstOpen) {
+            Toast.makeText(this, Greeting(name = "User"), Toast.LENGTH_SHORT).show()
+            // Set isFirstOpen to false
+            sharedPreferences.edit().putBoolean("isFirstOpen", false).apply()
+        }
+
         Log.d(TAG, "onCreate: Main activity is being created")
 
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-        /*
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ContextCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                locationPermissionCode
-            )
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
-        }
-         */
-
+        setupPermissionLauncher()
+        checkPermissionsAndStartLocationUpdates()
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == locationPermissionCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+    fun onNextButtonClick(view: View) {
+        if (::latestLocation.isInitialized) {
+            Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, SecondActivity::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
+        }
+    }
+    fun onNextOSMButtonClick(view: View) {
+        if (::latestLocation.isInitialized) {
+            Toast.makeText(this, "Going to the OpenStreetMaps!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, OpenStreetMap::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun checkPermissionsAndStartLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            startLocationUpdates()
+        } else {
+            requestLocationPermissions()
+        }
+    }
+
+    private fun startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+        }
+
+        // Get last known location immediately
+        val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (lastKnownLocation != null) {
+            onLocationChanged(lastKnownLocation)
+        }
+    }
+    private fun requestLocationPermissions(){
+        requestPermissionLauncher.launch(arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ))
+    }
+
+    private fun setupPermissionLauncher() {
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            // Check for location permissions
+            val granted = permissions.entries.all { it.value }
+            if (granted) {
+                // PERMISSION GRANTED
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        5000,
+                        5f,
+                        this
+                    )
+                }
+            } else {
+                // The location is updated every 5000 milliseconds (or 5 seconds) and/or if the device moves more than 5 meters,
+                // whichever happens first
+                //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
             }
         }
     }
 
-
     override fun onLocationChanged(location: Location) {
-        val latitude = location.latitude
-        val longitude = location.longitude
-        Toast.makeText(this, "Latitude: $latitude, Longitude: $longitude", Toast.LENGTH_SHORT)
-            .show()
+        latestLocation = location
+        runOnUiThread {
+            val textView: TextView = findViewById(R.id.mainTextView)
+            textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
+        }
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onProviderDisabled(provider: String) {}
-
-    fun onNextButtonClick(view: View) {
-        // This is the handler
-        Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
-
-        // go to another activity
-        val intent = Intent(this, SecondActivity::class.java)
-        startActivity(intent)
-    }
 }
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier,
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MAD_2024_AppTheme {
-        Greeting("Android")
-    }
-
-
+fun Greeting(name: String): String {
+    return "Hello ${name}!"
 }

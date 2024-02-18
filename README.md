@@ -1,3 +1,6 @@
+# MAD_2024
+Our first mobile application using Kotlin.
+=======
 # LogoGPS - The Ultimate Gymkhana Experience
 
 Welcome to **LogoGPS**, a state-of-the-art mobile application designed for enhancing gymkhana events with real-time location tracking. Our app brings an innovative approach to outdoor adventure games, ensuring a fun and interactive experience.
