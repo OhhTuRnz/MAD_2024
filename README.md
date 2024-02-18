@@ -25,7 +25,7 @@ Here are some snapshots of LogoGPS in action:
 
 ## Installation
 
-LogoGPS is available for both iOS and Android devices. You can download it from the App Store or Google Play Store.
+LogoGPS is available for Android devices. You can download it from the Google Play Store.
 
 ## Support
 
