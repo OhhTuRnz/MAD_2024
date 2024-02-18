@@ -20,7 +20,7 @@ Here are some snapshots of LogoGPS in action:
 </p>
 <p>
   <span">*LogoGPS Map Interface*</span>
-  <span style="margin-left: 220px;>*LogoGPS Main Menu*</span>
+  <span style="margin-right: 220px;>*LogoGPS Main Menu*</span>
 </p>
 
 ## Installation
