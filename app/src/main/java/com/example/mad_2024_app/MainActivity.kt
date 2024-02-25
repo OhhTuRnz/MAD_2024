@@ -1,7 +1,7 @@
 package com.example.mad_2024_app
 
+import Utils
 import android.Manifest
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,12 +10,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -23,7 +17,6 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import com.example.mad_2024_app.ui.theme.MAD_2024_AppTheme
 import java.util.UUID
 
 class MainActivity : ComponentActivity(), LocationListener {
@@ -173,6 +166,7 @@ class MainActivity : ComponentActivity(), LocationListener {
             val textView: TextView = findViewById(R.id.mainTextView)
             textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
         }
+        Utils.writeLocationToCSV(this, location)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
