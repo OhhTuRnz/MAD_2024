@@ -20,6 +20,7 @@ class Utils {
                     val fileContents = "${location.latitude},${location.longitude},${location.altitude}\n"
                     it.write(fileContents.toByteArray())
                 }
+            // Manage file exception
             } catch (e: IOException) {
                 e.printStackTrace()
             }
