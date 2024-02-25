@@ -2,10 +2,12 @@ package com.example.mad_2024_app
 
 import android.content.Intent
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import org.osmdroid.config.Configuration
@@ -39,13 +41,14 @@ class OpenStreetMap : AppCompatActivity() {
         "CITSEM"
     )
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_open_street_map)
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.");
 
         val bundle = intent.getBundleExtra("locationBundle")
-        val location: Location? = bundle?.getParcelable("location")
+        val location: Location? = bundle?.getParcelable("location", Location::class.java)
         if (location != null) {
             Log.i(
                 TAG,
@@ -95,7 +98,7 @@ class OpenStreetMap : AppCompatActivity() {
         mapView.invalidate() // Refresh the map to display the new markers
     }
 
-    fun addMarkersAndRoute(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {
+    private fun addMarkersAndRoute(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {
         if (locationsCoords.size != locationsNames.size) {
             Log.e("addMarkersAndRoute", "Locations and names lists must have the same number of items.")
             return

@@ -24,6 +24,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.example.mad_2024_app.ui.theme.MAD_2024_AppTheme
+import java.util.UUID
 
 class MainActivity : ComponentActivity(), LocationListener {
 
@@ -39,6 +40,17 @@ class MainActivity : ComponentActivity(), LocationListener {
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         val isFirstOpen = sharedPreferences.getBoolean("isFirstOpen", true)
+        val userId = sharedPreferences.getString("userId", null)
+
+        if (userId == null) {
+            // Generate a unique user ID. Here we are using a random UUID.
+            val newUserId = UUID.randomUUID().toString()
+
+            with(sharedPreferences.edit()) {
+                putString("userId", newUserId)
+                apply()
+            }
+        }
 
         if (isFirstOpen) {
             Toast.makeText(this, Greeting(name = "User"), Toast.LENGTH_SHORT).show()
@@ -69,7 +81,7 @@ class MainActivity : ComponentActivity(), LocationListener {
     }
     fun onNextOSMButtonClick(view: View) {
         if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to the OpenStreetMaps!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Going to OpenStreetMaps!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, OpenStreetMap::class.java).apply {
                 putExtra("locationBundle", Bundle().apply {
                     putParcelable("location", latestLocation)
@@ -79,6 +91,12 @@ class MainActivity : ComponentActivity(), LocationListener {
         } else {
             Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    fun onNextSettingsButtonClick(view: View){
+        Toast.makeText(this, "Going to the Settings", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, Settings::class.java)
+        startActivity(intent)
     }
 
     private fun checkPermissionsAndStartLocationUpdates() {
@@ -138,6 +156,15 @@ class MainActivity : ComponentActivity(), LocationListener {
                 //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
             }
         }
+    }
+
+    private fun retrieveUserPreferences() {
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val userId = sharedPreferences.getString("userId", null)
+        val authToken = sharedPreferences.getString("authToken", null)
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Use these values as needed in your app
     }
 
     override fun onLocationChanged(location: Location) {
