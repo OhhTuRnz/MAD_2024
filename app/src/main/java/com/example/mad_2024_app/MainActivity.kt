@@ -18,6 +18,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import java.util.UUID
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
+import java.io.File
 
 class MainActivity : ComponentActivity(), LocationListener {
 
@@ -38,11 +41,15 @@ class MainActivity : ComponentActivity(), LocationListener {
         if (userId == null) {
             // Generate a unique user ID. Here we are using a random UUID.
             val newUserId = UUID.randomUUID().toString()
+            askForUserIdentifier()
 
             with(sharedPreferences.edit()) {
                 putString("userId", newUserId)
                 apply()
             }
+        }
+        else{
+            Toast.makeText(this, "User ID: $userId", Toast.LENGTH_LONG).show()
         }
 
         if (isFirstOpen) {
@@ -160,12 +167,52 @@ class MainActivity : ComponentActivity(), LocationListener {
         // Use these values as needed in your app
     }
 
+    private fun saveUserIdentifier(userIdentifier: String) {
+        val sharedPreferences = this.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        sharedPreferences.edit().apply {
+            putString("userIdentifier", userIdentifier)
+            apply()
+        }
+    }
+    private fun getUserIdentifier(): String? {
+        val sharedPreferences = this.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("userIdentifier", null)
+    }
+
+    private fun askForUserIdentifier() {
+        val input = EditText(this)
+        AlertDialog.Builder(this)
+            .setTitle("Enter User Identifier")
+            .setIcon(R.mipmap.ic_launcher)
+            .setView(input)
+            .setPositiveButton("Save") { dialog, which ->
+                val userInput = input.text.toString()
+                if (userInput.isNotBlank()) {
+                    saveUserIdentifier(userInput)
+                    Toast.makeText(this, "User ID saved: $userInput", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "User ID cannot be blank", Toast.LENGTH_LONG).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun saveCoordinatesToFile(latitude: Double, longitude: Double) {
+        val fileName = "gps_coordinates.csv"
+        val file = File(filesDir, fileName)
+        val timestamp = System.currentTimeMillis()
+        file.appendText("$timestamp;$latitude;$longitude\n")
+    }
+
+
     override fun onLocationChanged(location: Location) {
         latestLocation = location
         runOnUiThread {
             val textView: TextView = findViewById(R.id.mainTextView)
             textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
         }
+        saveCoordinatesToFile(location.latitude, location.longitude)
         Utils.writeLocationToCSV(this, location)
     }
 
