@@ -5,4 +5,8 @@
     <string name="Hello_World">Hello World!</string>
     <string name="OpenMapsTitle">OpenStreetMaps</string>
     <string name="Settings">Settings</string>
+    <string name="title_home">Home</string>
+    <string name="title_map">Map</string>
+    <string name="title_list">Collection</string>
+    <string name="title_config">Settings</string>
 </resources>

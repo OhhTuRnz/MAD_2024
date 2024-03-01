@@ -13,6 +13,8 @@ import androidx.activity.ComponentActivity
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,8 +23,14 @@ import java.util.UUID
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import java.io.File
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : ComponentActivity(), LocationListener {
+
+
+
+class MainActivity : AppCompatActivity(), LocationListener {
 
     private lateinit var locationManager: LocationManager
     private lateinit var latestLocation: Location
@@ -47,8 +55,7 @@ class MainActivity : ComponentActivity(), LocationListener {
                 putString("userId", newUserId)
                 apply()
             }
-        }
-        else{
+        } else {
             Toast.makeText(this, "User ID: $userId", Toast.LENGTH_LONG).show()
         }
 
@@ -64,6 +71,42 @@ class MainActivity : ComponentActivity(), LocationListener {
 
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
+
+        val navView: BottomNavigationView = findViewById(R.id.nav_view)
+        navView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.navigation_map -> {
+                    if (latestLocation != null) {
+                        val intent = Intent(this, OpenStreetMap::class.java)
+                        val bundle = Bundle()
+                        bundle.putParcelable("location", latestLocation)
+                        intent.putExtra("locationBundle", bundle)
+                        startActivity(intent)
+                    } else {
+                        Log.e(TAG, "Location not set yet.")
+                    }
+                    true
+                }
+
+                R.id.navigation_list -> {
+                    val intent = Intent(this, SecondActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        // Configure Toolbar
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
     }
 
     fun onNextButtonClick(view: View) {
@@ -79,6 +122,7 @@ class MainActivity : ComponentActivity(), LocationListener {
             Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
     }
+
     fun onNextOSMButtonClick(view: View) {
         if (::latestLocation.isInitialized) {
             Toast.makeText(this, "Going to OpenStreetMaps!", Toast.LENGTH_SHORT).show()
@@ -93,15 +137,22 @@ class MainActivity : ComponentActivity(), LocationListener {
         }
     }
 
-    fun onNextSettingsButtonClick(view: View){
+    fun onNextSettingsButtonClick(view: View) {
         Toast.makeText(this, "Going to the Settings", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, Settings::class.java)
         startActivity(intent)
     }
 
     private fun checkPermissionsAndStartLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             startLocationUpdates()
         } else {
             requestLocationPermissions()
@@ -109,8 +160,15 @@ class MainActivity : ComponentActivity(), LocationListener {
     }
 
     private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
         }
 
@@ -120,11 +178,14 @@ class MainActivity : ComponentActivity(), LocationListener {
             onLocationChanged(lastKnownLocation)
         }
     }
-    private fun requestLocationPermissions(){
-        requestPermissionLauncher.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ))
+
+    private fun requestLocationPermissions() {
+        requestPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
     }
 
     private fun setupPermissionLauncher() {
@@ -174,6 +235,7 @@ class MainActivity : ComponentActivity(), LocationListener {
             apply()
         }
     }
+
     private fun getUserIdentifier(): String? {
         val sharedPreferences = this.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         return sharedPreferences.getString("userIdentifier", null)
@@ -219,7 +281,24 @@ class MainActivity : ComponentActivity(), LocationListener {
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onProviderDisabled(provider: String) {}
-}
-fun Greeting(name: String): String {
-    return "Hello ${name}!"
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, Settings::class.java))
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun Greeting(name: String): String {
+        return "Hello ${name}!"
+    }
 }
