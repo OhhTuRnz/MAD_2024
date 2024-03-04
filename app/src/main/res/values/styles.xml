@@ -37,4 +37,8 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Chip</item>
     </style>
 
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
 </resources>

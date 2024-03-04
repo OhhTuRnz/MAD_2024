@@ -21,13 +21,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import java.util.UUID
 import android.widget.EditText
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import java.io.File
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-
-
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var locationManager: LocationManager
     private lateinit var latestLocation: Location
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var toggle: ActionBarDrawerToggle
+
     private val locationPermissionCode = 2
     private val TAG = "LogoGPSMainActivity"
 
@@ -72,41 +75,24 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
 
-        val navView: BottomNavigationView = findViewById(R.id.nav_view)
-        navView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home -> {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
+        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
-                R.id.navigation_map -> {
-                    if (latestLocation != null) {
-                        val intent = Intent(this, OpenStreetMap::class.java)
-                        val bundle = Bundle()
-                        bundle.putParcelable("location", latestLocation)
-                        intent.putExtra("locationBundle", bundle)
-                        startActivity(intent)
-                    } else {
-                        Log.e(TAG, "Location not set yet.")
-                    }
-                    true
-                }
+        toggle = ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
 
-                R.id.navigation_list -> {
-                    val intent = Intent(this, SecondActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-                else -> false
+        navView.setNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.nav_item1 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
+                R.id.nav_item2 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
+                R.id.nav_item3 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
             }
+            true
         }
 
-        // Configure Toolbar
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
     }
 
     fun onNextButtonClick(view: View) {
@@ -282,7 +268,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
     override fun onProviderEnabled(provider: String) {}
     override fun onProviderDisabled(provider: String) {}
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return false
+    }
+
+    /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         return true
     }
@@ -297,6 +290,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
             else -> super.onOptionsItemSelected(item)
         }
     }
+     */
 
     fun Greeting(name: String): String {
         return "Hello ${name}!"

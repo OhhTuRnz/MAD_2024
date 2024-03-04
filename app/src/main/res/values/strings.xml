@@ -9,4 +9,6 @@
     <string name="title_map">Map</string>
     <string name="title_list">Collection</string>
     <string name="title_config">Settings</string>
+    <string name="Open">Open</string>
+    <string name="Close">Close</string>
 </resources>
