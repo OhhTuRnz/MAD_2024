@@ -10,9 +10,9 @@
 
     <ImageView
         android:id="@+id/appIconImageView"
-        android:layout_marginStart="50dp"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_marginStart="10dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:src="@drawable/donut"
         android:contentDescription="DonutLogo" />
 
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="16dp">
+        android:paddingStart="8dp">
 
         <TextView
             android:id="@+id/headerTextView"

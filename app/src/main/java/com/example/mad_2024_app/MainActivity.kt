@@ -85,12 +85,39 @@ class MainActivity : AppCompatActivity(), LocationListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         navView.setNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.nav_item1 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
-                R.id.nav_item2 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
-                R.id.nav_item3 -> Toast.makeText(applicationContext,"Prueba", Toast.LENGTH_SHORT).show()
+            when (it.itemId) {
+                R.id.nav_home -> {
+                    // Handle nav_home click (Home)
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goHome(rootView)
+                    true
+                }
+                R.id.nav_maps -> {
+                    // Handle nav_maps click (OpenStreetMaps)
+                    Toast.makeText(applicationContext, "OpenStreetMaps", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goMaps(rootView)
+                    true
+                }
+                R.id.nav_settings -> {
+                    // Handle nav_settings click (Settings)
+                    Toast.makeText(applicationContext, "Settings", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goSettings(rootView)
+                    true
+                }
+                R.id.nav_login -> {
+                    // Handle nav_login click (Login)
+                    Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.nav_profile -> {
+                    // Handle nav_profile click (Profile)
+                    Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> false
             }
-            true
         }
 
     }
@@ -272,27 +299,27 @@ class MainActivity : AppCompatActivity(), LocationListener {
         if(toggle.onOptionsItemSelected(item)) {
             return true
         }
-        return false
+        return super.onOptionsItemSelected(item)
     }
-
-    /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.toolbar_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(Intent(this, Settings::class.java))
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-     */
 
     fun Greeting(name: String): String {
         return "Hello ${name}!"
+    }
+
+    private fun goHome(view: View){
+        // go to Main
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun goMaps(view: View){
+        // go to OpenStreetMaps
+        onNextOSMButtonClick(view)
+    }
+
+    private fun goSettings(view: View){
+        // go to Settings
+        val intent = Intent(this, Settings::class.java)
+        startActivity(intent)
     }
 }
