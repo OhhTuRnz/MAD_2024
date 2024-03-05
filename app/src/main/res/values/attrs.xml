@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="mainBackgroundColor" format="reference|color" />
+    <attr name="drawerBackgroundColor" format="reference|color" />
+    <attr name="buttonColor" format="reference|color" />
 </resources>

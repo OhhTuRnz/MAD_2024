@@ -45,6 +45,8 @@
         <item name="colorSecondary">@color/accentColor</item>
         <item name="mainBackgroundColor">@color/backgroundLight</item>
         <item name="android:textColor">@color/textColorLight</item>
+        <item name="drawerBackgroundColor">@color/drawerBackgroundLight</item>
+        <item name="buttonColor">@color/buttonColorLight</item>
     </style>
 
     <!-- Base application theme for night mode -->
@@ -56,6 +58,8 @@
         <item name="colorSecondary">@color/accentDarkColor</item>
         <item name="mainBackgroundColor">@color/backgroundDark</item>
         <item name="android:textColor">@color/textColorDark</item>
+        <item name="drawerBackgroundColor">@color/drawerBackgroundDark</item>
+        <item name="buttonColor">@color/buttonColorDark</item>
     </style>
 
 </resources>
