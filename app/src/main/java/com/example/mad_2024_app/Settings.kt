@@ -32,11 +32,19 @@ class Settings : ComponentActivity(){
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+
         setContentView(R.layout.activity_settings)
 
         val switchDarkMode = findViewById<Switch>(R.id.switchDarkMode)
-
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
         // Retrieve and display user ID
         displayUserId(sharedPreferences)
@@ -49,6 +57,13 @@ class Settings : ComponentActivity(){
                 putBoolean("darkModeEnabled", isChecked)
                 apply()
             }
+            if(isChecked){
+                setTheme(R.style.AppTheme_Dark)
+            } else {
+                setTheme(R.style.AppTheme_Light)
+            }
+            val intent = Intent(this, Settings::class.java)
+            startActivity(intent)
         }
     }
 
