@@ -37,8 +37,29 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Chip</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme.Light" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- Primary branding color for the app bar -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryLightColor</item>
+        <!-- Secondary color for controls, like checkboxes and text fields -->
+        <item name="colorSecondary">@color/accentColor</item>
+        <item name="mainBackgroundColor">@color/backgroundLight</item>
+        <item name="android:textColor">@color/textColorLight</item>
+        <item name="drawerBackgroundColor">@color/drawerBackgroundLight</item>
+        <item name="buttonColor">@color/buttonColorLight</item>
+    </style>
+
+    <!-- Base application theme for night mode -->
+    <style name="AppTheme.Dark" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary branding color for the app bar -->
+        <item name="colorPrimary">@color/primaryDarkColor</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkLightColor</item>
+        <!-- Secondary color for controls, like checkboxes and text fields -->
+        <item name="colorSecondary">@color/accentDarkColor</item>
+        <item name="mainBackgroundColor">@color/backgroundDark</item>
+        <item name="android:textColor">@color/textColorDark</item>
+        <item name="drawerBackgroundColor">@color/drawerBackgroundDark</item>
+        <item name="buttonColor">@color/buttonColorDark</item>
     </style>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.example.mad_2024_app
 
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Build
@@ -44,7 +45,18 @@ class OpenStreetMap : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+
         setContentView(R.layout.activity_open_street_map)
+
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.");
 
         val bundle = intent.getBundleExtra("locationBundle")

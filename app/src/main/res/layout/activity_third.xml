@@ -14,7 +14,7 @@
     android:gravity="center"
     tools:context=".ThirdActivity"
     android:padding="16dp"
-    android:background="@color/light_gray">
+    android:background="?attr/mainBackgroundColor">
 
     <TextView
         android:id="@+id/message"
@@ -31,7 +31,7 @@
         android:layout_marginBottom="16dp"
         android:onClick="onPrevButtonClick"
         android:text="@string/button_previous"
-        android:backgroundTint="@color/purple_200"
+        android:backgroundTint="?attr/buttonColor"
         android:backgroundTintMode="src_atop"/>
     </RelativeLayout>
 <com.google.android.material.navigation.NavigationView

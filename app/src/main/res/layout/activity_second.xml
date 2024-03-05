@@ -13,7 +13,7 @@
         android:gravity="center"
         android:orientation="vertical"
         tools:context=".SecondActivity"
-        android:background="@color/light_gray">
+        android:background="?attr/mainBackgroundColor">
 
         <TextView
             android:id="@+id/message"
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_next"
-            android:backgroundTint="@color/purple_200"
+            android:backgroundTint="?attr/buttonColor"
             android:backgroundTintMode="src_atop"
             android:onClick="onNextButtonClick"
             android:layout_alignParentBottom="true"
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_previous"
-            android:backgroundTint="@color/purple_200"
+            android:backgroundTint="?attr/buttonColor"
             android:backgroundTintMode="src_atop"
             android:onClick="onPrevButtonClick"
             android:layout_alignParentBottom="true"

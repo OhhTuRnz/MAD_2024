@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?attr/mainBackgroundColor">
 
     <!-- User ID Display -->
     <TextView
@@ -35,7 +36,7 @@
         android:layout_marginEnd="20dp"
         android:onClick="onPrevButtonClick"
         android:text="@string/button_previous"
-        android:backgroundTint="@color/purple_200"
+        android:backgroundTint="?attr/buttonColor"
         android:backgroundTintMode="src_atop"/>
 
 </RelativeLayout>
