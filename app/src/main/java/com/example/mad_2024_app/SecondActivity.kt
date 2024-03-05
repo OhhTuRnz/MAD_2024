@@ -50,6 +50,18 @@ class SecondActivity : AppCompatActivity() {
             )
         }
 
+        // Assuming you're using lvCoordinates ListView
+        val listView: ListView = findViewById(R.id.lvCoordinates)
+
+        // Example data source, replace with your actual data source
+        val dataList: List<List<String>> = readFileContents() // Your method to read data
+
+        // Initialize your custom adapter
+        val adapter = CoordinatesAdapter(this, dataList)
+
+        // Set the adapter to the ListView
+        listView.adapter = adapter
+
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
@@ -113,6 +125,43 @@ class SecondActivity : AppCompatActivity() {
         // go to another activity
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+    }
+    private class CoordinatesAdapter(
+        context: Context,
+        private val coordinatesList: List<List<String>>
+    ) :
+        ArrayAdapter<List<String>>(context, R.layout.listview_item, coordinatesList) {
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: inflater.inflate(R.layout.listview_item, parent, false)
+
+            val timestampTextView: TextView = view.findViewById(R.id.tvTimestamp)
+            val latitudeTextView: TextView = view.findViewById(R.id.tvLatitude)
+            val longitudeTextView: TextView = view.findViewById(R.id.tvLongitude)
+            val item = coordinatesList[position]
+            timestampTextView.text = formatTimestamp(item[0].toLong())
+            latitudeTextView.text = formatCoordinate(item[1].toDouble())
+            longitudeTextView.text = formatCoordinate(item[2].toDouble())
+
+            view.setOnClickListener {
+                val intent = Intent(context, ThirdActivity::class.java).apply {
+                    putExtra("latitude", item[1])
+                    putExtra("longitude", item[2])
+                }
+                context.startActivity(intent)
+            }
+            return view
+        }
+
+
+        private fun formatTimestamp(timestamp: Long): String {
+            val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            return formatter.format(Date(timestamp))
+        }
+
+        private fun formatCoordinate(value: Double): String {
+            return String.format("%.6f", value)
+        }
     }
 
     private fun readFileContents(): List<List<String>> {
