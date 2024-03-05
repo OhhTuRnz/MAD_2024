@@ -21,29 +21,37 @@ class Utils {
                         it.write("Latitude,Longitude,Altitude\n".toByteArray())
                     }
                     // Append location data
-                    val fileContents = "${location.latitude},${location.longitude},${location.altitude}\n"
+                    val fileContents =
+                        "${location.latitude},${location.longitude},${location.altitude}\n"
                     it.write(fileContents.toByteArray())
                 }
-            // Manage file exception
+                // Manage file exception
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
-    }
 
-    fun askForUserIdentifier(context:Context){
-        val input = EditText(context)
-        AlertDialog.Builder(context)
-            .setTitle("Enter Your Username")
-            .setIcon(R.mipmap.ic_launcher)
-            .setView(input)
-            .setPositiveButton("Save") { dialog, which ->
-                var userInput = input.text.toString()
-                if (userInput.isBlank()) {
-                    userInput = "Banana"
+        fun saveCoordinatesToFile(latitude: Double, longitude: Double, filesDir: File) {
+            val fileName = "gps_coordinates.csv"
+            val file = File(filesDir, fileName)
+            val timestamp = System.currentTimeMillis()
+            file.appendText("$timestamp;$latitude;$longitude\n")
+        }
+
+        fun askForUserIdentifier(context: Context) {
+            val input = EditText(context)
+            AlertDialog.Builder(context)
+                .setTitle("Enter Your Username")
+                .setIcon(R.mipmap.ic_launcher)
+                .setView(input)
+                .setPositiveButton("Save") { dialog, which ->
+                    var userInput = input.text.toString()
+                    if (userInput.isBlank()) {
+                        userInput = "Banana"
+                    }
                 }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
     }
 }

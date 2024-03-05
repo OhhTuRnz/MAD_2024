@@ -3,6 +3,7 @@ package com.example.mad_2024_app
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -38,17 +39,14 @@ class SecondActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
 
-        // Apply the appropriate theme
-        if (isDarkModeEnabled) {
-            setTheme(R.style.AppTheme_Dark)
-        } else {
-            setTheme(R.style.AppTheme_Light)
-        }
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_second)
+
+        toggleDrawer()
 
         val bundle = intent.getBundleExtra("locationBundle")
         val location: Location? = bundle?.getParcelable("location", Location::class.java)
@@ -71,11 +69,24 @@ class SecondActivity : AppCompatActivity() {
 
         // Set the adapter to the ListView
         listView.adapter = adapter
+    }
 
+    private fun applyTheme(sharedPreferences: SharedPreferences){
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+    }
+
+    private fun toggleDrawer(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close)
+        toggle = ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -106,22 +117,24 @@ class SecondActivity : AppCompatActivity() {
                 R.id.nav_login -> {
                     // Handle nav_login click (Login)
                     Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goProfile(rootView)
                     true
                 }
                 R.id.nav_profile -> {
                     // Handle nav_profile click (Profile)
                     Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goProfile(rootView)
                     true
                 }
                 else -> false
             }
         }
-
     }
 
     fun onNextButtonClick(view: View) {
         // This is the handler
-        Toast.makeText(this, "Going to the third layer!", Toast.LENGTH_SHORT).show()
 
         val intent = Intent(this, ThirdActivity::class.java).apply {
             putExtra("locationBundle", Bundle().apply {
@@ -132,9 +145,6 @@ class SecondActivity : AppCompatActivity() {
     }
 
     fun onPrevButtonClick(view: View) {
-        // This is the handler
-        Toast.makeText(this, "Going to the main layer!", Toast.LENGTH_SHORT).show()
-
         // go to another activity
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
@@ -142,30 +152,21 @@ class SecondActivity : AppCompatActivity() {
     private class CoordinatesAdapter(
         context: Context,
         private val coordinatesList: List<List<String>>
-    ) :
-        ArrayAdapter<List<String>>(context, R.layout.listview_item, coordinatesList) {
-        private val inflater: LayoutInflater = LayoutInflater.from(context)
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = convertView ?: inflater.inflate(R.layout.listview_item, parent, false)
+    ) : ArrayAdapter<List<String>>(context, R.layout.listview_item, coordinatesList) {
+            private val inflater: LayoutInflater = LayoutInflater.from(context)
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = convertView ?: inflater.inflate(R.layout.listview_item, parent, false)
 
-            val timestampTextView: TextView = view.findViewById(R.id.tvTimestamp)
-            val latitudeTextView: TextView = view.findViewById(R.id.tvLatitude)
-            val longitudeTextView: TextView = view.findViewById(R.id.tvLongitude)
-            val item = coordinatesList[position]
-            timestampTextView.text = formatTimestamp(item[0].toLong())
-            latitudeTextView.text = formatCoordinate(item[1].toDouble())
-            longitudeTextView.text = formatCoordinate(item[2].toDouble())
+                val timestampTextView: TextView = view.findViewById(R.id.tvTimestamp)
+                val latitudeTextView: TextView = view.findViewById(R.id.tvLatitude)
+                val longitudeTextView: TextView = view.findViewById(R.id.tvLongitude)
+                val item = coordinatesList[position]
+                timestampTextView.text = formatTimestamp(item[0].toLong())
+                latitudeTextView.text = formatCoordinate(item[1].toDouble())
+                longitudeTextView.text = formatCoordinate(item[2].toDouble())
 
-            view.setOnClickListener {
-                val intent = Intent(context, ThirdActivity::class.java).apply {
-                    putExtra("latitude", item[1])
-                    putExtra("longitude", item[2])
-                }
-                context.startActivity(intent)
-            }
-            return view
+                return view
         }
-
 
         private fun formatTimestamp(timestamp: Long): String {
             val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -213,7 +214,6 @@ class SecondActivity : AppCompatActivity() {
     private fun goMaps(view: View){
         // go to OpenStreetMaps
         if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to OpenStreetMaps!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, OpenStreetMap::class.java).apply {
                 putExtra("locationBundle", Bundle().apply {
                     putParcelable("location", latestLocation)
@@ -228,6 +228,12 @@ class SecondActivity : AppCompatActivity() {
     private fun goSettings(view: View){
         // go to Settings
         val intent = Intent(this, Settings::class.java)
+        startActivity(intent)
+    }
+
+    private fun goProfile(view: View){
+        // go to Settings
+        val intent = Intent(this, Profile::class.java)
         startActivity(intent)
     }
 }

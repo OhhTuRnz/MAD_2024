@@ -2,6 +2,7 @@ package com.example.mad_2024_app
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -26,17 +27,14 @@ class ThirdActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
 
-        // Apply the appropriate theme
-        if (isDarkModeEnabled) {
-            setTheme(R.style.AppTheme_Dark)
-        } else {
-            setTheme(R.style.AppTheme_Light)
-        }
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_third)
+
+        toggleDrawer()
 
         val bundle = intent.getBundleExtra("locationBundle")
         val location: Location? = bundle?.getParcelable("location", Location::class.java)
@@ -47,11 +45,13 @@ class ThirdActivity : AppCompatActivity() {
                 "onCreate: Location[" + location.altitude + "][" + location.latitude + "][" + location.longitude + "]"
             )
         }
+    }
 
+    private fun toggleDrawer(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close)
+        toggle = ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -82,11 +82,15 @@ class ThirdActivity : AppCompatActivity() {
                 R.id.nav_login -> {
                     // Handle nav_login click (Login)
                     Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goProfile(rootView)
                     true
                 }
                 R.id.nav_profile -> {
                     // Handle nav_profile click (Profile)
                     Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goProfile(rootView)
                     true
                 }
                 else -> false
@@ -94,22 +98,40 @@ class ThirdActivity : AppCompatActivity() {
         }
     }
 
+    private fun applyTheme(sharedPreferences: SharedPreferences){
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+    }
+
     fun onPrevButtonClick(view: View){
-        // go to another activity
-        val intent = Intent(this, SecondActivity::class.java)
+        if (::latestLocation.isInitialized) {
+            val intent = Intent(this, SecondActivity::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun goHome(view: View){
+        // go to Main
+        val intent = Intent(this, MainActivity::class.java)
+
         startActivity(intent)
     }
 
-    private fun goHome(view: View){
-        // go to Main
-        val intent = Intent(this, MainActivity::class.java)
-        finish()
-    }
-
-    private fun goMaps(view: View){
+    fun goMaps(view: View){
         // go to OpenStreetMaps
         if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to OpenStreetMaps!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, OpenStreetMap::class.java).apply {
                 putExtra("locationBundle", Bundle().apply {
                     putParcelable("location", latestLocation)
@@ -121,7 +143,7 @@ class ThirdActivity : AppCompatActivity() {
         }
     }
 
-    private fun goSettings(view: View){
+    fun goSettings(view: View){
         // go to Settings
         val intent = Intent(this, Settings::class.java)
         startActivity(intent)
@@ -131,5 +153,11 @@ class ThirdActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun goProfile(view: View){
+        // go to Settings
+        val intent = Intent(this, Profile::class.java)
+        startActivity(intent)
     }
 }

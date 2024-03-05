@@ -13,6 +13,14 @@
         tools:context=".MainActivity"
         android:background="?attr/mainBackgroundColor">
 
+        <ImageView
+            android:id="@+id/backgroundImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="200dp"/>
+
         <Button
             android:id="@+id/mainButton"
             android:layout_width="wrap_content"
@@ -30,7 +38,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="?attr/buttonColor"
             android:backgroundTintMode="src_atop"
-            android:onClick="onNextOSMButtonClick"
+            android:onClick="goMaps"
             android:text="@string/OpenMapsTitle"
             android:layout_centerHorizontal="true"
             android:drawableStart="@drawable/map"
@@ -47,7 +55,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="?attr/buttonColor"
             android:backgroundTintMode="src_atop"
-            android:onClick="onNextSettingsButtonClick"
+            android:onClick="goSettings"
             android:text="@string/Settings"
             android:layout_centerHorizontal="true"
             android:drawableStart="@drawable/settings"

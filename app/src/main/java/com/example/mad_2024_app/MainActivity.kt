@@ -1,9 +1,11 @@
 package com.example.mad_2024_app
 
 import Utils
+import Utils.Companion.saveCoordinatesToFile
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import java.util.UUID
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import java.io.File
@@ -28,6 +31,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 
 
@@ -43,19 +47,43 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
 
-        // Apply the appropriate theme
-        if (isDarkModeEnabled) {
-            setTheme(R.style.AppTheme_Dark)
-        } else {
-            setTheme(R.style.AppTheme_Light)
-        }
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_main)
 
-        val isFirstOpen = sharedPreferences.getBoolean("isFirstOpen", true)
+        toggleDrawer()
+
+        createUUID(sharedPreferences)
+
+        val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
+        val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
+        Glide.with(this).load(gifUrl).into(backgroundImageView)
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        setupPermissionLauncher()
+        checkPermissionsAndStartLocationUpdates()
+
+        Log.d(TAG, "onCreate: Main activity is being created")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Toast.makeText(this, "prueba", Toast.LENGTH_SHORT).show()
+        Log.d(TAG, "OnDestroy: MAIN DESTROYED")
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        // Reset isFirstOpen to true when the app is closed or sent to the background
+        with(sharedPreferences.edit()) {
+            putBoolean("isFirstOpen", true)
+            apply()
+        }
+    }
+
+    private fun createUUID(sharedPreferences : SharedPreferences){
         val userId = sharedPreferences.getString("userId", null)
 
         if (userId == null) {
@@ -66,23 +94,49 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 putString("userId", newUserId)
                 apply()
             }
+        }
+    }
+
+    private fun applyTheme(sharedPreferences: SharedPreferences){
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
         } else {
-            Toast.makeText(this, "User ID: $userId", Toast.LENGTH_LONG).show()
+            setTheme(R.style.AppTheme_Light)
         }
-
-        if (isFirstOpen) {
-            Toast.makeText(this, Greeting(name = "User"), Toast.LENGTH_SHORT).show()
-            // Set isFirstOpen to false
-            sharedPreferences.edit().putBoolean("isFirstOpen", false).apply()
+    }
+    fun onNextButtonClick(view: View) {
+        if (::latestLocation.isInitialized) {
+            val intent = Intent(this, SecondActivity::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
+    }
 
-        Log.d(TAG, "onCreate: Main activity is being created")
+    private fun checkPermissionsAndStartLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            startLocationUpdates()
+        } else {
+            requestLocationPermissions()
+        }
+    }
 
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        setupPermissionLauncher()
-        checkPermissionsAndStartLocationUpdates()
-
+    private fun toggleDrawer(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
@@ -122,64 +176,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 R.id.nav_profile -> {
                     // Handle nav_profile click (Profile)
                     Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goProfile(rootView)
                     true
                 }
                 else -> false
             }
         }
-
     }
-
-    fun onNextButtonClick(view: View) {
-        if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to the second layer!", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, SecondActivity::class.java).apply {
-                putExtra("locationBundle", Bundle().apply {
-                    putParcelable("location", latestLocation)
-                })
-            }
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun onNextOSMButtonClick(view: View) {
-        if (::latestLocation.isInitialized) {
-            Toast.makeText(this, "Going to OpenStreetMaps!", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, OpenStreetMap::class.java).apply {
-                putExtra("locationBundle", Bundle().apply {
-                    putParcelable("location", latestLocation)
-                })
-            }
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun onNextSettingsButtonClick(view: View) {
-        Toast.makeText(this, "Going to the Settings", Toast.LENGTH_SHORT).show()
-        val intent = Intent(this, Settings::class.java)
-        startActivity(intent)
-    }
-
-    private fun checkPermissionsAndStartLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            startLocationUpdates()
-        } else {
-            requestLocationPermissions()
-        }
-    }
-
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -240,35 +244,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun retrieveUserPreferences() {
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getString("userId", null)
-        val authToken = sharedPreferences.getString("authToken", null)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
-
-        // Use these values as needed in your app
-    }
-
-    private fun saveUserIdentifier(userIdentifier: String) {
-        val sharedPreferences = this.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        sharedPreferences.edit().apply {
-            putString("userIdentifier", userIdentifier)
-            apply()
-        }
-    }
-
-    private fun getUserIdentifier(): String? {
-        val sharedPreferences = this.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("userIdentifier", null)
-    }
-
-    private fun saveCoordinatesToFile(latitude: Double, longitude: Double) {
-        val fileName = "gps_coordinates.csv"
-        val file = File(filesDir, fileName)
-        val timestamp = System.currentTimeMillis()
-        file.appendText("$timestamp;$latitude;$longitude\n")
-    }
-
 
     override fun onLocationChanged(location: Location) {
         latestLocation = location
@@ -276,7 +251,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
             val textView: TextView = findViewById(R.id.mainTextView)
             textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
         }
-        saveCoordinatesToFile(location.latitude, location.longitude)
+        saveCoordinatesToFile(location.latitude, location.longitude, filesDir)
         Utils.writeLocationToCSV(this, location)
     }
 
@@ -301,13 +276,29 @@ class MainActivity : AppCompatActivity(), LocationListener {
         startActivity(intent)
     }
 
-    private fun goMaps(view: View){
+    fun goMaps(view: View){
         // go to OpenStreetMaps
-        onNextOSMButtonClick(view)
+        if (::latestLocation.isInitialized) {
+            val intent = Intent(this, OpenStreetMap::class.java).apply {
+                putExtra("locationBundle", Bundle().apply {
+                    putParcelable("location", latestLocation)
+                })
+            }
+            startActivity(intent)
+        } else {
+            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun goSettings(view: View){
+    fun goSettings(view: View){
         // go to Settings
-        onNextSettingsButtonClick(view)
+        val intent = Intent(this, Settings::class.java)
+        startActivity(intent)
+    }
+
+    private fun goProfile(view: View){
+        // go to Settings
+        val intent = Intent(this, Profile::class.java)
+        startActivity(intent)
     }
 }

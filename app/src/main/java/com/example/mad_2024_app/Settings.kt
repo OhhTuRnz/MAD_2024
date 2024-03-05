@@ -32,15 +32,10 @@ class Settings : ComponentActivity(){
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
 
-        // Apply the appropriate theme
-        if (isDarkModeEnabled) {
-            setTheme(R.style.AppTheme_Dark)
-        } else {
-            setTheme(R.style.AppTheme_Light)
-        }
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_settings)
 
@@ -67,17 +62,25 @@ class Settings : ComponentActivity(){
         }
     }
 
+    private fun applyTheme(sharedPreferences: SharedPreferences){
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+    }
+
     private fun displayUserId(sharedPreferences: SharedPreferences) {
         val userId = sharedPreferences.getString("userId", "Not Set")
         val tvUserId: TextView = findViewById(R.id.tvUserId)
         tvUserId.text = "User ID: $userId"
     }
     fun onPrevButtonClick(view: View){
-        // This is the handler
-        Toast.makeText(this, "Going to the main layer!", Toast.LENGTH_SHORT).show()
-
-        // go to another activity
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+            // go to another activity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
     }
 }

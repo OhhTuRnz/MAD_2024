@@ -1,7 +1,9 @@
 package com.example.mad_2024_app
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -9,8 +11,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -21,6 +26,9 @@ import org.osmdroid.views.overlay.Polyline
 class OpenStreetMap : AppCompatActivity() {
     private val TAG = "LogoGPSOpenStreetMapActivity"
     private lateinit var map: MapView
+    private lateinit var latestLocation:Location
+    private lateinit var toggle: ActionBarDrawerToggle
+
     val gymkhanaCoords = listOf(
         GeoPoint(40.38779608214728, -3.627687914352839), // Tennis
         GeoPoint(40.38788595319803, -3.627048250272035), // Futsal outdoors
@@ -42,22 +50,18 @@ class OpenStreetMap : AppCompatActivity() {
         "CITSEM"
     )
 
+    @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
 
-        // Apply the appropriate theme
-        if (isDarkModeEnabled) {
-            setTheme(R.style.AppTheme_Dark)
-        } else {
-            setTheme(R.style.AppTheme_Light)
-        }
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_open_street_map)
 
-        Log.d(TAG, "onCreate: The activity OpenMaps is being created.");
+        Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
 
         val bundle = intent.getBundleExtra("locationBundle")
         val location: Location? = bundle?.getParcelable("location", Location::class.java)
@@ -80,9 +84,19 @@ class OpenStreetMap : AppCompatActivity() {
         };
     }
 
+    private fun applyTheme(sharedPreferences: SharedPreferences){
+        val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
+
+        // Apply the appropriate theme
+        if (isDarkModeEnabled) {
+            setTheme(R.style.AppTheme_Dark)
+        } else {
+            setTheme(R.style.AppTheme_Light)
+        }
+    }
+
     fun onPrevButtonClick(view: View){
         // This is the handler
-        Toast.makeText(this, "Going to the main layer!", Toast.LENGTH_SHORT).show()
 
         // go to another activity
         val intent = Intent(this, MainActivity::class.java)
