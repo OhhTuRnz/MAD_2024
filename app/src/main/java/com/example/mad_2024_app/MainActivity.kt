@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
         if (userId == null) {
             // Generate a unique user ID. Here we are using a random UUID.
             val newUserId = UUID.randomUUID().toString()
-            askForUserIdentifier()
 
             with(sharedPreferences.edit()) {
                 putString("userId", newUserId)
@@ -263,25 +262,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
         return sharedPreferences.getString("userIdentifier", null)
     }
 
-    private fun askForUserIdentifier() {
-        val input = EditText(this)
-        AlertDialog.Builder(this)
-            .setTitle("Enter User Identifier")
-            .setIcon(R.mipmap.ic_launcher)
-            .setView(input)
-            .setPositiveButton("Save") { dialog, which ->
-                val userInput = input.text.toString()
-                if (userInput.isNotBlank()) {
-                    saveUserIdentifier(userInput)
-                    Toast.makeText(this, "User ID saved: $userInput", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "User ID cannot be blank", Toast.LENGTH_LONG).show()
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
     private fun saveCoordinatesToFile(latitude: Double, longitude: Double) {
         val fileName = "gps_coordinates.csv"
         val file = File(filesDir, fileName)
@@ -328,7 +308,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     private fun goSettings(view: View){
         // go to Settings
-        val intent = Intent(this, Settings::class.java)
-        startActivity(intent)
+        onNextSettingsButtonClick(view)
     }
 }

@@ -123,8 +123,11 @@ class SecondActivity : AppCompatActivity() {
         // This is the handler
         Toast.makeText(this, "Going to the third layer!", Toast.LENGTH_SHORT).show()
 
-        // go to another activity
-        val intent = Intent(this, ThirdActivity::class.java)
+        val intent = Intent(this, ThirdActivity::class.java).apply {
+            putExtra("locationBundle", Bundle().apply {
+                putParcelable("location", latestLocation)
+            })
+        }
         startActivity(intent)
     }
 

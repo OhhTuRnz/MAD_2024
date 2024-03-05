@@ -103,7 +103,7 @@ class ThirdActivity : AppCompatActivity() {
     private fun goHome(view: View){
         // go to Main
         val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
+        finish()
     }
 
     private fun goMaps(view: View){
