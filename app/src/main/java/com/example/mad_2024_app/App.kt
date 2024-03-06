@@ -20,7 +20,7 @@ class App : Application() {
                 // Display greeting toast when the first activity is created
                 if (activityCount == 1) {
                     val sharedPreferences = activity.getSharedPreferences("ProfilePreferences", Context.MODE_PRIVATE)
-                    val username = sharedPreferences.getString("username", "")
+                    var username = sharedPreferences.getString("username", "User")
                     Toast.makeText(activity, "Hello, $username!", Toast.LENGTH_SHORT).show()
                 }
             }
