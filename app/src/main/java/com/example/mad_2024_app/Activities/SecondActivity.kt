@@ -1,4 +1,4 @@
-package com.example.mad_2024_app
+package com.example.mad_2024_app.Activities
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import java.io.IOException
 import android.widget.ArrayAdapter
@@ -22,7 +21,7 @@ import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.mad_2024_app.R
 import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -86,7 +85,7 @@ class SecondActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close)
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 

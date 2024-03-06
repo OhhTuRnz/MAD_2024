@@ -20,7 +20,7 @@
         android:theme="@style/Theme.MAD_2024_App"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
             <intent-filter>
@@ -29,27 +29,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SecondActivity"
+            android:name=".Activities.SecondActivity"
             android:exported="true"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar">
         </activity>
         <activity
-            android:name=".ThirdActivity"
+            android:name=".Activities.ThirdActivity"
             android:exported="true"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar">
         </activity>
         <activity
-            android:name=".OpenStreetMap"
+            android:name=".Activities.OpenStreetMap"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
         <activity
-            android:name=".Settings"
+            android:name=".Activities.Settings"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
         <activity
-            android:name=".Profile"
+            android:name=".Activities.Profile"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>

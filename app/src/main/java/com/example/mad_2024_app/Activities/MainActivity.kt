@@ -1,4 +1,4 @@
-package com.example.mad_2024_app
+package com.example.mad_2024_app.Activities
 
 import Utils
 import Utils.Companion.saveCoordinatesToFile
@@ -11,27 +11,21 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import java.util.UUID
-import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
-import java.io.File
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
+import com.example.mad_2024_app.R
 import com.google.android.material.navigation.NavigationView
 
 
@@ -140,7 +134,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout,R.string.Open, R.string.Close)
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Close)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 

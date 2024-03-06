@@ -1,6 +1,5 @@
-package com.example.mad_2024_app
+package com.example.mad_2024_app.Activities
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -14,9 +13,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
 import com.example.mad_2024_app.R
-import com.google.android.material.navigation.NavigationView
 
 class Profile : AppCompatActivity() {
 
