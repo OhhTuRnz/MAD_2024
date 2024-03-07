@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
 
@@ -36,7 +37,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var toggle: ActionBarDrawerToggle
 
-    private val locationPermissionCode = 2
     private val TAG = "LogoGPSMainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setContentView(R.layout.activity_main)
 
-        toggleDrawer()
+        setupDrawer()
+
+        setupBottomNav()
 
         createUUID(sharedPreferences)
 
@@ -130,7 +132,31 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun toggleDrawer(){
+    private fun setupBottomNav() {
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+
+        bottomNav.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_favorites -> {
+                    // Handle favorites action
+                    true
+                }
+
+                R.id.nav_maps -> {
+                    // Handle maps action
+                    true
+                }
+
+                R.id.nav_donuts -> {
+                    // Handle nearby donuts action
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+    private fun setupDrawer(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view_drawer)
 
