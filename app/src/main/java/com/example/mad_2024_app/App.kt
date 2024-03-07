@@ -4,13 +4,18 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 
 class App : Application() {
     private var activityCount = 0
+    private val TAG = "AppActivity"
 
     override fun onCreate() {
         super.onCreate()
+
+        val database = AppDatabase.getDatabase(this)
+        Log.d(TAG, "onCreate: Database instance retrieved")
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

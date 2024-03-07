@@ -15,7 +15,10 @@ interface FavoriteShopsDAO {
     @Delete
     fun removeFavoriteShop(favoriteShop: FavoriteShops)
 
-    @Query("SELECT * FROM Shop INNER JOIN FavoriteShops ON Shop.id = FavoriteShops.shopId WHERE FavoriteShops.userId = :userId")
+    @Query("DELETE FROM FavoriteShops WHERE userId = :userId AND shopId = :shopId")
+    fun removeFavoriteShopById(userId: Int, shopId: Int)
+
+    @Query("SELECT * FROM Shop INNER JOIN FavoriteShops ON Shop.shopId = FavoriteShops.shopId WHERE FavoriteShops.userId = :userId")
     fun getFavoriteShopsByUser(userId: Int): List<Shop>
 
     // Other database operations as needed

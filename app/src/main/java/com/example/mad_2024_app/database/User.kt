@@ -5,11 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class User(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val userId: Int = 0,
     val username: String,
     val email: String,
-    val iconPath: String, // This could be a path or a resource identifier
-    val homeLatitude : Double,
-    val homeLongitude : Double
+    val iconPath: String?, // This could be a path or a resource identifier,
+    val uuid: String,
+    val homeLatitude : Double? = null,
+    val homeLongitude : Double? = null
 )
 

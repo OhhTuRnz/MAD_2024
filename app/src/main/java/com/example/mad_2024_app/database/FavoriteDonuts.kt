@@ -8,10 +8,9 @@ import androidx.room.PrimaryKey
     primaryKeys = ["donutId", "userId"],
     foreignKeys = [
         ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["userId"]),
-        ForeignKey(entity = Shop::class, parentColumns = ["shopId"], childColumns = ["shopId"])
+        ForeignKey(entity = Donut::class, parentColumns = ["donutId"], childColumns = ["donutId"])
     ])
 data class FavoriteDonuts (
-    @PrimaryKey(autoGenerate = true) val id: Int,
     val donutId: Int,
     val userId: Int
 )

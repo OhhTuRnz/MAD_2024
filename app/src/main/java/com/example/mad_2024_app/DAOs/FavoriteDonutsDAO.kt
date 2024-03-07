@@ -15,7 +15,10 @@ interface FavoriteDonutsDAO {
     @Delete
     fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts)
 
-    @Query("SELECT * FROM Donut INNER JOIN FavoriteDonuts ON Donut.id = FavoriteDonuts.donutId WHERE FavoriteDonuts.userId = :userId")
+    @Query("DELETE FROM FavoriteDonuts WHERE userId = :userId AND donutId = :donutId")
+    fun removeFavoriteDonutById(userId: Int, donutId: Int)
+
+    @Query("SELECT * FROM Donut INNER JOIN FavoriteDonuts ON Donut.donutId = FavoriteDonuts.donutId WHERE FavoriteDonuts.userId = :userId")
     fun getFavoriteDonutsByUser(userId: Int): List<Donut>
 
     // Other database operations as needed

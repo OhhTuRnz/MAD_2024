@@ -6,15 +6,15 @@ import androidx.room.PrimaryKey
 
 @Entity(foreignKeys = [
     ForeignKey(entity = Coordinate::class,
-        parentColumns = ["id"],
+        parentColumns = ["coordinateId"],
         childColumns = ["location"]),
     ForeignKey(entity = Address::class,
-        parentColumns = ["id"],
-        childColumns = ["addressId"])])
+        parentColumns = ["addressId"],
+        childColumns = ["address"])])
 data class Shop (
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey(autoGenerate = true) val shopId: Int = 0,
     val name : String,
     val description : String,
-    val addressId: String,
-    val location : Int
+    val address: Int? = null,
+    val location : Int? = null
 )
