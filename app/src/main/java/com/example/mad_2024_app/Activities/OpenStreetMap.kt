@@ -35,7 +35,10 @@ class OpenStreetMap : AppCompatActivity() {
         GeoPoint(40.38956358584258, -3.629046081389352), // Teleco
         GeoPoint(40.38992125672989, -3.6281366497769714), // ETSISI
         GeoPoint(40.39037466191718, -3.6270256763598447), // Library
-        GeoPoint(40.389855884803005, -3.626782180787362) // CITSEM
+        GeoPoint(40.389855884803005, -3.626782180787362), // CITSEM
+        GeoPoint(40.37192552382719, -3.5917083345440353), //La Gavia DUNKIN
+        GeoPoint(40.395484086123915, -3.687844694066538), // Bite Me Cafe Arganzuela
+        GeoPoint(40.3926706041883, -3.7076844647927683), // DUNKIN Plaza Rio
     )
     val gymkhanaNames = listOf(
         "Tennis",
@@ -45,7 +48,10 @@ class OpenStreetMap : AppCompatActivity() {
         "Telecommunications school",
         "ETSISI",
         "Library",
-        "CITSEM"
+        "CITSEM",
+        "Gavia",
+        "Arganzuela",
+        "Plaza Rio"
     )
 
     @SuppressLint("MissingInflatedId")
@@ -116,7 +122,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.position = location
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             marker.title = "Marker at ${locationsNames.get(locationsCoords.indexOf(location))} ${location.latitude}, ${location.longitude}"
-            marker.icon = ContextCompat.getDrawable(this, R.drawable.ic_m3_chip_checked_circle)
+            marker.icon = ContextCompat.getDrawable(this, R.mipmap.ic_marker_foreground)
             mapView.overlays.add(marker)
         }
         mapView.invalidate() // Refresh the map to display the new markers
@@ -137,7 +143,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             val locationIndex = locationsCoords.indexOf(location)
             marker.title = "Marker at ${locationsNames[locationIndex]} ${location.latitude}, ${location.longitude}"
-            marker.icon = ContextCompat.getDrawable(this, org.osmdroid.library.R.drawable.ic_menu_compass)
+            marker.icon = ContextCompat.getDrawable(this, R.mipmap.ic_marker_foreground)
             mapView.overlays.add(marker)
         }
         mapView.invalidate()
