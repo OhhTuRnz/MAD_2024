@@ -11,7 +11,7 @@
         android:id="@+id/profile_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/donut_2"
+        android:src="@drawable/donut_icon_1"
         android:scaleType="centerCrop"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"/>
