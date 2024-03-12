@@ -2,9 +2,18 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
+    id ("com.google.gms.google-services")
 }
 
 android {
+    signingConfigs {
+        create("newdebugkey") {
+            storeFile = file("C:\\Users\\estudiante\\.android\\debug.keystore")
+            storePassword = "android"
+            keyAlias = "android"
+            keyPassword = "android"
+        }
+    }
     namespace = "com.example.mad_2024_app"
     compileSdk = 34
 
@@ -19,6 +28,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        signingConfig = signingConfigs.getByName("newdebugkey")
     }
 
     buildTypes {
@@ -40,11 +50,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
+
 }
 
 dependencies {
@@ -86,4 +92,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation(kotlin("script-runtime"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.firebaseui:firebase-ui-auth:8.0.1")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
 }

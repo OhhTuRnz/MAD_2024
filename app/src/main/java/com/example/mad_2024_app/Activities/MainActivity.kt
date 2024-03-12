@@ -28,6 +28,10 @@ import com.bumptech.glide.Glide
 import com.example.mad_2024_app.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.IdpResponse
+import com.google.firebase.auth.FirebaseAuth
+
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
