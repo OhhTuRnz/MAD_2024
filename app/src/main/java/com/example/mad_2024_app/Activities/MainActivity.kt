@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setupBottomNav()
 
-        createUUID(sharedPreferences)
+        setIfNotExistingUUID(sharedPreferences)
 
         val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
         val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
@@ -79,10 +79,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun createUUID(sharedPreferences : SharedPreferences){
+    private fun setIfNotExistingUUID(sharedPreferences : SharedPreferences){
         val userId = sharedPreferences.getString("userId", null)
 
         if (userId == null) {
+
             // Generate a unique user ID. Here we are using a random UUID.
             val newUserId = UUID.randomUUID().toString()
 

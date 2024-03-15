@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,10 +13,13 @@ interface UserDAO {
     fun insert(user: User)
 
     @Query("SELECT * FROM User")
-    fun getAllUsers(): List<User>
+    fun getAllUsers(): LiveData<List<User>>
 
     @Query("SELECT * FROM User WHERE userId = :userId")
     fun getUserById(userId: Int): User
+
+    @Query("SELECT * FROM User WHERE uuid = :userUUID")
+    fun getUserByUUID(userUUID: String)
 
     @Delete
     fun delete(user: User)

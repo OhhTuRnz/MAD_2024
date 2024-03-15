@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,7 +13,7 @@ interface DonutDAO {
     fun insert(donut: Donut)
 
     @Query("SELECT * FROM Donut")
-    fun getAllDonuts(): List<Donut>
+    fun getAllDonuts(): LiveData<List<Donut>>
 
     @Query("SELECT * FROM Donut WHERE donutId = :donutId")
     fun getDonutById(donutId: Int): Donut

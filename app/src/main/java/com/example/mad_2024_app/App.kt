@@ -6,6 +6,10 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.example.mad_2024_app.DAOs.UserDAO
+import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.UserRepository
+import com.example.mad_2024_app.workers.ClearCacheWorker
 
 class App : Application() {
     private var activityCount = 0
@@ -16,6 +20,17 @@ class App : Application() {
 
         val database = AppDatabase.getDatabase(this)
         Log.d(TAG, "onCreate: Database instance retrieved")
+
+        // Instantiate DAOs
+        val userDao = database.userDao()
+        val shopDao = database.shopDao()
+
+        // Instantiate Repos
+        val userRepo = UserRepository(userDao)
+        val shopRepo = ShopRepository(shopDao)
+
+        ClearCacheWorker.scheduleCacheClearing(this, userRepo)
+        ClearCacheWorker.scheduleCacheClearing(this, shopRepo)
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -36,16 +51,7 @@ class App : Application() {
 
             override fun onActivityPaused(activity: Activity) {}
 
-            override fun onActivityStopped(activity: Activity) {
-                // Decrement the activity count when an activity is stopped
-                activityCount--
-                // If no activity is active, the app is going to background
-                if (activityCount == 0) {
-                    // Set isFirstRun to false when app goes to background
-                    val sharedPreferences = activity.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().putBoolean("isFirstRun", false).apply()
-                }
-            }
+            override fun onActivityStopped(activity: Activity) {}
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 

@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,7 +13,7 @@ interface CoordinateDAO {
     fun insert(coordinate: Coordinate)
 
     @Query("SELECT * FROM Coordinate")
-    fun getAllCoordinates(): List<Coordinate>
+    fun getAllCoordinates(): LiveData<List<Coordinate>>
 
     @Query("SELECT * FROM Coordinate WHERE coordinateId = :coordinateId")
     fun getCoordinateById(coordinateId: Int): Coordinate

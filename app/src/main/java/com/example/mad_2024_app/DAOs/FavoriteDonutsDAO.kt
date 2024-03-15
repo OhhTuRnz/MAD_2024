@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query

@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,7 +13,7 @@ interface AddressDAO {
     fun insert(address: Address)
 
     @Query("SELECT * FROM Address")
-    fun getAllAddresses(): List<Address>
+    fun getAllAddresses(): LiveData<List<Address>>
 
     @Query("SELECT * FROM Address WHERE addressId = :addressId")
     fun getAddressById(addressId: Int): Address
