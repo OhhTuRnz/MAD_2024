@@ -27,12 +27,11 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
-import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.UserRepository
-import com.example.mad_2024_app.view_models.UserViewModelFactory
-import com.example.mad_2024_app.viewmodels.UserViewModel
+import com.example.mad_2024_app.view_models.UserViewModel
+import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +59,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         applyTheme(sharedPreferences)
 
-        userRepo = dbUtils.getUserRepository(appContext)
+        userRepo = DbUtils.getUserRepository(appContext)
+        val factory = ViewModelFactory(userRepo)
+        viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 
         setContentView(R.layout.activity_main)
 
@@ -101,34 +102,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val userUUID = sharedPreferences.getString("userId", null)
 
         userUUID?.let { uuid ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val user = userRepo.getUserByUUID(uuid) // Asynchronously fetch user by UUID
-
-                // Handle the result (user) accordingly
-                if (user == null) {
-                    // User does not exist, perform insertion
-                    Log.d(TAG, "CheckExistingUser: Creating user with uuid: $uuid")
-                    userRepo.insert(User(uuid = uuid))
-                } else {
-                    // User exists, handle accordingly
-                    Log.d(TAG, "CheckExistingUser: User exists, uuid: $uuid")
-                }
-            }
-        }
-    }
-
-    private fun setIfNotExistingUUID(sharedPreferences : SharedPreferences){
-        val userId = sharedPreferences.getString("userId", null)
-
-        if (userId == null) {
-
-            // Generate a unique user ID. Here we are using a random UUID.
-            val newUserId = UUID.randomUUID().toString()
-
-            with(sharedPreferences.edit()) {
-                putString("userId", newUserId)
-                apply()
-            }
+            viewModel.checkAndStoreUser(uuid, this)
         }
     }
 

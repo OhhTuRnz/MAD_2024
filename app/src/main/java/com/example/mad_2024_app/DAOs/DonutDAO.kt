@@ -5,12 +5,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Donut
 
 @Dao
 interface DonutDAO {
-    @Insert
-    fun insert(donut: Donut)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(donut: Donut) : Long
 
     @Query("SELECT * FROM Donut")
     fun getAllDonuts(): LiveData<List<Donut>>

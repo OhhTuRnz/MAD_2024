@@ -5,13 +5,14 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Donut
 import com.example.mad_2024_app.database.FavoriteDonuts
 
 @Dao
 interface FavoriteDonutsDAO {
-    @Insert
-    fun addFavoriteDonut(favoriteDonut: FavoriteDonuts)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun addFavoriteDonut(favoriteDonut: FavoriteDonuts) : Long
 
     @Delete
     fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts)

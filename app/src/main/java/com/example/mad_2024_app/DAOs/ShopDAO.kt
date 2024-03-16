@@ -5,13 +5,14 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
 
 @Dao
 interface ShopDAO {
-    @Insert
-    fun insert(shop: Shop)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(shop: Shop) : Long
 
     @Query("SELECT * FROM Shop")
     fun getAllShops(): LiveData<List<Shop>>

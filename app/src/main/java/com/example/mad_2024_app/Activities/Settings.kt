@@ -12,15 +12,10 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
-import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.R
-import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.UserRepository
-import com.example.mad_2024_app.view_models.UserViewModelFactory
-import com.example.mad_2024_app.viewmodels.UserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.mad_2024_app.view_models.ViewModelFactory
+import com.example.mad_2024_app.view_models.UserViewModel
 
 class Settings : ComponentActivity(){
 
@@ -48,8 +43,8 @@ class Settings : ComponentActivity(){
 
         // Initialize ViewModel with ViewModelFactory
         val appContext = application as App
-        userRepo = dbUtils.getUserRepository(appContext)
-        val factory = UserViewModelFactory(userRepo)
+        userRepo = DbUtils.getUserRepository(appContext)
+        val factory = ViewModelFactory(userRepo)
         viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 
         fetchAndDisplayUserData(sharedPreferences)
@@ -75,19 +70,19 @@ class Settings : ComponentActivity(){
     private fun fetchAndDisplayUserData(sharedPreferences: SharedPreferences) {
         val userUUID = sharedPreferences.getString("userId", null)
         userUUID?.let { uuid ->
-            viewModel.getUserByUUID(uuid)
+            viewModel.getUserByUUID(uuid) // This is non-suspending and returns LiveData
         }
 
         // Observe the LiveData from ViewModel
         viewModel.user.observe(this) { user ->
             user?.let {
                 // Update TextView with user UUID
-                tvUserId.text = "User ID: ${it.uuid}"
+                tvUserId.text = "${user.uuid}"
             } ?: run {
                 // Handle case where user is null
                 Log.d(TAG, "User missing or not found")
                 // Optionally, update TextView to indicate user not found
-                tvUserId.text = "User not found"
+                tvUserId.text = "$userUUID"
             }
         }
     }
@@ -109,27 +104,6 @@ class Settings : ComponentActivity(){
         tvUserId.text = "User ID: $userId"
     }
 
-    private fun displayUserIdDb(sharedPreferences: SharedPreferences, database: AppDatabase, userRepo: UserRepository){
-        val userUUID = sharedPreferences.getString("userId", null)
-        val tvUserId: TextView = findViewById(R.id.tvUserId)
-
-
-        userUUID?.let { uuid ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val user = userRepo.getUserByUUID(uuid) // Asynchronously fetch user by UUID
-
-                // Handle the result (user) accordingly
-                if (user == null) {
-                    // User does not exist, perform insertion
-                    Log.d(TAG, "CheckExistingUser: User missing: $uuid")
-                } else {
-                    // User exists, handle accordingly
-                    Log.d(TAG, "CheckExistingUser: User exists, uuid: $uuid")
-                    tvUserId.text = "User ID: ${user.uuid}"
-                }
-            }
-        }
-    }
     fun onPrevButtonClick(view: View){
             // go to another activity
             val intent = Intent(this, MainActivity::class.java)

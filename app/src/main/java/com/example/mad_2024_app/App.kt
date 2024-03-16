@@ -6,8 +6,16 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import java.util.concurrent.TimeUnit
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class App : Application() {
     private var activityCount = 0
@@ -19,19 +27,30 @@ class App : Application() {
     lateinit var shopRepo : ShopRepository
         private set
 
+    val cache: Cache<String, Any> by lazy {
+        CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build()
+    }
     override fun onCreate() {
         super.onCreate()
 
         database = AppDatabase.getDatabase(this)
         Log.d(TAG, "onCreate: Database instance retrieved")
 
+        // Launch a coroutine in the IO context to populate the database
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.populateDatabase(this@App)
+        }
+
         // Instantiate DAOs
         val userDao = database.userDao()
         val shopDao = database.shopDao()
 
         // Instantiate Repos
-        userRepo = UserRepository(userDao)
-        shopRepo = ShopRepository(shopDao)
+        userRepo = UserRepository(userDao, cache)
+        shopRepo = ShopRepository(shopDao, cache)
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

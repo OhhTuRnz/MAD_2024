@@ -5,12 +5,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.User
 
 @Dao
 interface UserDAO {
-    @Insert
-    fun insert(user: User)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(user: User) : Long
 
     @Query("SELECT * FROM User")
     fun getAllUsers(): LiveData<List<User>>

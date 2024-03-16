@@ -4,12 +4,13 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.ShopVisitHistory
 
 @Dao
 interface ShopVisitHistoryDAO {
-    @Insert
-    fun insertVisitHistory(visitHistory: ShopVisitHistory)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertVisitHistory(visitHistory: ShopVisitHistory) : Long
 
     @Query("SELECT * FROM ShopVisitHistory WHERE visitorId = :userId ORDER BY timestamp DESC")
     fun getVisitHistoryByUser(userId: Int): List<ShopVisitHistory>

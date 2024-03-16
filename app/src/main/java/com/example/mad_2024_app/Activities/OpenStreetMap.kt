@@ -35,7 +35,8 @@ class OpenStreetMap : AppCompatActivity() {
         GeoPoint(40.38956358584258, -3.629046081389352), // Teleco
         GeoPoint(40.38992125672989, -3.6281366497769714), // ETSISI
         GeoPoint(40.39037466191718, -3.6270256763598447), // Library
-        GeoPoint(40.389855884803005, -3.626782180787362) // CITSEM
+        GeoPoint(40.389855884803005, -3.626782180787362), // CITSEM
+        GeoPoint(40.5103921,-3.69627951671)
     )
     val gymkhanaNames = listOf(
         "Tennis",
@@ -45,7 +46,8 @@ class OpenStreetMap : AppCompatActivity() {
         "Telecommunications school",
         "ETSISI",
         "Library",
-        "CITSEM"
+        "CITSEM",
+        "Donut_shop_test"
     )
 
     @SuppressLint("MissingInflatedId")
@@ -76,9 +78,9 @@ class OpenStreetMap : AppCompatActivity() {
             val startPoint = GeoPoint(location.latitude, location.longitude)
             //val startPoint = GeoPoint(40.416775, -3.703790) in case you want to test it mannualy
             map.controller.setCenter(startPoint)
-            addMarker(startPoint, "My current location")
             addMarkers(map, gymkhanaCoords, gymkhanaNames)
             addMarkersAndRoute(map, gymkhanaCoords, gymkhanaNames)
+            addMarker(startPoint, "My current location")
         };
     }
 
@@ -106,6 +108,10 @@ class OpenStreetMap : AppCompatActivity() {
         marker.position = point
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         marker.title = title
+
+        // Set the custom icon for the marker
+        marker.icon = ContextCompat.getDrawable(this, R.drawable.location_marker)
+
         map.overlays.add(marker)
         map.invalidate() // Reload map
     }
@@ -116,7 +122,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.position = location
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             marker.title = "Marker at ${locationsNames.get(locationsCoords.indexOf(location))} ${location.latitude}, ${location.longitude}"
-            marker.icon = ContextCompat.getDrawable(this, R.drawable.ic_m3_chip_checked_circle)
+            marker.icon = ContextCompat.getDrawable(this, R.drawable.shop_marker)
             mapView.overlays.add(marker)
         }
         mapView.invalidate() // Refresh the map to display the new markers
@@ -137,7 +143,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             val locationIndex = locationsCoords.indexOf(location)
             marker.title = "Marker at ${locationsNames[locationIndex]} ${location.latitude}, ${location.longitude}"
-            marker.icon = ContextCompat.getDrawable(this, org.osmdroid.library.R.drawable.ic_menu_compass)
+            marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
             mapView.overlays.add(marker)
         }
         mapView.invalidate()
