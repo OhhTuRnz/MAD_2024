@@ -19,7 +19,6 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
-import java.util.UUID
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -28,15 +27,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
-import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
@@ -205,6 +200,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 R.id.nav_login -> {
                     // Handle nav_login click (Login)
                     Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goLogin(rootView)
                     true
                 }
                 R.id.nav_profile -> {
@@ -324,6 +321,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
     fun goSettings(view: View){
         // go to Settings
         val intent = Intent(this, Settings::class.java)
+        startActivity(intent)
+    }
+
+    fun goLogin(view: View){
+        // go to Settings
+        val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
     }
 

@@ -53,5 +53,10 @@
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
+            android:exported="true">
+        </activity>
     </application>
 </manifest>
