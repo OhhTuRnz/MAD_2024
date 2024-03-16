@@ -1,29 +1,48 @@
 package com.example.mad_2024_app.repositories
 
-import android.util.LruCache
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
+import android.util.Log
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import com.example.mad_2024_app.DAOs.UserDAO
-import com.example.mad_2024_app.database.Coordinate
-import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.database.User
-import kotlinx.coroutines.sync.Mutex
-import androidx.lifecycle.map as map
+import java.util.concurrent.TimeUnit
 
-class UserRepository(private val userDao: UserDAO): Repository{
-    private val cacheSize = 1024 * 1024 // 1MB for instance
-    private val cache = LruCache<String, List<Shop>>(cacheSize)
-    private val mutex = Mutex()
-    private var lastCacheUpdateTime = System.currentTimeMillis()
+class UserRepository(private val userDao: UserDAO) {
+    private val cache: Cache<String, User> = CacheBuilder.newBuilder()
+        .maximumSize(100) // Maximum cache size
+        .expireAfterWrite(10, TimeUnit.MINUTES) // Cache expiration time
+        .build()
+
+    private val TAG : String = "User Cache"
+
     suspend fun insert(user: User) {
+        // Insert user into the database
         userDao.insert(user)
+
+        // Update cache after insertion
+        cache.put(user.uuid, user)
     }
 
-    suspend fun getUserById(userId: Int){
-        userDao.getUserById(userId)
+    suspend fun getUserById(userId: Int): User {
+        return userDao.getUserById(userId)
     }
 
-    override fun clearCache() {
-        cache.evictAll()
+    suspend fun getUserByUUID(userUUID: String): User? {
+        // Check if user is present in cache
+        val cachedUser = cache.getIfPresent(userUUID)
+        if (cachedUser != null) {
+            Log.d(TAG, "Cache hit for userUUID: $userUUID")
+            return cachedUser
+        } else {
+            Log.d(TAG, "Cache miss for userUUID: $userUUID")
+        }
+
+        // If user is not in cache, fetch from database
+        val user = userDao.getUserByUUID(userUUID)
+
+        // Cache the user if found
+        user?.let { cache.put(userUUID, it) }
+
+        return user
     }
 }

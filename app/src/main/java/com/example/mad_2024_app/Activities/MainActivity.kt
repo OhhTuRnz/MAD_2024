@@ -25,13 +25,16 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
+import com.example.mad_2024_app.App
+import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.database.User
+import com.example.mad_2024_app.repositories.UserRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.IdpResponse
-import com.google.firebase.auth.FirebaseAuth
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
@@ -47,6 +50,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
         super.onCreate(savedInstanceState)
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val appContext = application as App
+        val database = appContext.database
+        val userRepo = appContext.userRepo
 
         applyTheme(sharedPreferences)
 
@@ -57,6 +63,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupBottomNav()
 
         setIfNotExistingUUID(sharedPreferences)
+
+        storeUserIfNotExisting(sharedPreferences, database, userRepo)
 
         val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
         val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
@@ -80,6 +88,26 @@ class MainActivity : AppCompatActivity(), LocationListener {
         with(sharedPreferences.edit()) {
             putBoolean("isFirstOpen", true)
             apply()
+        }
+    }
+
+    private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences, database: AppDatabase, userRepo : UserRepository){
+        val userUUID = sharedPreferences.getString("userId", null)
+
+        userUUID?.let { uuid ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val user = userRepo.getUserByUUID(uuid) // Asynchronously fetch user by UUID
+
+                // Handle the result (user) accordingly
+                if (user == null) {
+                    // User does not exist, perform insertion
+                    Log.d(TAG, "CheckExistingUser: Creating user with uuid: $uuid")
+                    userRepo.insert(User(uuid = uuid))
+                } else {
+                    // User exists, handle accordingly
+                    Log.d(TAG, "CheckExistingUser: User exists, uuid: $uuid")
+                }
+            }
         }
     }
 

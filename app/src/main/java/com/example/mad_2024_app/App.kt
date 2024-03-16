@@ -6,19 +6,23 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.example.mad_2024_app.DAOs.UserDAO
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
-import com.example.mad_2024_app.workers.ClearCacheWorker
 
 class App : Application() {
     private var activityCount = 0
     private val TAG = "AppActivity"
+    lateinit var database: AppDatabase
+        private set
+    lateinit var userRepo : UserRepository
+        private set
+    lateinit var shopRepo : ShopRepository
+        private set
 
     override fun onCreate() {
         super.onCreate()
 
-        val database = AppDatabase.getDatabase(this)
+        database = AppDatabase.getDatabase(this)
         Log.d(TAG, "onCreate: Database instance retrieved")
 
         // Instantiate DAOs
@@ -26,11 +30,8 @@ class App : Application() {
         val shopDao = database.shopDao()
 
         // Instantiate Repos
-        val userRepo = UserRepository(userDao)
-        val shopRepo = ShopRepository(shopDao)
-
-        ClearCacheWorker.scheduleCacheClearing(this, userRepo)
-        ClearCacheWorker.scheduleCacheClearing(this, shopRepo)
+        userRepo = UserRepository(userDao)
+        shopRepo = ShopRepository(shopDao)
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

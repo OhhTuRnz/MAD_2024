@@ -76,19 +76,7 @@ dependencies {
     implementation("androidx.test:core-ktx:1.5.0")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    // ViewModel utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    // LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    // Lifecycle utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-    // Saved state module for ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("com.google.guava:guava:31.0-android")
     kapt("androidx.room:room-compiler:2.6.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")

@@ -7,14 +7,16 @@ import androidx.lifecycle.MutableLiveData
 import com.example.mad_2024_app.DAOs.ShopDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.google.common.cache.CacheBuilder
 import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.TimeUnit
 import kotlin.math.cos
 
-class ShopRepository(private val shopDao: ShopDAO) : Repository {
-    private val cacheSize = 1024 * 1024 // 1MB for instance
-    private val cache = LruCache<String, List<Shop>>(cacheSize)
-    private val mutex = Mutex()
-    private var lastCacheUpdateTime = System.currentTimeMillis()
+class ShopRepository(private val shopDao: ShopDAO) {
+    private val cache = CacheBuilder.newBuilder()
+        .maximumSize(200) // Maximum cache size
+        .expireAfterWrite(10, TimeUnit.MINUTES) // Cache expiration time
+        .build<String, List<Shop>>() // Note: Guava's Cache is slightly different from Caffeine's
 
     companion object {
         const val CACHE_VALIDITY_MS = 7 * 24 * 60 * 60 * 1000 // 1 week in milliseconds
@@ -30,7 +32,8 @@ class ShopRepository(private val shopDao: ShopDAO) : Repository {
         val cacheKey = "${location.latitude},${location.longitude},$radius"
 
         // Check cache
-        cache[cacheKey]?.let { cachedShops ->
+        val cachedShops = cache.getIfPresent(cacheKey)
+        if (cachedShops != null) {
             return MutableLiveData(cachedShops)
         }
 
@@ -52,9 +55,5 @@ class ShopRepository(private val shopDao: ShopDAO) : Repository {
 
         // Wrap in LiveData
         return MutableLiveData(result ?: emptyList())
-    }
-
-    override fun clearCache() {
-        TODO("Not yet implemented")
     }
 }

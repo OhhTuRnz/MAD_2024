@@ -19,7 +19,7 @@ interface UserDAO {
     fun getUserById(userId: Int): User
 
     @Query("SELECT * FROM User WHERE uuid = :userUUID")
-    fun getUserByUUID(userUUID: String)
+    fun getUserByUUID(userUUID: String) : User?
 
     @Delete
     fun delete(user: User)
