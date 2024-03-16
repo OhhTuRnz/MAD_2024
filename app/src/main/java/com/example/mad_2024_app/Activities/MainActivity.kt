@@ -24,12 +24,15 @@ import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.UserRepository
+import com.example.mad_2024_app.view_models.UserViewModelFactory
+import com.example.mad_2024_app.viewmodels.UserViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineScope
@@ -43,6 +46,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var latestLocation: Location
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var viewModel: UserViewModel
+    private lateinit var userRepo: UserRepository
 
     private val TAG = "LogoGPSMainActivity"
 
@@ -50,11 +55,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
         super.onCreate(savedInstanceState)
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
         val appContext = application as App
-        val database = appContext.database
-        val userRepo = appContext.userRepo
 
         applyTheme(sharedPreferences)
+
+        userRepo = dbUtils.getUserRepository(appContext)
 
         setContentView(R.layout.activity_main)
 
@@ -62,9 +68,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setupBottomNav()
 
-        setIfNotExistingUUID(sharedPreferences)
+        //setIfNotExistingUUID(sharedPreferences)
 
-        storeUserIfNotExisting(sharedPreferences, database, userRepo)
+        storeUserIfNotExisting(sharedPreferences, userRepo)
 
         val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
         val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
@@ -91,7 +97,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences, database: AppDatabase, userRepo : UserRepository){
+    private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences, userRepo : UserRepository){
         val userUUID = sharedPreferences.getString("userId", null)
 
         userUUID?.let { uuid ->
@@ -136,6 +142,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
             setTheme(R.style.AppTheme_Light)
         }
     }
+
     fun onNextButtonClick(view: View) {
         if (::latestLocation.isInitialized) {
             val intent = Intent(this, SecondActivity::class.java).apply {
@@ -308,6 +315,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         Utils.writeLocationToCSV(this, location)
     }
 
+    @Deprecated("This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details")
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onProviderDisabled(provider: String) {}
@@ -317,10 +325,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    fun Greeting(name: String): String {
-        return "Hello ${name}!"
     }
 
     private fun goHome(view: View){

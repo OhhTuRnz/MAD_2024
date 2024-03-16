@@ -77,6 +77,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.guava:guava:31.0-android")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     kapt("androidx.room:room-compiler:2.6.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")

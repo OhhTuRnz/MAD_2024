@@ -47,6 +47,7 @@
         <item name="android:textColor">@color/textColorLight</item>
         <item name="drawerBackgroundColor">@color/drawerBackgroundLight</item>
         <item name="buttonColor">@color/buttonColorLight</item>
+        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.Colored</item>
     </style>
 
     <!-- Base application theme for night mode -->
@@ -60,6 +61,7 @@
         <item name="android:textColor">@color/textColorDark</item>
         <item name="drawerBackgroundColor">@color/drawerBackgroundDark</item>
         <item name="buttonColor">@color/buttonColorDark</item>
+        <item name="bottomNavigationStyle">@style/Widget.MaterialComponents.BottomNavigationView.Colored</item>
     </style>
 
 </resources>
