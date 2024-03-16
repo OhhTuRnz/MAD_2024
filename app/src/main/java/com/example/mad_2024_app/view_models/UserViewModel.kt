@@ -40,19 +40,18 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
-    fun checkAndStoreUser(userUUID: String, lifecycleOwner: LifecycleOwner) {
-        userRepository.getUserByUUID(userUUID).observe(lifecycleOwner) { user ->
-            // Perform actions with the user data here
-            if (user == null) {
-                // User does not exist, perform insertion
-                Log.d(TAG, "Creating user with uuid: $userUUID")
-                viewModelScope.launch(Dispatchers.IO) {
-                    userRepository.insert(User(uuid = userUUID))
-                }
-            } else {
-                // User exists, update LiveData
-                _user.value = user
+    fun checkAndStoreUser(userUUID: String) {
+        val liveData = userRepository.getUserByUUID(userUUID)
+        // Perform actions with the user data here
+        if (liveData.value == null) {
+            // User does not exist, perform insertion
+            Log.d(TAG, "Creating user with uuid: $userUUID")
+            viewModelScope.launch(Dispatchers.IO) {
+                userRepository.insert(User(uuid = userUUID))
             }
+        } else {
+            // User exists, update LiveData
+            _user.value = liveData.value
         }
     }
 }

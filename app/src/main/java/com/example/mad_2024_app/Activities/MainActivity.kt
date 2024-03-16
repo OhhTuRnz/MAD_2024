@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val userUUID = sharedPreferences.getString("userId", null)
 
         userUUID?.let { uuid ->
-            viewModel.checkAndStoreUser(uuid, this)
+            viewModel.checkAndStoreUser(uuid)
         }
     }
 

@@ -34,18 +34,18 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
 
         // Cache the user if found
         user?.let { cache.put(userId.toString(), it) }
-        Log.d(TAG, "Nigger: Adding user to cache with uuid: ${user.userId}")
+        Log.d(TAG, "DatabaseInsertId: Adding user to cache with uuid: ${user.userId}")
 
         emit(user)
     }
 
     fun getUserByUUID(userUUID: String): LiveData<User?> = liveData(Dispatchers.IO){
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(userUUID.toString()) as User?
+        val cachedUser = cache.getIfPresent(userUUID) as User?
         printCacheContents()
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $userUUID")
-            Log.i(TAG, "User in cache: ${cachedUser.toString()}")
+            Log.i(TAG, "User in cache: ${cachedUser}")
             emit(cachedUser)
         }
         Log.d(TAG, "Cache miss for userUUID: $userUUID")
@@ -53,8 +53,8 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
         val user = userDao.getUserByUUID(userUUID = userUUID)
 
         // Cache the user if found
-        user?.let { cache.put(userUUID.toString(), it) }
-        Log.d(TAG, "Nigger: Adding user to cache with uuid: ${user?.uuid}")
+        user?.let { cache.put(userUUID, it) }
+        Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${user?.uuid}")
         printCacheContents()
         if (user != null) {
             emit(user)
