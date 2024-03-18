@@ -10,8 +10,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="600dp"
-        android:src="@drawable/donut" />
+        android:layout_marginTop="60dp"
+        android:src="@drawable/donut_logo_256" />
 
     <EditText
         android:id="@+id/editTextEmail"
@@ -53,5 +53,26 @@
         android:text="Login"
         android:textColor="?android:textColor"
         android:backgroundTint="?attr/buttonColor" />
+
+    <Button
+        android:id="@+id/buttonRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonLogin"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="Register Account"
+        android:textColor="?android:textColor"
+        android:backgroundTint="?attr/buttonColor" />
+
+    <ImageButton
+        android:id="@+id/buttonCancel"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/red_circle"/>
 
 </RelativeLayout>

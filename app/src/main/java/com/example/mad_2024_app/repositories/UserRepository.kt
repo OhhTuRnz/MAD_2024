@@ -45,7 +45,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
         printCacheContents()
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $userUUID")
-            Log.i(TAG, "User in cache: ${cachedUser}")
+            Log.i(TAG, "User in cache: ${cachedUser.toString()}")
             emit(cachedUser)
         }
         Log.d(TAG, "Cache miss for userUUID: $userUUID")
