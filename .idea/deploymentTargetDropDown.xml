@@ -5,7 +5,16 @@
       <entry key="DAOUnitTest">
         <State />
       </entry>
+      <entry key="ShopDAOTest">
+        <State />
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="getAllNearbyShopsTest()">
+        <State />
+      </entry>
+      <entry key="testGetShopsWithinBounds()">
         <State />
       </entry>
     </value>

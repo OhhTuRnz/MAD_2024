@@ -30,7 +30,7 @@ import com.example.mad_2024_app.database.User
 import com.google.gson.Gson
 import java.util.concurrent.Executors
 
-@Database(entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class, FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 4)
+@Database(entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class, FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 5)
 @TypeConverters(Converters::class) // Correct placement of annotation
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDAO
@@ -118,7 +118,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
 
             // Insert coordinate
-            val coordinate2 = Coordinate(latitude = 40.50094324601982, longitude = -3.6914443284916154)
+            val coordinate2 = Coordinate(latitude = 40.50064546438078, longitude = -3.691342396218224)
             val coordinateId2 = coordinateDao.insert(coordinate2)
             Log.d(TAG, "Inserted coordinate with ID: $coordinateId2")
 

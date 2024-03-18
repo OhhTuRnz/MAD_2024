@@ -14,24 +14,33 @@ import android.widget.Toast
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import android.widget.ImageView
+import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.database.Coordinate
+import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.UserRepository
+import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
@@ -40,8 +49,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var latestLocation: Location
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var viewModel: UserViewModel
+    private lateinit var userViewModel: UserViewModel
     private lateinit var userRepo: UserRepository
+    private lateinit var shopViewModel: ShopViewModel
+
+    private lateinit var listView: ListView
+    private lateinit var shopAdapter: ShopAdapter
 
     private val TAG = "LogoGPSMainActivity"
 
@@ -56,7 +69,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         userRepo = DbUtils.getUserRepository(appContext)
         val factory = ViewModelFactory(userRepo)
-        viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
+        userViewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
+
+        val shopRepo = DbUtils.getShopRepository(appContext)
+        val shopFactory = ViewModelFactory(shopRepo)
+        shopViewModel = ViewModelProvider(this, shopFactory).get(ShopViewModel::class.java)
 
         setContentView(R.layout.activity_main)
 
@@ -76,6 +93,16 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
+
+        listView = findViewById(R.id.lvShops)
+        shopAdapter = ShopAdapter(this)
+        listView.adapter = shopAdapter
+
+        shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
+            if (shops != null) {
+                shopAdapter.setShops(shops)
+            }
+        })
 
         Log.d(TAG, "onCreate: Main activity is being created")
     }
@@ -97,7 +124,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val userUUID = sharedPreferences.getString("userId", null)
 
         userUUID?.let { uuid ->
-            viewModel.checkAndStoreUser(uuid)
+            userViewModel.checkAndStoreUser(uuid)
         }
     }
 
@@ -199,7 +226,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 }
                 R.id.nav_login -> {
                     // Handle nav_login click (Login)
-                    Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
                     val rootView = findViewById<View>(android.R.id.content)
                     goLogin(rootView)
                     true
@@ -209,6 +235,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
                     val rootView = findViewById<View>(android.R.id.content)
                     goProfile(rootView)
+                    true
+                }
+                R.id.nav_logout -> {
+                    logoutUser()
                     true
                 }
                 else -> false
@@ -284,6 +314,58 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
         saveCoordinatesToFile(location.latitude, location.longitude, filesDir)
         Utils.writeLocationToCSV(this, location)
+
+        updateNearbyStores(location)
+    }
+
+    private fun updateNearbyStores(location: Location) {
+        // Convert Location to your Coordinate class (if necessary)
+        val coordinate = Coordinate(latitude=location.latitude, longitude=location.longitude)
+
+        // Define the radius within which you want to search for stores
+        val radius = 5000 // for example, 10 km
+
+        // Use the ViewModel to fetch stores
+        shopViewModel.getAllShopsNearCoordinates(coordinate, radius)
+        //shopViewModel.getAllShops()
+
+        // The LiveData observer in onCreate() will handle updating the ListView
+    }
+
+    private fun updateListView(shops: List<Shop>) {
+        // Update the adapter's data
+        shopAdapter.setShops(shops)
+    }
+
+    class ShopAdapter(private val context: Context) : BaseAdapter() {
+        private var shops: MutableList<Shop> = mutableListOf()
+
+        private val TAG = "ShopAdapter"
+        fun setShops(newShops: List<Shop>) {
+            Log.d(TAG, "Adding Shops")
+            Log.d(TAG, "Added ${shops.size} shop(s)")
+            shops.clear()
+            shops.addAll(newShops)
+            notifyDataSetChanged()
+        }
+        override fun getCount(): Int = shops.size
+
+        override fun getItem(position: Int): Any = shops[position]
+
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            var listItemView = convertView
+            if (listItemView == null) {
+                listItemView = LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
+            }
+
+            val shop = getItem(position) as Shop
+            listItemView?.findViewById<TextView>(R.id.shop_name)?.text = shop?.name
+            listItemView?.findViewById<TextView>(R.id.shop_description)?.text = shop?.description
+
+            return listItemView!!
+        }
     }
 
     @Deprecated("This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details")
@@ -324,15 +406,40 @@ class MainActivity : AppCompatActivity(), LocationListener {
         startActivity(intent)
     }
 
-    fun goLogin(view: View){
-        // go to Settings
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+    private fun goLogin(view: View){
+        // Check if the user is already logged in
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            // User is already logged in, show a toast message
+            Toast.makeText(this, "Already logged in", Toast.LENGTH_SHORT).show()
+        } else {
+            // User is not logged in, go to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun goProfile(view: View){
         // go to Settings
         val intent = Intent(this, Profile::class.java)
         startActivity(intent)
+    }
+
+    private fun logoutUser() {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            // User is logged in, proceed with logout
+            auth.signOut()
+            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+
+            // Redirect to login screen or another appropriate activity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Optionally, close the current activity
+        } else {
+            // User is not logged in
+            Toast.makeText(this, "No user is logged in", Toast.LENGTH_SHORT).show()
+        }
     }
 }

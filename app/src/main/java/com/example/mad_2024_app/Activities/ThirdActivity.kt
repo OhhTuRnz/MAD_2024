@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.example.mad_2024_app.R
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 class ThirdActivity : AppCompatActivity() {
 
@@ -80,9 +81,8 @@ class ThirdActivity : AppCompatActivity() {
                 }
                 R.id.nav_login -> {
                     // Handle nav_login click (Login)
-                    Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
                     val rootView = findViewById<View>(android.R.id.content)
-                    goProfile(rootView)
+                    goLogin(rootView)
                     true
                 }
                 R.id.nav_profile -> {
@@ -90,6 +90,10 @@ class ThirdActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Profile", Toast.LENGTH_SHORT).show()
                     val rootView = findViewById<View>(android.R.id.content)
                     goProfile(rootView)
+                    true
+                }
+                R.id.nav_logout -> {
+                    logoutUser()
                     true
                 }
                 else -> false
@@ -158,5 +162,35 @@ class ThirdActivity : AppCompatActivity() {
         // go to Settings
         val intent = Intent(this, Profile::class.java)
         startActivity(intent)
+    }
+
+    private fun goLogin(view: View){
+        // Check if the user is already logged in
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            // User is already logged in, show a toast message
+            Toast.makeText(this, "Already logged in", Toast.LENGTH_SHORT).show()
+        } else {
+            // User is not logged in, go to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun logoutUser() {
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser != null) {
+            // User is logged in, proceed with logout
+            auth.signOut()
+            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+
+            // Redirect to login screen or another appropriate activity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Optionally, close the current activity
+        } else {
+            // User is not logged in
+            Toast.makeText(this, "No user is logged in", Toast.LENGTH_SHORT).show()
+        }
     }
 }

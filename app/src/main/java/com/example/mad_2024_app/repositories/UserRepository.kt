@@ -20,7 +20,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
         cache.put(user.uuid, user)
     }
 
-    suspend fun getUserById(userId: Int): LiveData<User?> = liveData(Dispatchers.IO){
+    fun getUserById(userId: Int): LiveData<User?> = liveData(Dispatchers.IO){
         // Check if user is present in cache
         val cachedUser = cache.getIfPresent(userId.toString()) as User?
         if (cachedUser != null) {

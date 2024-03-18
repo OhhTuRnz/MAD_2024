@@ -27,7 +27,7 @@ interface ShopDAO {
     @Query("DELETE FROM Shop WHERE shopId = :shopId")
     fun deleteById(shopId: Int)
 
-    @Query("SELECT * FROM Shop INNER JOIN Coordinate ON Shop.locationId = Coordinate.coordinateId WHERE Coordinate.latitude BETWEEN :minLat AND :maxLat AND Coordinate.longitude BETWEEN :minLon AND :maxLon")
-    fun getShopsWithinBounds(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): LiveData<List<Shop>>
+    @Query("SELECT * FROM Shop WHERE locationId IN (SELECT coordinateId FROM Coordinate WHERE latitude >= :minLat AND latitude <= :maxLat AND longitude >= :minLon AND longitude <= :maxLon)")
+    fun getShopsWithinBounds(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): List<Shop>
 
 }

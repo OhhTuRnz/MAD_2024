@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 data class Shop (
     @PrimaryKey(autoGenerate = true) val shopId: Int = 0,
     val name : String,
-    val description : String,
+    val description : String? = null,
     val addressId: Int? = null,
     val locationId : Int? = null
 )

@@ -93,9 +93,6 @@ class LoginActivity : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
 
-                    // Redirect to MainActivity
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
                     finish() // Finish LoginActivity so it's removed from the back stack
                 } else {
                     Log.d(TAG, "Invalid user login")
