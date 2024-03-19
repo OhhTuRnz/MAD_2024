@@ -82,6 +82,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("androidx.activity:activity:1.8.2")
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     kapt("androidx.room:room-compiler:2.6.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")

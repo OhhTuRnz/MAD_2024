@@ -28,26 +28,54 @@ class OpenStreetMap : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
 
     val gymkhanaCoords = listOf(
-        GeoPoint(40.38779608214728, -3.627687914352839), // Tennis
-        GeoPoint(40.38788595319803, -3.627048250272035), // Futsal outdoors
-        GeoPoint(40.3887315224542, -3.628643539758645), // Fashion and design
-        GeoPoint(40.38926842612264, -3.630067893975619), // Topos
-        GeoPoint(40.38956358584258, -3.629046081389352), // Teleco
-        GeoPoint(40.38992125672989, -3.6281366497769714), // ETSISI
-        GeoPoint(40.39037466191718, -3.6270256763598447), // Library
-        GeoPoint(40.389855884803005, -3.626782180787362), // CITSEM
-        GeoPoint(40.5103921,-3.69627951671)
+        //GeoPoint(40.38779608214728, -3.627687914352839), // Tennis
+        //GeoPoint(40.38788595319803, -3.627048250272035), // Futsal outdoors
+        //GeoPoint(40.3887315224542, -3.628643539758645), // Fashion and design
+        //GeoPoint(40.38926842612264, -3.630067893975619), // Topos
+        //GeoPoint(40.38956358584258, -3.629046081389352), // Teleco
+        //GeoPoint(40.38992125672989, -3.6281366497769714), // ETSISI
+        //GeoPoint(40.39037466191718, -3.6270256763598447), // Library
+        //GeoPoint(40.389855884803005, -3.626782180787362), // CITSEM
+        GeoPoint(40.5103921,-3.69627951671),
+        GeoPoint(40.30216386637232, -3.4402212966369747), // Granier Arganda
+        GeoPoint(40.33789633833347, -3.5300499470893385), // DUNKIN Rivas H20
+        GeoPoint(40.383173612528864, -3.6268099771703244), // LIDL UPM
+        GeoPoint(40.382939957549375, -3.628704563477796), // Supeco UPM
+        GeoPoint(40.38296744641256, -3.6249153908628533), // Mercadona UPM
+        GeoPoint(40.38627977232809, -3.62547474503236), // Chef Rosa UPM
+        GeoPoint(40.386953212854976, -3.6361746467497937), // Pan Familiar UPM
+        GeoPoint(40.39267993157272, -3.624293651826863), // Carrefour Express UPM
+        GeoPoint(40.37271470034199, -3.5915906061005254), // DUNKIN La Gavia
+        GeoPoint(40.39165928008534, -3.7003710177221287), // DUNKIN Plaza Rio 2
+        GeoPoint(40.40915611015745, -3.692045723585773), // DUNKIN Atocha
+        GeoPoint(40.42505522977919, -3.70327409511652), // LULULU Artesanal Donuts Tribunal
+        GeoPoint(40.51086830465546, -3.695438356003822), // Panaix Bakery & Coffee Montecarmelo
+        GeoPoint(40.4172309597888, -3.6738480248533203) // Rousquillas Bakery Ibiza
     )
     val gymkhanaNames = listOf(
-        "Tennis",
-        "Futsal outdoors",
-        "Fashion and design school",
-        "Topography school",
-        "Telecommunications school",
-        "ETSISI",
-        "Library",
-        "CITSEM",
-        "Donut_shop_test"
+        //"Tennis",
+        //"Futsal outdoors",
+        //"Fashion and design school",
+        //"Topography school",
+        //"Telecommunications school",
+        //"ETSISI",
+        //"Library",
+        //"CITSEM",
+        "Donut_shop_test",
+        "Granier Arganda del Rey",
+        "DUNKIN Rivas H20",
+        "LIDL UPM",
+        "Supeco UPM",
+        "Mercadona UPM",
+        "Chef Rosa UPM",
+        "Pan Familiar UPM",
+        "Carrefour Express UPM",
+        "DUNKIN La Gavia",
+        "DUNKIN Plaza Rio 2",
+        "DUNKIN Atocha",
+        "LULULU Artesanal Donuts Tribunal",
+        "Panaix Bakery & Coffee Montecarmelo",
+        "Rousquillas Bakery Ibiza"
     )
 
     @SuppressLint("MissingInflatedId")
@@ -110,7 +138,7 @@ class OpenStreetMap : AppCompatActivity() {
         marker.title = title
 
         // Set the custom icon for the marker
-        marker.icon = ContextCompat.getDrawable(this, R.drawable.location_marker)
+        marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
 
         map.overlays.add(marker)
         map.invalidate() // Reload map
