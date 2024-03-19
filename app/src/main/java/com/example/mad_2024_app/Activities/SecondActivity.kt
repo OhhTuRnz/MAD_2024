@@ -244,12 +244,13 @@ class SecondActivity : AppCompatActivity() {
         // Check if the user is already logged in
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            // User is already logged in, show a toast message
+            // User is already logged in, show a toast message and do not navigate
             Toast.makeText(this, "Already logged in", Toast.LENGTH_SHORT).show()
         } else {
-            // User is not logged in, go to LoginActivity
+            // User is not logged in, navigate to LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            // Optionally, you can remove this toast to avoid redundancy
             Toast.makeText(applicationContext, "Login", Toast.LENGTH_SHORT).show()
         }
     }
@@ -259,7 +260,7 @@ class SecondActivity : AppCompatActivity() {
         if (auth.currentUser != null) {
             // User is logged in, proceed with logout
             auth.signOut()
-            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
 
             // Redirect to login screen or another appropriate activity
             val intent = Intent(this, LoginActivity::class.java)

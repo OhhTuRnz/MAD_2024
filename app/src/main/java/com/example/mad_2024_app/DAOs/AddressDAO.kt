@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Delete
 import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Address
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AddressDAO {
@@ -14,10 +15,10 @@ interface AddressDAO {
     suspend fun insert(address: Address) : Long
 
     @Query("SELECT * FROM Address")
-    fun getAllAddresses(): LiveData<List<Address>>
+    fun getAllAddresses(): Flow<List<Address>>
 
     @Query("SELECT * FROM Address WHERE addressId = :addressId")
-    fun getAddressById(addressId: Int): Address
+    fun getAddressById(addressId: Int): Flow<Address>
 
     @Delete
     suspend fun delete(address: Address)
