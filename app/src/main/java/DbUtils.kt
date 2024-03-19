@@ -1,6 +1,7 @@
 import android.content.Context
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.AppDatabase
+import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
 import com.google.common.cache.Cache
@@ -27,6 +28,12 @@ class DbUtils {
             val database = getDatabase(context)
             val shopDao = database.shopDao()
             return ShopRepository(shopDao, getCache(context))
+        }
+
+        fun getAddressRepository(context: Context): AddressRepository {
+            val database = getDatabase(context)
+            val addressDao = database.addressDao()
+            return AddressRepository(addressDao, getCache(context))
         }
     }
 }

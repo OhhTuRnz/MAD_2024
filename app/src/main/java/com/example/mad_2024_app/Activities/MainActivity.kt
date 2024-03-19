@@ -14,6 +14,7 @@ import android.widget.Toast
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.provider.Telephony.Mms.Addr
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -27,14 +28,19 @@ import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
+import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
@@ -51,8 +57,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var userViewModel: UserViewModel
-    private lateinit var userRepo: UserRepository
     private lateinit var shopViewModel: ShopViewModel
+    private lateinit var addressViewModel: AddressViewModel
+    private lateinit var userRepo: UserRepository
+    private lateinit var shopRepo: ShopRepository
+    private lateinit var addressRepo: AddressRepository
 
     private lateinit var listView: ListView
     private lateinit var shopAdapter: ShopAdapter
@@ -68,13 +77,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         applyTheme(sharedPreferences)
 
-        userRepo = DbUtils.getUserRepository(appContext)
-        val factory = ViewModelFactory(userRepo)
-        userViewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
-
-        val shopRepo = DbUtils.getShopRepository(appContext)
-        val shopFactory = ViewModelFactory(shopRepo)
-        shopViewModel = ViewModelProvider(this, shopFactory).get(ShopViewModel::class.java)
+        initializeViewModels(appContext)
 
         setContentView(R.layout.activity_main)
 
@@ -93,16 +96,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
 
-        listView = findViewById(R.id.lvShops)
-        shopAdapter = ShopAdapter(this)
-        listView.adapter = shopAdapter
-
-        shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
-            if (shops != null) {
-                Log.d(TAG, "In observer, shops aren't null")
-                shopAdapter.setShops(shops)
-            }
-        })
+        setupShopObserver(appContext)
 
         Log.d(TAG, "onCreate: Main activity is being created")
     }
@@ -118,6 +112,34 @@ class MainActivity : AppCompatActivity(), LocationListener {
             putBoolean("isFirstOpen", true)
             apply()
         }
+    }
+
+    private fun setupShopObserver(appContext: Context) {
+        val listView = findViewById<ListView>(R.id.lvShops)
+        val shopAdapter = ShopAdapter(this, addressViewModel)
+        listView.adapter = shopAdapter
+
+        // Observe the shopsNearCoordinates LiveData
+        shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
+            if (shops != null) {
+                Log.d(TAG, "In observer, shops aren't null")
+                shopAdapter.setShops(shops)
+            }
+        })
+    }
+
+    private fun initializeViewModels(appContext: Context){
+        userRepo = DbUtils.getUserRepository(appContext)
+        val userFactory = ViewModelFactory(userRepo)
+        userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
+
+        shopRepo = DbUtils.getShopRepository(appContext)
+        val shopFactory = ViewModelFactory(shopRepo)
+        shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
+
+        addressRepo = DbUtils.getAddressRepository(appContext)
+        val addressFactory = ViewModelFactory(addressRepo)
+        addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
     }
 
     private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences) {
@@ -348,7 +370,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         shopAdapter.setShops(shops)
     }
 
-    class ShopAdapter(private val context: Context) : BaseAdapter() {
+    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel) : BaseAdapter() {
         private var shops: MutableList<Shop> = mutableListOf()
 
         private val TAG = "ShopAdapter"
@@ -372,10 +394,21 @@ class MainActivity : AppCompatActivity(), LocationListener {
             }
 
             val shop = getItem(position) as Shop
-            listItemView?.findViewById<TextView>(R.id.shop_name)?.text = shop?.name
-            listItemView?.findViewById<TextView>(R.id.shop_description)?.text = shop?.description
+            listItemView?.findViewById<TextView>(R.id.shop_name)?.text = shop.name
+
+            // Observe the LiveData to get the address and update the UI
+            addressViewModel.address.observe(context as LifecycleOwner) { address ->
+                address?.let {
+                    val addressString = formatAddressString(address)
+                    listItemView?.findViewById<TextView>(R.id.shop_address)?.text = addressString
+                }
+            }
 
             return listItemView!!
+        }
+
+        private fun formatAddressString(address: Address): String {
+            return "${address.street}, ${address.number}\n${address.city}, ${address.zipCode}\n${address.country}"
         }
     }
 

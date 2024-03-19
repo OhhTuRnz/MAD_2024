@@ -13,9 +13,8 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/shop_description"
+        android:id="@+id/shop_address"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
         android:textSize="12sp" />
 </LinearLayout>
