@@ -17,10 +17,10 @@ class AddressViewModel(private val addressRepository: AddressRepository) : ViewM
     val address: LiveData<Address?> = _address
     private val TAG = "AddressViewModel"
 
-    fun getAddressById(addressId: Int) = viewModelScope.launch {
+    fun getAddressById(addressId: Int, callback: (Address?) -> Unit) = viewModelScope.launch {
         addressRepository.getAddressById(addressId).collect { address ->
             Log.d(TAG, "Retrieving address for ID: $addressId")
-            _address.postValue(address)
+            callback(address)
         }
     }
     fun insertAddress(address: Address) = viewModelScope.launch {

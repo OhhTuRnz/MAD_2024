@@ -123,13 +123,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
             if (shops != null) {
                 Log.d(TAG, "In observer, shops aren't null")
                 shopAdapter.setShops(shops)
-
-                // Fetch and update addresses for each shop
-                shops.forEach { shop ->
-                    shop.addressId?.let { addressId ->
-                        addressViewModel.getAddressById(addressId)
-                    }
-                }
             }
         })
     }
@@ -393,22 +386,22 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var listItemView = convertView
-            if (listItemView == null) {
-                listItemView = LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
-            }
+                ?: LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
 
             val shop = getItem(position) as Shop
-            listItemView?.findViewById<TextView>(R.id.shop_name)?.text = shop.name
+            listItemView.findViewById<TextView>(R.id.shop_name).text = shop.name
 
-            // Observe the LiveData to get the address and update the UI
-            addressViewModel.address.observe(context as LifecycleOwner) { address ->
-                address?.let {
-                    val addressString = formatAddressString(address)
-                    listItemView?.findViewById<TextView>(R.id.shop_address)?.text = addressString
+            // Fetch and display the address
+            shop.addressId?.let { addressId ->
+                addressViewModel.getAddressById(addressId) { address ->
+                    address?.let {
+                        // Update the UI with the address
+                        listItemView.findViewById<TextView>(R.id.shop_address).text = formatAddressString(it)
+                    }
                 }
             }
 
-            return listItemView!!
+            return listItemView
         }
 
         private fun formatAddressString(address: Address): String {

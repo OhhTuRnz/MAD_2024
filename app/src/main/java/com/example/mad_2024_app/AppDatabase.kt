@@ -82,7 +82,7 @@ abstract class AppDatabase : RoomDatabase() {
                 if (coordinateId1 != -1L) {
                     // Insert address associated with the coordinate
                     val address = Address(
-                        street = "C. del Monasterio de Oseira, 19",
+                        street = "C. del Monasterio de Oseira",
                         city = "Madrid",
                         country = "Spain",
                         number = 19,
