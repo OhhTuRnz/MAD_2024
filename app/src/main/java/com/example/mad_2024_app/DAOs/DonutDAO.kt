@@ -11,7 +11,7 @@ import com.example.mad_2024_app.database.Donut
 @Dao
 interface DonutDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(donut: Donut) : Long
+    suspend fun insert(donut: Donut) : Long
 
     @Query("SELECT * FROM Donut")
     fun getAllDonuts(): LiveData<List<Donut>>
@@ -20,7 +20,7 @@ interface DonutDAO {
     fun getDonutById(donutId: Int): Donut
 
     @Delete
-    fun delete(donut: Donut)
+    suspend fun delete(donut: Donut)
 
     // Optionally, if you need to delete by ID:
     @Query("DELETE FROM Donut WHERE donutId = :donutId")

@@ -41,6 +41,7 @@ import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import java.util.UUID
 
 
 class MainActivity : AppCompatActivity(), LocationListener {
@@ -81,9 +82,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setupBottomNav()
 
-        //setIfNotExistingUUID(sharedPreferences)
-
-        storeUserIfNotExisting(sharedPreferences, userRepo)
+        storeUserIfNotExisting(sharedPreferences)
 
         val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
         val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
@@ -100,6 +99,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
             if (shops != null) {
+                Log.d(TAG, "In observer, shops aren't null")
                 shopAdapter.setShops(shops)
             }
         })
@@ -120,12 +120,23 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences, userRepo : UserRepository){
-        val userUUID = sharedPreferences.getString("userId", null)
+    private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences) {
+        var userUUID = sharedPreferences.getString("userId", null)
 
-        userUUID?.let { uuid ->
-            userViewModel.checkAndStoreUser(uuid)
+        if (userUUID == null) {
+            // Generate a new UUID
+            userUUID = UUID.randomUUID().toString()
+            Log.d(TAG, "Generated new UUID: $userUUID")
+
+            // Store the new UUID in SharedPreferences
+            sharedPreferences.edit().apply {
+                putString("userId", userUUID)
+                apply()
+            }
         }
+
+        // Check and store user (the method will handle insertion if user doesn't exist)
+        userViewModel.checkAndStoreUser(userUUID)
     }
 
     private fun applyTheme(sharedPreferences: SharedPreferences){
@@ -342,13 +353,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         private val TAG = "ShopAdapter"
         fun setShops(newShops: List<Shop>) {
-            if (shops.isNotEmpty()) {
-                Log.d(TAG, "Adding Shops")
-                Log.d(TAG, "Added ${shops.size} shop(s)")
-                shops.clear()
-                shops.addAll(newShops)
-                notifyDataSetChanged()
-            }
+            Log.d(TAG, "Adding Shops")
+            Log.d(TAG, "Added ${shops.size} shop(s)")
+            shops.clear()
+            shops.addAll(newShops)
+            notifyDataSetChanged()
         }
         override fun getCount(): Int = shops.size
 

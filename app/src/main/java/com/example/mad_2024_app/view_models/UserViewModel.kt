@@ -10,15 +10,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.database.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
-    private val _user = MediatorLiveData<User?>()
+    private val _user = MutableLiveData<User?>()
+    val user: LiveData<User?> = _user
     private val TAG = "UserViewModel"
 
-    val user: LiveData<User?> = _user
     // Function to insert a user
     fun insertUser(user: User) = viewModelScope.launch {
         userRepository.insert(user)
@@ -26,35 +27,30 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     // Function to get a user by ID
     fun getUserById(userId: Int) = viewModelScope.launch {
-        val liveData = userRepository.getUserById(userId)
-        _user.addSource(liveData) { userData ->
-            _user.value = userData
+        userRepository.getUserById(userId).collect { userData ->
+            _user.postValue(userData)
         }
     }
 
     // Function to get a user by UUID
-    fun getUserByUUID(userUUID: String) {
-        val liveData = userRepository.getUserByUUID(userUUID)
-        _user.addSource(liveData) { userData ->
-            _user.value = userData
+    fun getUserByUUID(userUUID: String) = viewModelScope.launch {
+        userRepository.getUserByUUID(userUUID).collect { userData ->
+            _user.postValue(userData)
         }
     }
 
-    fun checkAndStoreUser(userUUID: String) {
-        // Start a new coroutine to fetch user data
-        viewModelScope.launch {
-            val user = userRepository.getUserByUUID(userUUID).value
+    fun checkAndStoreUser(userUUID: String) = viewModelScope.launch {
+        val user = userRepository.getUserByUUID(userUUID).firstOrNull()
 
-            // Perform actions with the user data here
-            if (user == null) {
-                // User does not exist, perform insertion
-                Log.d(TAG, "Creating user with uuid: $userUUID")
-                insertUser(User(uuid = userUUID))
-            } else {
-                // User exists, update LiveData
-                Log.d(TAG, "User Retrieved in Model View")
-                _user.value = user
-            }
+        // Perform actions with the user data here
+        if (user == null) {
+            // User does not exist, perform insertion
+            Log.d(TAG, "Creating user with uuid: $userUUID")
+            insertUser(User(uuid = userUUID))
+        } else {
+            // User exists, update LiveData
+            Log.d(TAG, "User Retrieved in Model View")
+            _user.postValue(user)
         }
     }
 }

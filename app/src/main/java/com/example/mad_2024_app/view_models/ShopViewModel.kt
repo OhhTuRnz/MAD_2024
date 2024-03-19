@@ -13,10 +13,9 @@ import kotlinx.coroutines.launch
 
 class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
 
-    private val _shopsNearCoordinates = MediatorLiveData<List<Shop>?>()
-    private val TAG = "ShopViewModel"
-
+    private val _shopsNearCoordinates = MutableLiveData<List<Shop>?>()
     val shopsNearCoordinates: LiveData<List<Shop>?> = _shopsNearCoordinates
+    private val TAG = "ShopViewModel"
 
     // Function to insert a shop
     fun insertShop(shop: Shop) = viewModelScope.launch {
@@ -25,18 +24,16 @@ class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
 
     // Function to get all shops near a set of coordinates
     fun getAllShopsNearCoordinates(location: Coordinate, radius: Int) = viewModelScope.launch {
-        val liveData = shopRepository.getAllShopsNearCoordinates(location, radius)
-        _shopsNearCoordinates.addSource(liveData) { shops ->
-            Log.d(TAG, "Retrieving nearby shops, list size: ${_shopsNearCoordinates.value?.size}")
-            _shopsNearCoordinates.value = shops
+        shopRepository.getAllShopsNearCoordinates(location, radius).collect { shops ->
+            Log.d(TAG, "Retrieving nearby shops, list size: ${shops.size}")
+            _shopsNearCoordinates.postValue(shops)
         }
     }
 
     /*
     fun getAllShops() = viewModelScope.launch {
-        val liveData = shopRepository.getAllShops()
-        _shopsNearCoordinates.addSource(liveData) { userData ->
-            _shopsNearCoordinates.value = userData
+        shopRepository.getAllShops().collect { shops ->
+            _shopsNearCoordinates.postValue(shops)
         }
     }
      */

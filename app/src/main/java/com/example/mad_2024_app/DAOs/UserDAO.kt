@@ -7,27 +7,27 @@ import androidx.room.Query
 import androidx.room.Delete
 import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.User
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(user: User) : Long
+    suspend fun insert(user: User): Long
 
     @Query("SELECT * FROM User")
-    fun getAllUsers(): LiveData<List<User>>
+    fun getAllUsers(): Flow<List<User>>
 
     @Query("SELECT * FROM User WHERE userId = :userId")
-    fun getUserById(userId: Int): User
+    fun getUserById(userId: Int): Flow<User>
 
     @Query("SELECT * FROM User WHERE uuid = :userUUID")
-    fun getUserByUUID(userUUID: String) : User?
+    fun getUserByUUID(userUUID: String): Flow<User?>
 
     @Delete
-    fun delete(user: User)
+    suspend fun delete(user: User)
 
-    // Optionally, if you need to delete by ID:
     @Query("DELETE FROM User WHERE userId = :userId")
-    fun deleteUserById(userId: Int)
+    suspend fun deleteUserById(userId: Int)
 
     // Other database operations as needed
 }

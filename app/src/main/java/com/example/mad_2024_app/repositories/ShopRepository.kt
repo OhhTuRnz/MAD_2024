@@ -8,6 +8,10 @@ import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
 import com.google.common.cache.Cache
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -41,7 +45,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         return PointF(Math.toDegrees(lat), Math.toDegrees(lon))
     }
 
-    fun getAllShopsNearCoordinates(location: Coordinate, radius: Int = 5000): LiveData<List<Shop>> = liveData(Dispatchers.IO) {
+    fun getAllShopsNearCoordinates(location: Coordinate, radius: Int = 5000): Flow<List<Shop>> = flow {
         val cacheKey = "${location.latitude},${location.longitude},$radius"
 
         // Check cache
@@ -55,28 +59,21 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
             // Calculate bounding box points
             val minLat = calculateDerivedPosition(center, mult * radius, 180.0).x
             val maxLat = calculateDerivedPosition(center, mult * radius, 0.0).x
-            // Applying the fudge factor for longitude because not in the equator
+            // Applying the fudge factor for longitude because not at the equator
             val fudge = cos(Math.toRadians(location.latitude)).pow(2)
             val minLon = calculateDerivedPosition(center, mult * radius * fudge, 270.0).y
             val maxLon = calculateDerivedPosition(center, mult * radius * fudge, 90.0).y
 
-
-            Log.d(TAG, "ShopsNearCoordinates: SELECT * FROM Shop WHERE locationId IN (SELECT coordinateId FROM Coordinate WHERE latitude BETWEEN :$minLat AND :$maxLat AND longitude BETWEEN :$minLon AND :$maxLon)")
-
             // Fetch from database
-            val shops = shopDao.getShopsWithinBounds(minLat, maxLat, minLon, maxLon)
-
+            val shops = shopDao.getShopsWithinBounds(minLat, maxLat, minLon, maxLon).firstOrNull() ?: emptyList()
 
             // Cache the result and emit
-            shops?.let {
-                cache.put(cacheKey, it)
-                Log.d(TAG, "Emitting shops nearby")
-                emit(it)
-            } ?: emit(emptyList())
+            cache.put(cacheKey, shops)
+            emit(shops)
         }
-    }
+    }.flowOn(Dispatchers.IO) // Perform the flow operations on the IO dispatcher
 
-    fun getAllShops(): LiveData<List<Shop>> {
+    fun getAllShops(): Flow<List<Shop>> {
         return shopDao.getAllShops()
     }
 }

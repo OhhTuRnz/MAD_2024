@@ -11,7 +11,7 @@ import com.example.mad_2024_app.database.Coordinate
 @Dao
 interface CoordinateDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(coordinate: Coordinate) : Long
+    suspend fun insert(coordinate: Coordinate) : Long
 
     @Query("SELECT * FROM Coordinate")
     fun getAllCoordinates(): LiveData<List<Coordinate>>
@@ -20,7 +20,7 @@ interface CoordinateDAO {
     fun getCoordinateById(coordinateId: Int): Coordinate
 
     @Delete
-    fun delete(coordinate: Coordinate)
+    suspend fun delete(coordinate: Coordinate)
 
     // Optionally, if you need to delete by ID:
     @Query("DELETE FROM Coordinate WHERE coordinateId = :coordinateId")

@@ -28,6 +28,9 @@ import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.database.ShopVisitHistory
 import com.example.mad_2024_app.database.User
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Database(entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class, FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 5)
@@ -63,98 +66,102 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         fun populateDatabase(context: Context) {
-            val database = getDatabase(context)
-            val coordinateDao = database.coordinateDao()
-            val addressDao = database.addressDao()
-            val shopDao = database.shopDao()
+            GlobalScope.launch(Dispatchers.IO) {
+                val database = getDatabase(context)
+                val coordinateDao = database.coordinateDao()
+                val addressDao = database.addressDao()
+                val shopDao = database.shopDao()
 
-            // Insert coordinate
-            val coordinate1 = Coordinate(latitude = 40.510972939666736, longitude = -3.696400583332486)
-            val coordinateId1 = coordinateDao.insert(coordinate1)
-            Log.d(TAG, "Inserted coordinate with ID: $coordinateId1")
+                // Insert coordinate
+                val coordinate1 =
+                    Coordinate(latitude = 40.510972939666736, longitude = -3.696400583332486)
+                val coordinateId1 = coordinateDao.insert(coordinate1)
+                Log.d(TAG, "Inserted coordinate with ID: $coordinateId1")
 
-            // Check if coordinate insertion was successful
-            if (coordinateId1 != -1L) {
-                // Insert address associated with the coordinate
-                val address = Address(
-                    street = "C. del Monasterio de Oseira, 19",
-                    city = "Madrid",
-                    country = "Spain",
-                    number = 19,
-                    zipCode = 28949,
-                    coordinateId = coordinateId1.toInt()
-                )
-                val addressId = addressDao.insert(address)
-                Log.d(TAG, "Inserted address with ID: $addressId")
-
-                // Check if address insertion was successful
-                if (addressId != -1L) {
-                    // Insert shop associated with the address
-                    val tresOlivosShop1 = Shop(
-                        name = "Panaix Bakery Coffee",
-                        description = "Service options\n" +
-                                "\n" +
-                                "Kerbside pickup\n" +
-                                "\n" +
-                                "No-contact delivery\n" +
-                                "\n" +
-                                "Delivery\n" +
-                                "\n" +
-                                "In-store pick-up\n" +
-                                "\n" +
-                                "In-store shopping\n" +
-                                "\n" +
-                                "Takeaway\n" +
-                                "\n" +
-                                "Dine-in\n" +
-                                "\n" +
-                                "Same-day delivery",
-                        addressId = addressId.toInt(),
-                        locationId = coordinateId1.toInt()
+                // Check if coordinate insertion was successful
+                if (coordinateId1 != -1L) {
+                    // Insert address associated with the coordinate
+                    val address = Address(
+                        street = "C. del Monasterio de Oseira, 19",
+                        city = "Madrid",
+                        country = "Spain",
+                        number = 19,
+                        zipCode = 28949,
+                        coordinateId = coordinateId1.toInt()
                     )
-                    val shopId = shopDao.insert(tresOlivosShop1)
-                    Log.d(TAG, "Inserted shop with ID: $shopId")
+                    val addressId = addressDao.insert(address)
+                    Log.d(TAG, "Inserted address with ID: $addressId")
+
+                    // Check if address insertion was successful
+                    if (addressId != -1L) {
+                        // Insert shop associated with the address
+                        val tresOlivosShop1 = Shop(
+                            name = "Panaix Bakery Coffee",
+                            description = "Service options\n" +
+                                    "\n" +
+                                    "Kerbside pickup\n" +
+                                    "\n" +
+                                    "No-contact delivery\n" +
+                                    "\n" +
+                                    "Delivery\n" +
+                                    "\n" +
+                                    "In-store pick-up\n" +
+                                    "\n" +
+                                    "In-store shopping\n" +
+                                    "\n" +
+                                    "Takeaway\n" +
+                                    "\n" +
+                                    "Dine-in\n" +
+                                    "\n" +
+                                    "Same-day delivery",
+                            addressId = addressId.toInt(),
+                            locationId = coordinateId1.toInt()
+                        )
+                        val shopId = shopDao.insert(tresOlivosShop1)
+                        Log.d(TAG, "Inserted shop with ID: $shopId")
+                    }
                 }
-            }
 
-            // Insert coordinate
-            val coordinate2 = Coordinate(latitude = 40.50064546438078, longitude = -3.691342396218224)
-            val coordinateId2 = coordinateDao.insert(coordinate2)
-            Log.d(TAG, "Inserted coordinate with ID: $coordinateId2")
+                // Insert coordinate
+                val coordinate2 =
+                    Coordinate(latitude = 40.50064546438078, longitude = -3.691342396218224)
+                val coordinateId2 = coordinateDao.insert(coordinate2)
+                Log.d(TAG, "Inserted coordinate with ID: $coordinateId2")
 
-            // Check if coordinate insertion was successful
-            if (coordinateId2 != -1L) {
-                // Insert address associated with the coordinate
-                val address = Address(
-                    street = "Av. del Campo de Calatrava",
-                    city = "Madrid",
-                    country = "Spain",
-                    number = 17,
-                    zipCode = 28034,
-                    coordinateId = coordinateId2.toInt()
-                )
-                val addressId = addressDao.insert(address)
-                Log.d(TAG, "Inserted address with ID: $addressId")
-
-                // Check if address insertion was successful
-                if (addressId != -1L) {
-                    // Insert shop associated with the address
-                    val tresOlivosShop1 = Shop(
-                        name = "Cafetería Tres Olivos",
-                        description = "Service options\n" +
-                                "\n" +
-                                "Outdoor seating\n" +
-                                "\n" +
-                                "Takeaway\n" +
-                                "\n" +
-                                "Dine-in\n" +
-                                "\n" +
-                                "Delivery",
-                        addressId = addressId.toInt(),
-                        locationId = coordinateId2.toInt()
+                // Check if coordinate insertion was successful
+                if (coordinateId2 != -1L) {
+                    // Insert address associated with the coordinate
+                    val address = Address(
+                        street = "Av. del Campo de Calatrava",
+                        city = "Madrid",
+                        country = "Spain",
+                        number = 17,
+                        zipCode = 28034,
+                        coordinateId = coordinateId2.toInt()
                     )
-                    val shopId = shopDao.insert(tresOlivosShop1)
-                    Log.d(TAG, "Inserted shop with ID: $shopId")
+                    val addressId = addressDao.insert(address)
+                    Log.d(TAG, "Inserted address with ID: $addressId")
+
+                    // Check if address insertion was successful
+                    if (addressId != -1L) {
+                        // Insert shop associated with the address
+                        val tresOlivosShop1 = Shop(
+                            name = "Cafetería Tres Olivos",
+                            description = "Service options\n" +
+                                    "\n" +
+                                    "Outdoor seating\n" +
+                                    "\n" +
+                                    "Takeaway\n" +
+                                    "\n" +
+                                    "Dine-in\n" +
+                                    "\n" +
+                                    "Delivery",
+                            addressId = addressId.toInt(),
+                            locationId = coordinateId2.toInt()
+                        )
+                        val shopId = shopDao.insert(tresOlivosShop1)
+                        Log.d(TAG, "Inserted shop with ID: $shopId")
+                    }
                 }
             }
         }

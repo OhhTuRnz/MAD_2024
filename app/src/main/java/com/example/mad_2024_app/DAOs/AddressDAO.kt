@@ -11,7 +11,7 @@ import com.example.mad_2024_app.database.Address
 @Dao
 interface AddressDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(address: Address) : Long
+    suspend fun insert(address: Address) : Long
 
     @Query("SELECT * FROM Address")
     fun getAllAddresses(): LiveData<List<Address>>
@@ -20,7 +20,7 @@ interface AddressDAO {
     fun getAddressById(addressId: Int): Address
 
     @Delete
-    fun delete(address: Address)
+    suspend fun delete(address: Address)
 
     // Optionally, if you need to delete by ID:
     @Query("DELETE FROM Address WHERE addressId = :addressId")

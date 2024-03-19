@@ -7,6 +7,10 @@ import com.google.common.cache.Cache
 import com.example.mad_2024_app.DAOs.UserDAO
 import com.example.mad_2024_app.database.User
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class UserRepository(private val userDao: UserDAO, private val cache: Cache<String, Any>) : IRepository{
@@ -20,48 +24,43 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
         cache.put(user.uuid, user)
     }
 
-    fun getUserById(userId: Int): LiveData<User?> = liveData(Dispatchers.IO){
+    fun getUserById(userId: Int): Flow<User?> = flow {
         // Check if user is present in cache
         val cachedUser = cache.getIfPresent(userId.toString()) as User?
         if (cachedUser != null) {
-            Log.d(TAG, "Cache hit for userUUID: $userId")
-            Log.i(TAG, "User in cache: ${cachedUser.toString()}")
-            emit(cachedUser)
+            Log.d(TAG, "Cache hit for userId: $userId")
+            emit(cachedUser) // Emit cached user
+        } else {
+            Log.d(TAG, "Cache miss for userId: $userId")
+            // If user is not in cache, fetch from database and emit result
+            val user = userDao.getUserById(userId).firstOrNull()
+            user?.let {
+                cache.put(userId.toString(), it) // Cache the user if found
+                Log.d(TAG, "DatabaseInsertId: Adding user to cache with userId: ${it.userId}")
+            }
+            emit(user) // Emit user from database or null if not found
         }
-        Log.d(TAG, "Cache miss for userUUID: $userId")
-        // If user is not in cache, fetch from database
-        val user = userDao.getUserById(userId)
+    }.flowOn(Dispatchers.IO)
 
-        // Cache the user if found
-        user?.let { cache.put(userId.toString(), it) }
-        Log.d(TAG, "DatabaseInsertId: Adding user to cache with uuid: ${user.userId}")
-
-        emit(user)
-    }
-
-    fun getUserByUUID(userUUID: String): LiveData<User?> = liveData(Dispatchers.IO){
+    fun getUserByUUID(userUUID: String): Flow<User?> = flow {
         // Check if user is present in cache
         val cachedUser = cache.getIfPresent(userUUID) as User?
-        printCacheContents()
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $userUUID")
-            Log.i(TAG, "User in cache: ${cachedUser.toString()}")
-            emit(cachedUser)
+            emit(cachedUser) // Emit cached user
+        } else {
+            Log.d(TAG, "Cache miss for userUUID: $userUUID")
+            // If user is not in cache, fetch from database and emit result
+            val user = userDao.getUserByUUID(userUUID).firstOrNull()
+            user?.let {
+                cache.put(userUUID, it) // Cache the user if found
+                Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${it.uuid}")
+            }
+            emit(user) // Emit user from database or null if not found
         }
-        Log.d(TAG, "Cache miss for userUUID: $userUUID")
-        // If user is not in cache, fetch from database
-        val user = userDao.getUserByUUID(userUUID = userUUID)
+    }.flowOn(Dispatchers.IO)
 
-        // Cache the user if found
-        user?.let { cache.put(userUUID, it) }
-        Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${user?.uuid}")
-        printCacheContents()
-        if (user != null) {
-            emit(user)
-        }
-    }
-
-    private suspend fun printCacheContents() = withContext(Dispatchers.IO) {
+    private fun printCacheContents(){
         val cacheContents = cache.asMap()
         Log.d(TAG, "Cache Contents:")
 

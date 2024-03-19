@@ -11,10 +11,10 @@ import com.example.mad_2024_app.database.Shop
 @Dao
 interface FavoriteShopsDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun addFavoriteShop(favoriteShop: FavoriteShops) : Long
+    suspend fun addFavoriteShop(favoriteShop: FavoriteShops) : Long
 
     @Delete
-    fun removeFavoriteShop(favoriteShop: FavoriteShops)
+    suspend fun removeFavoriteShop(favoriteShop: FavoriteShops)
 
     @Query("DELETE FROM FavoriteShops WHERE userId = :userId AND shopId = :shopId")
     fun removeFavoriteShopById(userId: Int, shopId: Int)
