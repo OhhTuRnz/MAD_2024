@@ -14,7 +14,6 @@ import android.widget.Toast
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.provider.Telephony.Mms.Addr
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -96,7 +95,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
 
-        setupShopObserver(appContext)
+        setupShopObserverForNearbyStores(appContext)
 
         Log.d(TAG, "onCreate: Main activity is being created")
     }
@@ -114,7 +113,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun setupShopObserver(appContext: Context) {
+    private fun setupShopObserverForNearbyStores(appContext: Context) {
         val listView = findViewById<ListView>(R.id.lvShops)
         val shopAdapter = ShopAdapter(this, addressViewModel)
         listView.adapter = shopAdapter
@@ -124,6 +123,13 @@ class MainActivity : AppCompatActivity(), LocationListener {
             if (shops != null) {
                 Log.d(TAG, "In observer, shops aren't null")
                 shopAdapter.setShops(shops)
+
+                // Fetch and update addresses for each shop
+                shops.forEach { shop ->
+                    shop.addressId?.let { addressId ->
+                        addressViewModel.getAddressById(addressId)
+                    }
+                }
             }
         })
     }
@@ -356,13 +362,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val coordinate = Coordinate(latitude=location.latitude, longitude=location.longitude)
 
         // Define the radius within which you want to search for stores
-        val radius = 5000 // for example, 10 km
+        val radius = 5000 // meters
 
         // Use the ViewModel to fetch stores
         shopViewModel.getAllShopsNearCoordinates(coordinate, radius)
-        //shopViewModel.getAllShops()
 
-        // The LiveData observer in onCreate() will handle updating the ListView
     }
 
     private fun updateListView(shops: List<Shop>) {

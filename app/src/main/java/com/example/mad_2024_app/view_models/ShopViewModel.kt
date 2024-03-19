@@ -6,15 +6,21 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
 
     private val _shopsNearCoordinates = MutableLiveData<List<Shop>?>()
     val shopsNearCoordinates: LiveData<List<Shop>?> = _shopsNearCoordinates
+
+    val addressIds = MutableLiveData<List<Int>>()
+
     private val TAG = "ShopViewModel"
 
     // Function to insert a shop
@@ -27,6 +33,10 @@ class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
         shopRepository.getAllShopsNearCoordinates(location, radius).collect { shops ->
             Log.d(TAG, "Retrieving nearby shops, list size: ${shops.size}")
             _shopsNearCoordinates.postValue(shops)
+
+            // Update the address for updating the address view model
+            val ids = shops.mapNotNull { it.addressId }
+            addressIds.postValue(ids)
         }
     }
 
