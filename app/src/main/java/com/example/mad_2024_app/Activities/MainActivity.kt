@@ -342,11 +342,13 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         private val TAG = "ShopAdapter"
         fun setShops(newShops: List<Shop>) {
-            Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
-            shops.clear()
-            shops.addAll(newShops)
-            notifyDataSetChanged()
+            if (shops.isNotEmpty()) {
+                Log.d(TAG, "Adding Shops")
+                Log.d(TAG, "Added ${shops.size} shop(s)")
+                shops.clear()
+                shops.addAll(newShops)
+                notifyDataSetChanged()
+            }
         }
         override fun getCount(): Int = shops.size
 
