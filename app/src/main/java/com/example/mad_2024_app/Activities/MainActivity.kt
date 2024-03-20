@@ -212,6 +212,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
                 R.id.nav_maps -> {
                     // Handle maps action
+                    Toast.makeText(applicationContext, "OpenStreetMaps", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goMaps(rootView)
                     true
                 }
 
