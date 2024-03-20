@@ -1,6 +1,5 @@
 package com.example.mad_2024_app.DAOs
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -8,6 +7,7 @@ import androidx.room.Delete
 import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Donut
 import com.example.mad_2024_app.database.FavoriteDonuts
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDonutsDAO {
@@ -21,7 +21,7 @@ interface FavoriteDonutsDAO {
     fun removeFavoriteDonutById(userId: Int, donutId: Int)
 
     @Query("SELECT * FROM Donut INNER JOIN FavoriteDonuts ON Donut.donutId = FavoriteDonuts.donutId WHERE FavoriteDonuts.userId = :userId")
-    fun getFavoriteDonutsByUser(userId: Int): List<Donut>
+    fun getFavoriteDonutsByUser(userId: Int): Flow<List<Donut>>
 
     // Other database operations as needed
 }

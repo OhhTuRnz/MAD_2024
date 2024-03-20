@@ -14,6 +14,12 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.database.Address
+import com.example.mad_2024_app.database.Coordinate
+import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.view_models.AddressViewModel
+import com.example.mad_2024_app.view_models.CoordinateViewModel
+import com.example.mad_2024_app.view_models.ShopViewModel
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -26,6 +32,14 @@ class OpenStreetMap : AppCompatActivity() {
     private lateinit var map: MapView
     private lateinit var latestLocation:Location
     private lateinit var toggle: ActionBarDrawerToggle
+
+    private lateinit var shopViewModel: ShopViewModel
+    private lateinit var addressViewModel: AddressViewModel
+    private lateinit var coordinateViewModel: CoordinateViewModel
+
+    private var shops: List<Shop> = emptyList()
+    private var addresses: List<Address> = emptyList()
+    private var coordinates: List<Coordinate> = emptyList()
 
     val gymkhanaCoords = listOf(
         //GeoPoint(40.38779608214728, -3.627687914352839), // Tennis
@@ -51,6 +65,7 @@ class OpenStreetMap : AppCompatActivity() {
         GeoPoint(40.42505522977919, -3.70327409511652), // LULULU Artesanal Donuts Tribunal
         GeoPoint(40.51086830465546, -3.695438356003822), // Panaix Bakery & Coffee Montecarmelo
         GeoPoint(40.4172309597888, -3.6738480248533203) // Rousquillas Bakery Ibiza
+
     )
     val gymkhanaNames = listOf(
         //"Tennis",
@@ -91,6 +106,21 @@ class OpenStreetMap : AppCompatActivity() {
 
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
 
+        shopViewModel.shopsNearCoordinates.observe(this) { nearbyShops ->
+            shops = nearbyShops ?: emptyList()
+            updateShopDetails()
+        }
+
+        addressViewModel.nearAddresses.observe(this) { nearbyAddresses ->
+            addresses = nearbyAddresses ?: emptyList()
+            updateShopDetails()
+        }
+
+        coordinateViewModel.nearCoordinates.observe(this) { nearbyCoordinates ->
+            coordinates = nearbyCoordinates ?: emptyList()
+            updateShopDetails()
+        }
+
         val bundle = intent.getBundleExtra("locationBundle")
         val location: Location? = bundle?.getParcelable("location", Location::class.java)
         if (location != null) {
@@ -110,6 +140,44 @@ class OpenStreetMap : AppCompatActivity() {
             addMarkersAndRoute(map, gymkhanaCoords, gymkhanaNames)
             addMarker(startPoint, "My current location")
         };
+    }
+
+    private fun updateShopDetails() {
+        val shopDetails = shops.map { shop ->
+            ShopDetail(
+                shop = shop,
+                address = shop.addressId?.let { addresses[it] },
+                coordinate = shop.locationId?.let { coordinates[it] }
+            )
+        }
+        // Now you have a list of ShopDetail objects, you can update your UI here
+    }
+
+    private fun updateNearbyStores(location: Location) {
+        // Convert Location to your Coordinate class (if necessary)
+        val coordinate = Coordinate(latitude=location.latitude, longitude=location.longitude)
+
+        val radius = 5000 // Define the radius in meters
+
+        shopViewModel.shopsNearCoordinates.observe(this) { shops ->
+            if (shops != null) {
+                addShopMarkers(shops)
+            }
+        }
+    }
+
+    private fun addShopMarkers(shops: List<Shop>) {
+        for (shop in shops) {
+            shop.locationId?.let { locationId ->
+                coordinateViewModel.nearCoordinates.observe(this) { coordinate ->
+                    coordinate?.let {
+                        val geoPoint = GeoPoint(0, 0)
+                        addMarker(geoPoint, shop.name)
+                    }
+                }
+            }
+        }
+        map.invalidate() // Refresh the map to display the new markers
     }
 
     private fun applyTheme(sharedPreferences: SharedPreferences){
@@ -187,4 +255,10 @@ class OpenStreetMap : AppCompatActivity() {
         super.onPause()
         map.onPause()
     }
+
+    data class ShopDetail(
+        val shop: Shop,
+        val address: Address?,
+        val coordinate: Coordinate?
+    )
 }

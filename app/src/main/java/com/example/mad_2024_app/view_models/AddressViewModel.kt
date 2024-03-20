@@ -4,17 +4,15 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.mad_2024_app.database.Address
-import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
 import kotlinx.coroutines.launch
 
 class AddressViewModel(private val addressRepository: AddressRepository) : ViewModel() {
 
-    private val _address = MutableLiveData<Address?>()
-    val address: LiveData<Address?> = _address
+    private val _nearAddresses = MutableLiveData<List<Address>?>()
+    val nearAddresses: LiveData<List<Address>?> = _nearAddresses
     private val TAG = "AddressViewModel"
 
     fun getAddressById(addressId: Int, callback: (Address?) -> Unit) = viewModelScope.launch {

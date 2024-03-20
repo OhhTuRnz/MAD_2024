@@ -14,14 +14,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class UserRepository(private val userDao: UserDAO, private val cache: Cache<String, Any>) : IRepository{
-    private val TAG : String = "User Cache"
-
+    private val TAG : String = "UserRepo"
+    private val modelName = "User"
     suspend fun insert(user: User) {
         // Insert user into the database
         userDao.insert(user)
 
         // Update cache after insertion
-        cache.put(user.uuid, user)
+        cache.put(modelName+user.uuid, user)
     }
 
     fun getUserById(userId: Int): Flow<User?> = flow {
@@ -35,7 +35,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
             // If user is not in cache, fetch from database and emit result
             val user = userDao.getUserById(userId).firstOrNull()
             user?.let {
-                cache.put(userId.toString(), it) // Cache the user if found
+                cache.put(modelName+userId.toString(), it) // Cache the user if found
                 Log.d(TAG, "DatabaseInsertId: Adding user to cache with userId: ${it.userId}")
             }
             emit(user) // Emit user from database or null if not found
@@ -53,7 +53,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
             // If user is not in cache, fetch from database and emit result
             val user = userDao.getUserByUUID(userUUID).firstOrNull()
             user?.let {
-                cache.put(userUUID, it) // Cache the user if found
+                cache.put(modelName+userUUID, it) // Cache the user if found
                 Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${it.uuid}")
             }
             emit(user) // Emit user from database or null if not found

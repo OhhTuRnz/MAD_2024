@@ -27,4 +27,6 @@
     <color name="textColorDark">@color/white</color> <!-- white -->
     <color name="drawerBackgroundDark">@color/purple_300</color> <!-- purple 300 -->
     <color name="buttonColorDark">@color/purple_200</color> <!-- weak orange -->
+
+    <color name="googleSignInColor">#EF5350</color> <!-- weak orange -->
 </resources>

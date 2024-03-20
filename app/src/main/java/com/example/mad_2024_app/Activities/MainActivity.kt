@@ -365,11 +365,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     }
 
-    private fun updateListView(shops: List<Shop>) {
-        // Update the adapter's data
-        shopAdapter.setShops(shops)
-    }
-
     class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel) : BaseAdapter() {
         private var shops: MutableList<Shop> = mutableListOf()
 
@@ -388,7 +383,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         override fun getItemId(position: Int): Long = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            var listItemView = convertView
+            val listItemView = convertView
                 ?: LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
 
             val shop = getItem(position) as Shop

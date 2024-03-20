@@ -1,12 +1,12 @@
 package com.example.mad_2024_app.DAOs
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
 import androidx.room.OnConflictStrategy
 import com.example.mad_2024_app.database.Donut
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DonutDAO {
@@ -14,10 +14,10 @@ interface DonutDAO {
     suspend fun insert(donut: Donut) : Long
 
     @Query("SELECT * FROM Donut")
-    fun getAllDonuts(): LiveData<List<Donut>>
+    fun getAllDonuts(): Flow<List<Donut>>
 
     @Query("SELECT * FROM Donut WHERE donutId = :donutId")
-    fun getDonutById(donutId: Int): Donut
+    fun getDonutById(donutId: Int): Flow<Donut>
 
     @Delete
     suspend fun delete(donut: Donut)

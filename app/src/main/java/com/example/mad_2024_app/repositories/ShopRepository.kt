@@ -20,6 +20,8 @@ import kotlin.math.sin
 
 class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<String, Any>) : IRepository{
     private val TAG = "ShopRepo"
+    private val modelName = "Shop"
+
     // Method to insert a shop
     suspend fun insert(shop: Shop){
         shopDao.insert(shop)
@@ -68,7 +70,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
             val shops = shopDao.getShopsWithinBounds(minLat, maxLat, minLon, maxLon).firstOrNull() ?: emptyList()
 
             // Cache the result and emit
-            cache.put(cacheKey, shops)
+            cache.put(modelName+cacheKey, shops)
             emit(shops)
         }
     }.flowOn(Dispatchers.IO) // Perform the flow operations on the IO dispatcher
