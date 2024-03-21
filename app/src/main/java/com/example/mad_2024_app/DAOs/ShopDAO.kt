@@ -1,19 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
-import com.example.mad_2024_app.database.Coordinate
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.Shop
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ShopDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(shop: Shop): Long
+    @Upsert
+    suspend fun upsert(shop: Shop): Long
 
     @Query("SELECT * FROM Shop")
     fun getAllShops(): Flow<List<Shop>>

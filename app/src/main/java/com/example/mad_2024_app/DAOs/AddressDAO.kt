@@ -1,18 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.Address
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AddressDAO {
-    @Insert
-    suspend fun insert(address: Address) : Long
+    @Upsert
+    suspend fun upsert(address: Address) : Long
 
     @Query("SELECT * FROM Address")
     fun getAllAddresses(): Flow<List<Address>>

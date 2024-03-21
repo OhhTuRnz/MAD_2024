@@ -1,7 +1,6 @@
 package com.example.mad_2024_app.repositories
 
 import com.example.mad_2024_app.DAOs.CoordinateDAO
-import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.google.common.cache.Cache
 import kotlinx.coroutines.Dispatchers
@@ -43,8 +42,8 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun insertAddress(coordinate: Coordinate) {
-        coordinateDAO.insert(coordinate)
+    suspend fun upsertAddress(coordinate: Coordinate) {
+        coordinateDAO.upsert(coordinate)
         // Update cache after insertion
         cache.put(modelName+coordinate.coordinateId.toString(), coordinate)
     }

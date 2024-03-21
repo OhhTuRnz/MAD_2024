@@ -1,8 +1,6 @@
 package com.example.mad_2024_app.repositories
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import com.google.common.cache.Cache
 import com.example.mad_2024_app.DAOs.UserDAO
 import com.example.mad_2024_app.database.User
@@ -11,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 
 class UserRepository(private val userDao: UserDAO, private val cache: Cache<String, Any>) : IRepository{
     private val TAG : String = "UserRepo"
     private val modelName = "User"
-    suspend fun insert(user: User) {
+    suspend fun upsert(user: User) {
         // Insert user into the database
-        userDao.insert(user)
+        Log.d(TAG, "Upserting user with uuid ${user.uuid}")
+        userDao.upsert(user)
 
         // Update cache after insertion
         cache.put(modelName+user.uuid, user)

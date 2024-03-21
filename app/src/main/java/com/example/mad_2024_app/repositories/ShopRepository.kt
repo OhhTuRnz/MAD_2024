@@ -1,8 +1,5 @@
 package com.example.mad_2024_app.repositories
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
 import com.example.mad_2024_app.DAOs.ShopDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
@@ -23,8 +20,8 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
     private val modelName = "Shop"
 
     // Method to insert a shop
-    suspend fun insert(shop: Shop){
-        shopDao.insert(shop)
+    suspend fun upsert(shop: Shop){
+        shopDao.upsert(shop)
     }
 
     data class PointF(val x: Double, val y: Double)

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.mad_2024_app.DAOs.ShopDAO
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.database.User
 import org.junit.After
@@ -33,7 +32,7 @@ class DAOUnitTest {
     fun insertAndRetrieveShop() {
         val dao = database.shopDao()
         val shop = Shop(name = "Test Shop", description = "Test Description")
-        dao.insert(shop)
+        dao.upsert(shop)
 
         val retrievedShop = dao.getShopById(1)
         assertEquals(shop.name, retrievedShop.name)
@@ -45,7 +44,7 @@ class DAOUnitTest {
     fun insertAndRetrieveUser() {
         val dao = database.userDao()
         val user = User(username = "Test User", email = "martini@chinchong.com", uuid = "5de7c711-8c70-4515-853a-dcaf67300183")
-        dao.insert(user)
+        dao.upsert(user)
 
         val retrievedUser = dao.getUserById(1)
         assertEquals(user.username, retrievedUser.username)

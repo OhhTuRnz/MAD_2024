@@ -1,18 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(user: User): Long
+    @Upsert
+    suspend fun upsert(user: User): Long
 
     @Query("SELECT * FROM User")
     fun getAllUsers(): Flow<List<User>>

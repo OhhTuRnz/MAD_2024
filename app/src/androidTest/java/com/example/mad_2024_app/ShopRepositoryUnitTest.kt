@@ -1,5 +1,4 @@
 import android.content.Context
-import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -56,8 +55,8 @@ class ShopRepositoryUnitTest {
             val outsideCoordinate =
                 Coordinate(latitude = 12.400, longitude = 67.950) // Far from testLocation
 
-            val coordId1 = database.coordinateDao().insert(insideCoordinate)
-            val coordId2 = database.coordinateDao().insert(outsideCoordinate)
+            val coordId1 = database.coordinateDao().upsert(insideCoordinate)
+            val coordId2 = database.coordinateDao().upsert(outsideCoordinate)
 
             val shop1 = Shop(
                 name = "Shop Inside Radius",
@@ -70,8 +69,8 @@ class ShopRepositoryUnitTest {
                 locationId = coordId2.toInt()
             )
 
-            database.shopDao().insert(shop1)
-            database.shopDao().insert(shop2)
+            database.shopDao().upsert(shop1)
+            database.shopDao().upsert(shop2)
 
             // Perform the test within a coroutine
             launch {

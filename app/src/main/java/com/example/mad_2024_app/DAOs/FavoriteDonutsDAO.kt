@@ -1,18 +1,17 @@
 package com.example.mad_2024_app.DAOs
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.Donut
 import com.example.mad_2024_app.database.FavoriteDonuts
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDonutsDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addFavoriteDonut(favoriteDonut: FavoriteDonuts) : Long
+    @Upsert
+    suspend fun upsert(favoriteDonut: FavoriteDonuts) : Long
 
     @Delete
     suspend fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts)

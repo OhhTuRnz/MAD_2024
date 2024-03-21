@@ -1,17 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.Coordinate
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CoordinateDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(coordinate: Coordinate) : Long
+    @Upsert
+    suspend fun upsert(coordinate: Coordinate) : Long
 
     @Query("SELECT * FROM Coordinate")
     fun getAllCoordinates(): Flow<List<Coordinate>>

@@ -1,18 +1,15 @@
 package com.example.mad_2024_app.view_models
 
 import android.util.Log
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.database.User
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
 
@@ -21,8 +18,8 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
     private val TAG = "UserViewModel"
 
     // Function to insert a user
-    fun insertUser(user: User) = viewModelScope.launch {
-        userRepository.insert(user)
+    fun upsertUser(user: User) = viewModelScope.launch {
+        userRepository.upsert(user)
     }
 
     // Function to get a user by ID
@@ -39,6 +36,10 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         }
     }
 
+    suspend fun getUserByUUIDPreCollect(userUUID: String) : Flow<User?> {
+        return userRepository.getUserByUUID(userUUID)
+    }
+
     fun checkAndStoreUser(userUUID: String) = viewModelScope.launch {
         val user = userRepository.getUserByUUID(userUUID).firstOrNull()
 
@@ -46,7 +47,7 @@ class UserViewModel(private val userRepository: UserRepository) : ViewModel() {
         if (user == null) {
             // User does not exist, perform insertion
             Log.d(TAG, "Creating user with uuid: $userUUID")
-            insertUser(User(uuid = userUUID))
+            upsertUser(User(uuid = userUUID))
         } else {
             // User exists, update LiveData
             Log.d(TAG, "User Retrieved in Model View")

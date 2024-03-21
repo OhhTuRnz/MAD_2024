@@ -1,17 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.Donut
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DonutDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(donut: Donut) : Long
+    @Upsert
+    suspend fun upsert(donut: Donut) : Long
 
     @Query("SELECT * FROM Donut")
     fun getAllDonuts(): Flow<List<Donut>>

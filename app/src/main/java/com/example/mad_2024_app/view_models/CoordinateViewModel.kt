@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.repositories.CoordinateRepository
 import kotlinx.coroutines.launch
@@ -21,8 +20,8 @@ class CoordinateViewModel(private val coordinateRepository: CoordinateRepository
         }
     }
 
-    fun insertCoordinate(coordinate: Coordinate) = viewModelScope.launch {
-        coordinateRepository.insertAddress(coordinate)
+    fun upsertCoordinate(coordinate: Coordinate) = viewModelScope.launch {
+        coordinateRepository.upsertAddress(coordinate)
     }
 
     fun deleteCoordinate(coordinate: Coordinate) = viewModelScope.launch {

@@ -21,8 +21,8 @@ class AddressViewModel(private val addressRepository: AddressRepository) : ViewM
             callback(address)
         }
     }
-    fun insertAddress(address: Address) = viewModelScope.launch {
-        addressRepository.insertAddress(address)
+    fun upsertAddress(address: Address) = viewModelScope.launch {
+        addressRepository.upsertAddress(address)
     }
 
     fun deleteAddress(address: Address) = viewModelScope.launch {

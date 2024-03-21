@@ -13,7 +13,7 @@
     <!-- Colors for light theme -->
     <color name="primaryColor">#FF4081</color> <!-- Replace with your desired primary color -->
     <color name="primaryLightColor">#FF8A65</color> <!-- Lighter variant of primary color -->
-    <color name="accentColor">#FFC107</color> <!-- Replace with your desired accent color -->
+    <color name="accentColor">#C88A2F</color> <!-- Replace with your desired accent color -->
     <color name="backgroundLight">@color/white</color> <!-- white -->
     <color name="textColorLight">@color/black</color> <!-- black -->
     <color name="drawerBackgroundLight">#F44336</color> <!-- strong orange -->

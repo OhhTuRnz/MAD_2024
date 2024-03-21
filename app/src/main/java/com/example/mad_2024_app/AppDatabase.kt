@@ -1,15 +1,11 @@
 package com.example.mad_2024_app
 
 import android.content.Context
-import android.nfc.Tag
 import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Database
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.test.core.app.ApplicationProvider
 import com.example.mad_2024_app.DAOs.AddressDAO
 import com.example.mad_2024_app.DAOs.CoordinateDAO
 import com.example.mad_2024_app.DAOs.DonutDAO
@@ -27,12 +23,10 @@ import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.database.ShopVisitHistory
 import com.example.mad_2024_app.database.User
-import com.google.gson.Gson
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
 
 @Database(entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class, FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 5)
 @TypeConverters(Converters::class) // Correct placement of annotation
@@ -77,7 +71,7 @@ abstract class AppDatabase : RoomDatabase() {
                 // Insert coordinate
                 val coordinate1 =
                     Coordinate(latitude = 40.510972939666736, longitude = -3.696400583332486)
-                val coordinateId1 = coordinateDao.insert(coordinate1)
+                val coordinateId1 = coordinateDao.upsert(coordinate1)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId1")
 
                 // Check if coordinate insertion was successful
@@ -91,7 +85,7 @@ abstract class AppDatabase : RoomDatabase() {
                         zipCode = 28949,
                         coordinateId = coordinateId1.toInt()
                     )
-                    val addressId = addressDao.insert(address)
+                    val addressId = addressDao.upsert(address)
                     Log.d(TAG, "Inserted address with ID: $addressId")
 
                     // Check if address insertion was successful
@@ -119,14 +113,14 @@ abstract class AppDatabase : RoomDatabase() {
                             addressId = addressId.toInt(),
                             locationId = coordinateId1.toInt()
                         )
-                        val shopId = shopDao.insert(tresOlivosShop1)
+                        val shopId = shopDao.upsert(tresOlivosShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId")
                     }
                 }
 
                 val coordinate2 =
                     Coordinate(latitude = 40.50064546438078, longitude = -3.691342396218224)
-                val coordinateId2 = coordinateDao.insert(coordinate2)
+                val coordinateId2 = coordinateDao.upsert(coordinate2)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId2")
 
                 // Check if coordinate insertion was successful
@@ -140,7 +134,7 @@ abstract class AppDatabase : RoomDatabase() {
                         zipCode = 28034,
                         coordinateId = coordinateId2.toInt()
                     )
-                    val addressId2 = addressDao.insert(address2)
+                    val addressId2 = addressDao.upsert(address2)
                     Log.d(TAG, "Inserted address with ID: $addressId2")
 
                     // Check if address insertion was successful
@@ -160,13 +154,13 @@ abstract class AppDatabase : RoomDatabase() {
                             addressId = addressId2.toInt(),
                             locationId = coordinateId2.toInt()
                         )
-                        val shopId2 = shopDao.insert(montecarmeloShop1)
+                        val shopId2 = shopDao.upsert(montecarmeloShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId2")
                     }
                 }
 
                 val coordinate3 = Coordinate(latitude = 40.4172309597888, longitude = -3.6738480248533203)
-                val coordinateId3 = coordinateDao.insert(coordinate3)
+                val coordinateId3 = coordinateDao.upsert(coordinate3)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId3")
 
                 // Check if coordinate insertion was successful
@@ -180,7 +174,7 @@ abstract class AppDatabase : RoomDatabase() {
                         zipCode = 28009,
                         coordinateId = coordinateId3.toInt()
                     )
-                    val addressId3 = addressDao.insert(address3)
+                    val addressId3 = addressDao.upsert(address3)
                     Log.d(TAG, "Inserted address with ID: $addressId3")
 
                     // Check if address insertion was successful
@@ -204,7 +198,7 @@ abstract class AppDatabase : RoomDatabase() {
                             addressId = addressId3.toInt(),
                             locationId = coordinateId3.toInt()
                         )
-                        val shopId3 = shopDao.insert(retiroShop1)
+                        val shopId3 = shopDao.upsert(retiroShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId3")
                     }
                 }

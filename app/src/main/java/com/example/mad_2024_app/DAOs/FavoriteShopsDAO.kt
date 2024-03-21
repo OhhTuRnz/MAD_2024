@@ -1,17 +1,16 @@
 package com.example.mad_2024_app.DAOs
 
 import androidx.room.Dao
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
-import androidx.room.OnConflictStrategy
+import androidx.room.Upsert
 import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
 
 @Dao
 interface FavoriteShopsDAO {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addFavoriteShop(favoriteShop: FavoriteShops) : Long
+    @Upsert
+    suspend fun upsert(favoriteShop: FavoriteShops) : Long
 
     @Delete
     suspend fun removeFavoriteShop(favoriteShop: FavoriteShops)
