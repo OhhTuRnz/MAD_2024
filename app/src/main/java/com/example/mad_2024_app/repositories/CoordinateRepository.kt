@@ -30,7 +30,7 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
 
     fun getAddressById(addressId: Int): Flow<Coordinate?> = flow {
         // Check if address is present in cache
-        val cachedAddress = cache.getIfPresent(addressId.toString()) as Coordinate?
+        val cachedAddress = cache.getIfPresent(modelName+addressId.toString()) as Coordinate?
         if (cachedAddress != null) {
             emit(cachedAddress) // Emit cached address if present
         } else {
@@ -52,12 +52,12 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     suspend fun deleteAddress(coordinate: Coordinate) {
         coordinateDAO.delete(coordinate)
         // Remove address from cache after deletion
-        cache.invalidate(coordinate.coordinateId.toString())
+        cache.invalidate(modelName+coordinate.coordinateId.toString())
     }
 
     suspend fun deleteAddressById(addressId: Int) {
         coordinateDAO.deleteById(addressId)
         // Remove address from cache after deletion
-        cache.invalidate(addressId.toString())
+        cache.invalidate(modelName+addressId.toString())
     }
 }

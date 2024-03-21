@@ -51,7 +51,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         val cacheKey = "${location.latitude},${location.longitude},$radius"
 
         // Check cache
-        val cachedShops = cache.getIfPresent(cacheKey) as? List<Shop>
+        val cachedShops = cache.getIfPresent(modelName+cacheKey) as? List<Shop>
         if (cachedShops != null) {
             emit(cachedShops)
         } else {

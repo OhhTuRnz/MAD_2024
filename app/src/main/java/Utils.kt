@@ -1,14 +1,25 @@
 import android.content.Context
 import android.location.Location
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.mad_2024_app.R
+import com.google.common.cache.Cache
 import java.io.File
 import java.io.IOException
 
 class Utils {
     companion object {
+
+        fun printCacheContents(TAG : String, cache: Cache<String, Any>){
+            val cacheContents = cache.asMap()
+            Log.d(TAG, "Cache Contents:")
+
+            cacheContents.forEach { (key, value) ->
+                Log.d(TAG, "Key: $key, Value: $value")
+            }
+        }
         fun writeLocationToCSV(context: Context, location: Location) {
             val fileName = "locations.csv"
             val file = File(context.filesDir, fileName)

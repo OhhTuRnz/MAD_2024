@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOn
 class AddressRepository(private val addressDAO: AddressDAO, private val cache: Cache<String, Any>) : IRepository {
 
     private val TAG: String = "AddressRepo"
+    private val modelName: String = "Address"
 
     fun getAllAddresses(): Flow<List<Address>> = flow {
         // Check if addresses are present in cache
@@ -30,14 +31,14 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
 
     fun getAddressById(addressId: Int): Flow<Address?> = flow {
         // Check if address is present in cache
-        val cachedAddress = cache.getIfPresent(addressId.toString()) as Address?
+        val cachedAddress = cache.getIfPresent(modelName+addressId.toString()) as Address?
         if (cachedAddress != null) {
             emit(cachedAddress) // Emit cached address if present
         } else {
             // If address is not in cache, fetch from database and emit result
             val address = addressDAO.getAddressById(addressId).firstOrNull()
             address?.let {
-                cache.put(addressId.toString(), it) // Cache the address if found
+                cache.put(modelName+addressId.toString(), it) // Cache the address if found
             }
             emit(address) // Emit address from database or null if not found
         }
@@ -46,19 +47,20 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
     suspend fun insertAddress(address: Address) {
         addressDAO.insert(address)
         // Update cache after insertion
-        cache.put(address.addressId.toString(), address)
+        cache.put(modelName+address.addressId.toString(), address)
+        Utils.printCacheContents(TAG, cache)
     }
 
     suspend fun deleteAddress(address: Address) {
         addressDAO.delete(address)
         // Remove address from cache after deletion
-        cache.invalidate(address.addressId.toString())
+        cache.invalidate(modelName+address.addressId.toString())
     }
 
     suspend fun deleteAddressById(addressId: Int) {
         addressDAO.deleteById(addressId)
         // Remove address from cache after deletion
-        cache.invalidate(addressId.toString())
+        cache.invalidate(modelName+addressId.toString())
     }
 
     // Additional methods as needed

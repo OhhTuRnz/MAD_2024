@@ -26,7 +26,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
 
     fun getUserById(userId: Int): Flow<User?> = flow {
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(userId.toString()) as User?
+        val cachedUser = cache.getIfPresent(modelName+userId.toString()) as User?
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userId: $userId")
             emit(cachedUser) // Emit cached user
@@ -44,7 +44,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
 
     fun getUserByUUID(userUUID: String): Flow<User?> = flow {
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(userUUID) as User?
+        val cachedUser = cache.getIfPresent(modelName+userUUID) as User?
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $userUUID")
             emit(cachedUser) // Emit cached user
@@ -59,13 +59,4 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
             emit(user) // Emit user from database or null if not found
         }
     }.flowOn(Dispatchers.IO)
-
-    private fun printCacheContents(){
-        val cacheContents = cache.asMap()
-        Log.d(TAG, "Cache Contents:")
-
-        cacheContents.forEach { (key, value) ->
-            Log.d(TAG, "Key: $key, Value: $value")
-        }
-    }
 }

@@ -2,6 +2,7 @@ import android.content.Context
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.CoordinateRepository
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
 import com.google.common.cache.Cache
@@ -34,6 +35,12 @@ class DbUtils {
             val database = getDatabase(context)
             val addressDao = database.addressDao()
             return AddressRepository(addressDao, getCache(context))
+        }
+
+        fun getCoordinateRepository(context: Context): CoordinateRepository {
+            val database = getDatabase(context)
+            val coordinateDao = database.coordinateDao()  // Replace with your actual method name
+            return CoordinateRepository(coordinateDao, getCache(context))
         }
     }
 }
