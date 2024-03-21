@@ -27,11 +27,12 @@ import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
+import com.example.mad_2024_app.controller.FragmentPageAdapter
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
@@ -45,6 +46,7 @@ import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
 
@@ -64,6 +66,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     private lateinit var listView: ListView
     private lateinit var shopAdapter: ShopAdapter
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager2: ViewPager2
+    private lateinit var adapter: FragmentPageAdapter
 
     private val TAG = "LogoGPSMainActivity"
 
@@ -83,6 +88,40 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupDrawer()
 
         setupBottomNav()
+
+        tabLayout = findViewById(R.id.tabLayout)
+        viewPager2 = findViewById(R.id.viewPager2)
+
+        adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)
+
+        tabLayout.addTab(tabLayout.newTab().setText("Principal"))
+        tabLayout.addTab(tabLayout.newTab().setText("Recientes"))
+
+        viewPager2.adapter = adapter
+
+        tabLayout.addOnTabSelectedListener(object: TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (tab != null) {
+                    viewPager2.currentItem = tab.position
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
+
+        viewPager2.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                tabLayout.selectTab(tabLayout.getTabAt(position))
+            }
+        })
 
         storeUserIfNotExisting(sharedPreferences)
 

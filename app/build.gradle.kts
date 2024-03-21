@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("androidx.appcompat:appcompat:1.6.1")
