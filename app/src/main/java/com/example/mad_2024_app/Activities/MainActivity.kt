@@ -27,13 +27,14 @@ import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
-import com.example.mad_2024_app.controller.FragmentPageAdapter
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.controller.FragmentPageAdapter
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
@@ -46,6 +47,7 @@ import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
