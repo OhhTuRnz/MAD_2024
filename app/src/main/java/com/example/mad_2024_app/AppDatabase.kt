@@ -203,7 +203,7 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate4 = Coordinate(latitude = 40.306762199660604, longitude = -3.442294137777558)
+                val coordinate4 = Coordinate(latitude = 40.30107009651909, longitude = -3.4422432300331773)
                 val coordinateId4 = coordinateDao.upsert(coordinate4)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId4")
 
@@ -600,6 +600,48 @@ abstract class AppDatabase : RoomDatabase() {
                         )
                         val shopId13 = shopDao.upsert(bergueShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId13")
+                    }
+                }
+
+                val coordinate14 = Coordinate(latitude = 40.50353974997118, longitude = -3.708478944806984)
+                val coordinateId14 = coordinateDao.upsert(coordinate14)
+                Log.d(TAG, "Inserted coordinate with ID: $coordinateId14")
+
+                // Check if coordinate insertion was successful
+                if (coordinateId14 != -1L) {
+                    // Insert address associated with the coordinate
+                    val address14 = Address(
+                        street = "Av. del Monasterio de Silos",
+                        city = "Fuencarral-El Pardo, Madrid",
+                        country = "Spain",
+                        number = 20,
+                        zipCode = 28034,
+                        coordinateId = coordinateId14.toInt()
+                    )
+                    val addressId14 = addressDao.upsert(address14)
+                    Log.d(TAG, "Inserted address with ID: $addressId14")
+
+                    // Check if address insertion was successful
+                    if (addressId14 != -1L) {
+                        // Insert shop associated with the address
+                        val panariaShop1 = Shop(
+                            name = "PANARIA MONTECARMELO",
+                            description = "Service options\n" +
+                                    "\n" +
+                                    "Outdoor seating\n" +
+                                    "\n" +
+                                    "No-contact delivery\n" +
+                                    "\n" +
+                                    "Dine-in\n" +
+                                    "\n" +
+                                    "Kerbside pickup\n\n" +
+                                    "\n" +
+                                    "Takeaway",
+                            addressId = addressId14.toInt(),
+                            locationId = coordinateId14.toInt()
+                        )
+                        val shopId14 = shopDao.upsert(panariaShop1)
+                        Log.d(TAG, "Inserted shop with ID: $shopId14")
                     }
                 }
             }
