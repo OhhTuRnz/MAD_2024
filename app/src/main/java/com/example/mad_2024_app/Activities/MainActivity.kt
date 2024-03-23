@@ -144,7 +144,6 @@ class MainActivity : AppCompatActivity(), LocationListener {
     override fun onDestroy() {
         super.onDestroy()
 
-        Toast.makeText(this, "prueba", Toast.LENGTH_SHORT).show()
         Log.d(TAG, "OnDestroy: MAIN DESTROYED")
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
         // Reset isFirstOpen to true when the app is closed or sent to the background
