@@ -30,9 +30,11 @@ import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -64,13 +66,7 @@ class LoginActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                firebaseAuthWithGoogle(account.idToken!!)
-            } catch (e: ApiException) {
-                Log.w(TAG, "Google sign in failed", e)
-                // Handle Google Sign-In failure
-            }
+            handleSignInResult(task)
         }
     }
 
@@ -267,14 +263,24 @@ class LoginActivity : AppCompatActivity() {
                             // Existing user logic, if needed
                         }
 
-                        startActivity(intent)
-                        finish()
+                        redirectToMainActivity()
                     }
                 } else {
                     Log.d(TAG, "Invalid user login")
                     Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            account?.idToken?.let { firebaseAuthWithGoogle(it) }
+        } catch (e: ApiException) {
+            Log.w(TAG, "Google sign in failed", e)
+            // Update your UI with a message
+            Toast.makeText(this, "Google sign in failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
@@ -284,19 +290,9 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Google sign-in successful, check if new or existing user
                     val user = auth.currentUser
-                    if (user != null) {
+                    user?.let {
                         // Check if the user exists in your database
-                        lifecycleScope.launch {
-                            val userFromDb = userViewModel.getUserByUUIDPreCollect(user.uid).firstOrNull()
-                            if (userFromDb == null) {
-                                // New user, create an entry in your database
-                                createUserInDatabase(user)
-                            } else {
-                                // Existing user
-                                Log.d(TAG, "Existing Firebase user found")
-                                // You can redirect to the main activity here if needed
-                            }
-                        }
+                        checkUserInDatabase(it)
                     }
                 } else {
                     // Google sign-in failed
@@ -306,19 +302,43 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    private fun checkUserInDatabase(firebaseUser: FirebaseUser) {
+        lifecycleScope.launch {
+            val userFromDb = userViewModel.getUserByUUIDPreCollect(firebaseUser.uid).firstOrNull()
+            if (userFromDb == null) {
+                // New user, create an entry in your database
+                userViewModel.upsertUser(
+                    User(
+                        uuid = firebaseUser.uid,
+                        email = firebaseUser.email
+                    )
+                )
+            } else {
+                // Existing user
+                Log.d(TAG, "Existing Firebase user found")
+                redirectToMainActivity()
+            }
+        }
+    }
+
     private fun createUserInDatabase(firebaseUser: FirebaseUser) {
         val newUserDetails = User(
             uuid = firebaseUser.uid,
             email = firebaseUser.email ?: ""
-        ) // Adjust according to your User data class
+        )
+        // Adjust according to your User data class
 
-        // Upsert (create or update) the new user in the database
         userViewModel.upsertUser(newUserDetails).also {
             Log.d(TAG, "New Firebase user created with UUID: ${firebaseUser.uid}")
-            // Update shared preferences with the new user's UUID
             val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
             sharedPreferences.edit().putString("userId", firebaseUser.uid).apply()
-            // Redirect to the main activity or perform other post-creation actions
+            redirectToMainActivity()
         }
+    }
+
+    private fun redirectToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

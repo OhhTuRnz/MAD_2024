@@ -22,7 +22,7 @@
     <!-- Colors for dark theme -->
     <color name="primaryDarkColor">#37474F</color> <!-- Dark theme primary color -->
     <color name="primaryDarkLightColor">#62727B</color> <!-- Dark theme lighter variant of primary color -->
-    <color name="accentDarkColor">#283593</color> <!-- Dark theme accent color -->
+    <color name="accentDarkColor">#2E3DAA</color> <!-- Dark theme accent color -->
     <color name="backgroundDark">#263238</color> <!-- dark gray -->
     <color name="textColorDark">@color/white</color> <!-- white -->
     <color name="drawerBackgroundDark">@color/purple_300</color> <!-- purple 300 -->
