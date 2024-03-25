@@ -1,6 +1,6 @@
 package com.example.mad_2024_app.Activities
 
-import android.app.Activity
+import DbUtils
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -92,7 +92,7 @@ class LoginActivity : AppCompatActivity() {
         buttonLogin = findViewById(R.id.buttonLogin)
         buttonCancel = findViewById(R.id.buttonCancel)
 
-        buttonLogin.setOnClickListener {
+        buttonLogin.setOnClickListener{
             val email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
 
@@ -301,6 +301,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun checkUserInDatabase(firebaseUser: FirebaseUser) {
         lifecycleScope.launch {
+            val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
             val userFromDb = userViewModel.getUserByUUIDPreCollect(firebaseUser.uid).firstOrNull()
             if (userFromDb == null) {
                 // New user, create an entry in your database
@@ -311,10 +312,12 @@ class LoginActivity : AppCompatActivity() {
                     )
                 )
                 Log.d(TAG, "No Firebase Google account found, creating user")
+                sharedPreferences.edit().putString("userId", firebaseUser.uid).apply()
                 redirectToMainActivity()
             } else {
                 // Existing user
                 Log.d(TAG, "Existing Firebase user found")
+                sharedPreferences.edit().putString("userId", firebaseUser.uid).apply()
                 redirectToMainActivity()
             }
         }

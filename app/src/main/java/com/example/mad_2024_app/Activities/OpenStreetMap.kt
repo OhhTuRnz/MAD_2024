@@ -34,6 +34,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
+@Suppress("DEPRECATION")
 class OpenStreetMap : AppCompatActivity() {
     private val TAG = "LogoGPSOpenStreetMapActivity"
 
@@ -68,25 +69,45 @@ class OpenStreetMap : AppCompatActivity() {
 
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
 
-        val bundle = intent.getBundleExtra("locationBundle")
+        // Check if the intent contains the "locationBundle" extra
+        if (intent.hasExtra("locationBundle")) {
+            // Handle intent with location bundle
+            val bundle = intent.getBundleExtra("locationBundle")
+            latestLocation = bundle?.getParcelable("location")!!
+            updateNearbyStores(location = latestLocation)
+        } else if (intent.hasExtra("shopLocation")) {
+            // Handle intent with shop location
+            val bundle = intent.getBundleExtra("shopLocation")
+            val shopLatitude = intent.getDoubleExtra("shopLatitude", 0.0)
+            val shopLongitude = intent.getDoubleExtra("shopLongitude", 0.0)
+            // Perform actions with shop location
+        }
 
-        latestLocation = bundle?.getParcelable("location", Location::class.java)!!
+        // Retrieve latitude and longitude from the intent extras
+        val shopLatitude = intent.getDoubleExtra("shopLatitude", 0.0)
+        val shopLongitude = intent.getDoubleExtra("shopLongitude", 0.0)
 
-        updateNearbyStores(location=latestLocation)
+        if (shopLatitude != 0.0 && shopLongitude != 0.0) {
+            // Create a GeoPoint for the shop's location
+            val shopLocation = GeoPoint(shopLatitude, shopLongitude)
+            // Set the center of the map to the shop's location
+            map.controller.setCenter(shopLocation)
+            // Add a marker for the shop's location
+            addMarker(shopLocation, "Shop Location")
+        } else {
+            // If shop's location is not provided, use the current location as the center
+            val startPoint = GeoPoint(latestLocation.latitude, latestLocation.longitude)
+            map.controller.setCenter(startPoint)
+            addMarker(startPoint, "My current location")
+        }
 
-        Log.i(
-            TAG,
-            "onCreate: Location[" + latestLocation.altitude + "][" + latestLocation.latitude + "][" + latestLocation.longitude + "]["
-        )
+        updateNearbyStores(location = latestLocation)
+
         Configuration.getInstance()
             .load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
         map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.controller.setZoom(18.0)
-        val startPoint = GeoPoint(latestLocation.latitude, latestLocation.longitude)
-        //val startPoint = GeoPoint(40.416775, -3.703790) in case you want to test it mannualy
-        map.controller.setCenter(startPoint)
-        addMarker(startPoint, "My current location")
     }
 
     private fun updateShopDetails() {

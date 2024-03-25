@@ -45,9 +45,11 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
     }.flowOn(Dispatchers.IO)
 
     suspend fun upsertAddress(address: Address) {
-        addressDAO.upsert(address)
+        val upsertedId = addressDAO.upsert(address)
         // Update cache after insertion
-        cache.put(modelName+address.addressId.toString(), address)
+        if (upsertedId != -1L) {
+            cache.put(modelName + upsertedId.toString(), address)
+        }
         Utils.printCacheContents(TAG, cache)
     }
 

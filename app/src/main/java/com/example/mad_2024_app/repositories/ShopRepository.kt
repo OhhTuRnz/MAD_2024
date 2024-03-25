@@ -21,7 +21,11 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
 
     // Method to insert a shop
     suspend fun upsert(shop: Shop){
-        shopDao.upsert(shop)
+        val upsertedId = shopDao.upsert(shop)
+
+        if (upsertedId != -1L) {
+            cache.put(modelName + upsertedId.toString(), shop)
+        }
     }
 
     data class PointF(val x: Double, val y: Double)

@@ -13,7 +13,7 @@
     <!-- Colors for light theme -->
     <color name="primaryColor">#FF4081</color> <!-- Replace with your desired primary color -->
     <color name="primaryLightColor">#FF8A65</color> <!-- Lighter variant of primary color -->
-    <color name="accentColor">#C88A2F</color> <!-- Replace with your desired accent color -->
+    <color name="accentColor">#EF26AD</color> <!-- Replace with your desired accent color -->
     <color name="backgroundLight">@color/white</color> <!-- white -->
     <color name="textColorLight">@color/black</color> <!-- black -->
     <color name="drawerBackgroundLight">#F44336</color> <!-- strong orange -->
@@ -22,7 +22,7 @@
     <!-- Colors for dark theme -->
     <color name="primaryDarkColor">#37474F</color> <!-- Dark theme primary color -->
     <color name="primaryDarkLightColor">#62727B</color> <!-- Dark theme lighter variant of primary color -->
-    <color name="accentDarkColor">#2E3DAA</color> <!-- Dark theme accent color -->
+    <color name="accentDarkColor">#9B60FA</color> <!-- Dark theme accent color -->
     <color name="backgroundDark">#263238</color> <!-- dark gray -->
     <color name="textColorDark">@color/white</color> <!-- white -->
     <color name="drawerBackgroundDark">@color/purple_300</color> <!-- purple 300 -->

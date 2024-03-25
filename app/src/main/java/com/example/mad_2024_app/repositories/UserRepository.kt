@@ -16,10 +16,12 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
     suspend fun upsert(user: User) {
         // Insert user into the database
         Log.d(TAG, "Upserting user with uuid ${user.uuid}")
-        userDao.upsert(user)
+        val upsertedId = userDao.upsert(user)
 
         // Update cache after insertion
-        cache.put(modelName+user.uuid, user)
+        if (upsertedId != -1L) {
+            cache.put(modelName + upsertedId.toString(), user)
+        }
     }
 
     fun getUserById(userId: Int): Flow<User?> = flow {

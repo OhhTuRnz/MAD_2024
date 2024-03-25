@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Upsert
 import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteShopsDAO {
@@ -15,11 +16,12 @@ interface FavoriteShopsDAO {
     @Delete
     suspend fun removeFavoriteShop(favoriteShop: FavoriteShops)
 
-    @Query("DELETE FROM FavoriteShops WHERE userId = :userId AND shopId = :shopId")
-    fun removeFavoriteShopById(userId: Int, shopId: Int)
+    @Query("DELETE FROM FavoriteShops WHERE uuid = :uuid AND shopId = :shopId")
+    suspend fun removeFavoriteShopById(uuid: String?, shopId: Int)
 
-    @Query("SELECT * FROM Shop INNER JOIN FavoriteShops ON Shop.shopId = FavoriteShops.shopId WHERE FavoriteShops.userId = :userId")
-    fun getFavoriteShopsByUser(userId: Int): List<Shop>
+    @Query("SELECT * FROM Shop INNER JOIN FavoriteShops ON Shop.shopId = FavoriteShops.shopId WHERE FavoriteShops.uuid = :uuid")
+    fun getFavoriteShopsByUser(uuid: String?): Flow<List<Shop>>
 
-    // Other database operations as needed
+    @Query("SELECT COUNT(*) > 0 FROM FavoriteShops WHERE uuid = :uuid AND shopId = :shopId")
+    suspend fun isShopFavorite(uuid: String?, shopId: Int): Boolean
 }

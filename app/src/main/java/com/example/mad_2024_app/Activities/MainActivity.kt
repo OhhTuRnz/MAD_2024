@@ -20,6 +20,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,11 +40,16 @@ import com.example.mad_2024_app.Controller.FragmentPageAdapter
 
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
+import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
+import com.example.mad_2024_app.view_models.CoordinateViewModel
+import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
@@ -60,19 +66,25 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var latestLocation: Location
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var toggle: ActionBarDrawerToggle
+
     private lateinit var userViewModel: UserViewModel
     private lateinit var shopViewModel: ShopViewModel
     private lateinit var addressViewModel: AddressViewModel
+    private lateinit var favoriteShopsViewModel : FavoriteShopsViewModel
+    private lateinit var coordinateViewModel : CoordinateViewModel
+
     private lateinit var userRepo: UserRepository
     private lateinit var shopRepo: ShopRepository
     private lateinit var addressRepo: AddressRepository
+    private lateinit var favoriteShopsRepo : FavoriteShopsRepository
+    private lateinit var coordinateRepo: CoordinateRepository
 
     private lateinit var listView: ListView
     private lateinit var shopAdapter: ShopAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: FragmentPageAdapter
-    private lateinit var likeButton: CheckBox
+    private lateinit var likeButton: ImageButton
 
     private val TAG = "LogoGPSMainActivity"
 
@@ -130,22 +142,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
         })
         //Fin
 
-        //Boton corazon
-        val shopListItemView = layoutInflater.inflate(R.layout.shop_list_item, null)
-        likeButton = shopListItemView.findViewById(R.id.like_button)
-        likeButton.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked){
-                Toast.makeText(applicationContext, "Added to favourites", Toast.LENGTH_SHORT).show()
-            }
-            else {
-                Toast.makeText(applicationContext, "Removed from favourites", Toast.LENGTH_SHORT).show()
-            }
-        }
-        //Fin
-
         storeUserIfNotExisting(sharedPreferences)
 
-        val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
+        val backgroundImageView: ImageView = findViewById(R.id.donutBackground)
         val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
         Glide.with(this).load(gifUrl).into(backgroundImageView)
 
@@ -154,7 +153,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         setupPermissionLauncher()
         checkPermissionsAndStartLocationUpdates()
 
-        setupShopObserverForNearbyStores(appContext)
+        setupShopObserverForNearbyStores(appContext, sharedPreferences)
 
         Log.d(TAG, "onCreate: Main activity is being created")
     }
@@ -171,18 +170,39 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    private fun setupShopObserverForNearbyStores(appContext: Context) {
-        val listView = findViewById<ListView>(R.id.lvShops)
-        val shopAdapter = ShopAdapter(this, addressViewModel)
-        listView.adapter = shopAdapter
+    private fun setupShopObserverForNearbyStores(appContext: Context, sharedPreferences: SharedPreferences) {
+        val userId = sharedPreferences.getString("userId", null)
 
-        // Observe the shopsNearCoordinates LiveData
-        shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
-            if (shops != null) {
-                Log.d(TAG, "In observer, shops aren't null")
-                shopAdapter.setShops(shops)
-            }
-        })
+        if (userId != null) {
+            // Initialize an empty set to hold favorite shop IDs
+            val favoriteShops = mutableSetOf<Int>()
+
+            // Initialize the ListView and adapter
+            val listView = findViewById<ListView>(R.id.lvShops)
+            val shopAdapter = ShopAdapter(this, addressViewModel, favoriteShopsViewModel, coordinateViewModel, sharedPreferences)
+            listView.adapter = shopAdapter
+
+            favoriteShopsViewModel.getFavoriteShopsByUser(userId)
+            // Observing favorite shops and updating the adapter's favorite shops set
+            favoriteShopsViewModel.favoriteShops.observe(this, Observer { favoriteShopsList ->
+                if (favoriteShopsList != null) {
+                    // Extracting shop IDs from the favorite shops list
+                    val favoriteShopIds = favoriteShopsList.map { it.shopId }.toSet()
+                    Log.d(TAG, "Size of favorite shops: ${favoriteShopIds.size}")
+                    shopAdapter.setFavoriteShopsIds(favoriteShopIds)
+                }
+            })
+
+            // Observing shops near coordinates to update the adapter's shop list
+            shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
+                if (shops != null) {
+                    shopAdapter.setShops(shops)
+                }
+            })
+        } else {
+            // Handle case where user ID is not available
+            Log.e(TAG, "User ID not found in SharedPreferences.")
+        }
     }
 
     private fun initializeViewModels(appContext: Context){
@@ -197,6 +217,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
         addressRepo = DbUtils.getAddressRepository(appContext)
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
+
+        favoriteShopsRepo = DbUtils.getFavoriteShopsRepository(appContext)
+        val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
+        favoriteShopsViewModel = ViewModelProvider(this, favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
+
+        coordinateRepo = DbUtils.getCoordinateRepository(appContext)
+        val coordinateFactory = ViewModelFactory(coordinateRepo)
+        coordinateViewModel = ViewModelProvider(this, coordinateFactory).get(CoordinateViewModel::class.java)
     }
 
     private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences) {
@@ -426,10 +454,13 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     }
 
-    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel) : BaseAdapter() {
+    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel, private val favoriteShopsViewModel: FavoriteShopsViewModel, private val coordinateViewModel: CoordinateViewModel, private val sharedPreferences: SharedPreferences) : BaseAdapter() {
         private var shops: MutableList<Shop> = mutableListOf()
-
+        private var favoriteShopsIds: Set<Int> = emptySet()
         private val TAG = "ShopAdapter"
+
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
             Log.d(TAG, "Added ${shops.size} shop(s)")
@@ -437,6 +468,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
             shops.addAll(newShops)
             notifyDataSetChanged()
         }
+
+        fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
+            Log.d(TAG, "Adding Favorite Shops")
+            Log.d(TAG, "Added ${newFavoriteShopsIds.size} shop(s)")
+            favoriteShopsIds = newFavoriteShopsIds
+            notifyDataSetChanged()
+        }
+
         override fun getCount(): Int = shops.size
 
         override fun getItem(position: Int): Any = shops[position]
@@ -444,8 +483,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
         override fun getItemId(position: Int): Long = position.toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val listItemView = convertView
-                ?: LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
+            val listItemView = convertView ?: inflater.inflate(R.layout.shop_list_item, parent, false)
 
             val shop = getItem(position) as Shop
             listItemView.findViewById<TextView>(R.id.shop_name).text = shop.name
@@ -454,13 +492,65 @@ class MainActivity : AppCompatActivity(), LocationListener {
             shop.addressId?.let { addressId ->
                 addressViewModel.getAddressById(addressId) { address ->
                     address?.let {
-                        // Update the UI with the address
                         listItemView.findViewById<TextView>(R.id.shop_address).text = formatAddressString(it)
                     }
                 }
             }
 
+            // Find the like button (CheckBox) in the inflated view
+            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button)
+
+            // Check if the shop is a favorite and update the checkbox state
+            val isFavorite = shop.shopId in favoriteShopsIds
+            likeButton.isChecked = isFavorite
+
+            // Set OnCheckedChangeListener for the likeButton (CheckBox)
+            likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                // Inside this block, you can put your logic for handling the checkbox state change
+                Log.d(TAG, "Checkbox state changed: $isChecked")
+
+                val uuid = sharedPreferences.getString("userId", null)
+
+                if (uuid == null) {
+                    Log.e(TAG, "User ID is null.")
+                    return@setOnCheckedChangeListener
+                }
+
+                if (isChecked) {
+                    Log.d(TAG, "Adding shop ${shop.shopId} to favorites.")
+                    favoriteShopsViewModel.upsertFavoriteShop(FavoriteShops(uuid = uuid, shopId = shop.shopId))
+                } else {
+                    Log.d(TAG, "Removing shop ${shop.shopId} from favorites.")
+                    favoriteShopsViewModel.removeFavoriteShopById(uuid = uuid, shopId = shop.shopId)
+                }
+            }
+
+            // Find the map button (ImageView) in the inflated view
+            val mapButton = listItemView.findViewById<ImageView>(R.id.map_button)
+
+            shop.locationId?.let { locationId ->
+                coordinateViewModel.getCoordinateById(locationId) { coordinate ->
+                    coordinate?.let {
+                        // Set OnClickListener for the mapButton (ImageView)
+                        mapButton.setOnClickListener { view ->
+                            // Inside this block, call the goMaps function and pass the appropriate parameters
+                            val intent = Intent(view.context, OpenStreetMap::class.java)
+                            intent.putExtra("shopLocation", Bundle().apply {
+                                putDouble("shopLatitude", coordinate.latitude)
+                                putDouble("shopLongitude", coordinate.longitude)
+                            })
+                            view.context.startActivity(intent)
+                        }
+                    }
+                }
+            }
+
             return listItemView
+        }
+
+        private fun isShopFavorite(shopId: Int): Boolean {
+            val favoriteShopIds: Set<Int>? = favoriteShopsIds
+            return favoriteShopIds?.contains(shopId) ?: false
         }
 
         private fun formatAddressString(address: Address): String {

@@ -43,9 +43,10 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     }.flowOn(Dispatchers.IO)
 
     suspend fun upsertAddress(coordinate: Coordinate) {
-        coordinateDAO.upsert(coordinate)
-        // Update cache after insertion
-        cache.put(modelName+coordinate.coordinateId.toString(), coordinate)
+        val upsertedId = coordinateDAO.upsert(coordinate)
+        if (upsertedId != -1L) {
+            cache.put(modelName + upsertedId.toString(), coordinate)
+        }
     }
 
     suspend fun deleteAddress(coordinate: Coordinate) {

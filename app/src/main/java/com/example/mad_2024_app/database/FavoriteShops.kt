@@ -4,12 +4,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 
 @Entity(
-    primaryKeys = ["userId", "shopId"],
+    primaryKeys = ["uuid", "shopId"],
     foreignKeys = [
-        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["userId"]),
+        ForeignKey(entity = User::class, parentColumns = ["uuid"], childColumns = ["uuid"]),
         ForeignKey(entity = Shop::class, parentColumns = ["shopId"], childColumns = ["shopId"], onDelete= ForeignKey.CASCADE)
     ])
 data class FavoriteShops(
-    val userId: Int,
+    val uuid: String,
     val shopId: Int
 )
