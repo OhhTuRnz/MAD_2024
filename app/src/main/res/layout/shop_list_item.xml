@@ -46,13 +46,12 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/map_cartoon"/>
 
-        <ImageButton
+        <CheckBox
             android:id="@+id/like_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/heart_filled" /> <!-- Replace with your heart icon -->
-
+            android:button ="@drawable/selector_favourites_item" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,4 +1,4 @@
-package com.example.mad_2024_app.controller
+package com.example.mad_2024_app.Controller
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

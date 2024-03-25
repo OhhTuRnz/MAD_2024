@@ -3,6 +3,7 @@ package com.example.mad_2024_app.Activities
 import Utils
 import Utils.Companion.saveCoordinatesToFile
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,14 +29,14 @@ import android.widget.ListView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
-import com.example.mad_2024_app.controller.FragmentPageAdapter
+import com.example.mad_2024_app.Controller.FragmentPageAdapter
+
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
@@ -47,7 +49,6 @@ import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
@@ -71,9 +72,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: FragmentPageAdapter
+    private lateinit var likeButton: CheckBox
 
     private val TAG = "LogoGPSMainActivity"
 
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -91,12 +94,13 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         setupBottomNav()
 
+        //TabLayout
         tabLayout = findViewById(R.id.tabLayout)
         viewPager2 = findViewById(R.id.viewPager2)
 
         adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)
 
-        tabLayout.addTab(tabLayout.newTab().setText("Principal"))
+        tabLayout.addTab(tabLayout.newTab().setText("Cercanas"))
         tabLayout.addTab(tabLayout.newTab().setText("Recientes"))
 
         viewPager2.adapter = adapter
@@ -124,6 +128,20 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 tabLayout.selectTab(tabLayout.getTabAt(position))
             }
         })
+        //Fin
+
+        //Boton corazon
+        val shopListItemView = layoutInflater.inflate(R.layout.shop_list_item, null)
+        likeButton = shopListItemView.findViewById(R.id.like_button)
+        likeButton.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked){
+                Toast.makeText(applicationContext, "Added to favourites", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                Toast.makeText(applicationContext, "Removed from favourites", Toast.LENGTH_SHORT).show()
+            }
+        }
+        //Fin
 
         storeUserIfNotExisting(sharedPreferences)
 
@@ -247,6 +265,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
             when (item.itemId) {
                 R.id.nav_favorites -> {
                     // Handle favorites action
+                    Toast.makeText(applicationContext, "Favourites", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goFavourite(rootView)
                     true
                 }
 
@@ -502,6 +523,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private fun goProfile(view: View){
         // go to Settings
         val intent = Intent(this, Profile::class.java)
+        startActivity(intent)
+    }
+
+    private fun goFavourite(view: View){
+        // go to favourites
+        val intent = Intent(this, FavoriteShopsActivity::class.java)
         startActivity(intent)
     }
 

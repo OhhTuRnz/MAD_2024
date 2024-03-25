@@ -7,39 +7,40 @@
     android:layout_height="match_parent"
     tools:context=".Activities.ThirdActivity">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:gravity="center"
-    tools:context=".Activities.ThirdActivity"
-    android:padding="16dp"
-    android:background="?attr/mainBackgroundColor">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/mainBackgroundColor"
+        android:gravity="center"
+        android:padding="16dp"
+        tools:context=".Activities.ThirdActivity">
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello! This is the third activity"
-        android:textSize="24sp" />
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello! This is the third activity"
+            android:textSize="24sp" />
 
-    <Button
-        android:id="@+id/undo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginBottom="16dp"
-        android:onClick="onPrevButtonClick"
-        android:text="@string/button_previous"
-        android:backgroundTint="?attr/buttonColor"
-        android:backgroundTintMode="src_atop"/>
+        <Button
+            android:id="@+id/undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="?attr/buttonColor"
+            android:backgroundTintMode="src_atop"
+            android:onClick="onPrevButtonClick"
+            android:text="@string/button_previous" />
     </RelativeLayout>
-<com.google.android.material.navigation.NavigationView
-android:id="@+id/nav_view_drawer"
-android:layout_width="wrap_content"
-android:layout_height="match_parent"
-android:layout_gravity="start"
-android:fitsSystemWindows="true"
-app:headerLayout="@layout/nav_header"
-app:menu="@menu/drawer_menu"/>
-    </androidx.drawerlayout.widget.DrawerLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view_drawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu" />
+</androidx.drawerlayout.widget.DrawerLayout>
