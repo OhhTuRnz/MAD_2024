@@ -64,10 +64,8 @@ class LoginActivity : AppCompatActivity() {
     private val googleSignInResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            handleSignInResult(task)
-        }
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        handleSignInResult(task)
     }
 
     companion object {
@@ -262,7 +260,6 @@ class LoginActivity : AppCompatActivity() {
                             Log.d(TAG, "Existing user found with UUID: ${userFromDb.uuid}")
                             // Existing user logic, if needed
                         }
-
                         redirectToMainActivity()
                     }
                 } else {
@@ -313,26 +310,13 @@ class LoginActivity : AppCompatActivity() {
                         email = firebaseUser.email
                     )
                 )
+                Log.d(TAG, "No Firebase Google account found, creating user")
+                redirectToMainActivity()
             } else {
                 // Existing user
                 Log.d(TAG, "Existing Firebase user found")
                 redirectToMainActivity()
             }
-        }
-    }
-
-    private fun createUserInDatabase(firebaseUser: FirebaseUser) {
-        val newUserDetails = User(
-            uuid = firebaseUser.uid,
-            email = firebaseUser.email ?: ""
-        )
-        // Adjust according to your User data class
-
-        userViewModel.upsertUser(newUserDetails).also {
-            Log.d(TAG, "New Firebase user created with UUID: ${firebaseUser.uid}")
-            val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("userId", firebaseUser.uid).apply()
-            redirectToMainActivity()
         }
     }
 
