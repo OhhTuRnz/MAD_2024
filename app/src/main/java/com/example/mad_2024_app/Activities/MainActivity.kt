@@ -59,8 +59,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
 
-
-class MainActivity : AppCompatActivity(), LocationListener {
+class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
     private lateinit var locationManager: LocationManager
     private lateinit var latestLocation: Location
@@ -87,6 +86,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var likeButton: ImageButton
 
     private val TAG = "LogoGPSMainActivity"
+
+    override fun getLatestLocation(): Location? {
+        return if (::latestLocation.isInitialized) latestLocation else null
+    }
 
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,7 +182,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
             // Initialize the ListView and adapter
             val listView = findViewById<ListView>(R.id.lvShops)
-            val shopAdapter = ShopAdapter(this, addressViewModel, favoriteShopsViewModel, coordinateViewModel, sharedPreferences)
+            val shopAdapter = ShopAdapter(this, addressViewModel, favoriteShopsViewModel, coordinateViewModel, sharedPreferences, this)
             listView.adapter = shopAdapter
 
             favoriteShopsViewModel.getFavoriteShopsByUser(userId)
@@ -454,12 +457,18 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     }
 
-    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel, private val favoriteShopsViewModel: FavoriteShopsViewModel, private val coordinateViewModel: CoordinateViewModel, private val sharedPreferences: SharedPreferences) : BaseAdapter() {
+    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel,
+                      private val favoriteShopsViewModel: FavoriteShopsViewModel,
+                      private val coordinateViewModel: CoordinateViewModel,
+                      private val sharedPreferences: SharedPreferences,
+                      private val locationProvider: ILocationProvider) : BaseAdapter() {
         private var shops: MutableList<Shop> = mutableListOf()
         private var favoriteShopsIds: Set<Int> = emptySet()
         private val TAG = "ShopAdapter"
 
         private val inflater: LayoutInflater = LayoutInflater.from(context)
+
+        private lateinit var latestLocation : Location
 
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
@@ -498,7 +507,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
             }
 
             // Find the like button (CheckBox) in the inflated view
-            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button)
+            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button) as CheckBox
 
             // Check if the shop is a favorite and update the checkbox state
             val isFavorite = shop.shopId in favoriteShopsIds
@@ -533,13 +542,23 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     coordinate?.let {
                         // Set OnClickListener for the mapButton (ImageView)
                         mapButton.setOnClickListener { view ->
+                            latestLocation = locationProvider.getLatestLocation()!!
                             // Inside this block, call the goMaps function and pass the appropriate parameters
-                            val intent = Intent(view.context, OpenStreetMap::class.java)
-                            intent.putExtra("shopLocation", Bundle().apply {
-                                putDouble("shopLatitude", coordinate.latitude)
-                                putDouble("shopLongitude", coordinate.longitude)
-                            })
-                            view.context.startActivity(intent)
+                            if (::latestLocation.isInitialized) {
+                                val intent = Intent(view.context, OpenStreetMap::class.java).apply {
+                                    putExtra("locationBundle", Bundle().apply {
+                                        putParcelable("location", latestLocation)
+                                    })
+                                    putExtra("shopLocation", Bundle().apply {
+                                        putDouble("shopLatitude", coordinate.latitude)
+                                        putDouble("shopLongitude", coordinate.longitude)
+                                    })
+                                }
+                                view.context.startActivity(intent)
+                            } else {
+                                Toast.makeText(view.context, "Location not available yet.", Toast.LENGTH_SHORT).show()
+                                // Optionally, you can trigger location update here
+                            }
                         }
                     }
                 }

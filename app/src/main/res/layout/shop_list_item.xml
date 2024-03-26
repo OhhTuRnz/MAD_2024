@@ -49,7 +49,7 @@
             android:focusable="false"
             android:focusableInTouchMode="false"/>
 
-        <CheckBox
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/like_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,7 +60,6 @@
             android:checked="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:backgroundTint="@null"
-            android:backgroundTintMode="multiply"/>
+            android:backgroundTint="@null" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

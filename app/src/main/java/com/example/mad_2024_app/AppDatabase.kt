@@ -568,7 +568,7 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate13 = Coordinate(latitude = 40.50148291838675, longitude = -3.6906254736554396)
+                val coordinate13 = Coordinate(latitude = 40.50710527518719, longitude = -3.6948296648973167)
                 val coordinateId13 = coordinateDao.upsert(coordinate13)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId13")
 
@@ -643,6 +643,51 @@ abstract class AppDatabase : RoomDatabase() {
                         )
                         val shopId14 = shopDao.upsert(panariaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId14")
+                    }
+                }
+
+                val coordinate15 = Coordinate(latitude = 40.72514755869697, longitude = -2.483507878536185)
+                val coordinateId15 = coordinateDao.upsert(coordinate15)
+                Log.d(TAG, "Inserted coordinate with ID: $coordinateId15")
+
+                // Check if coordinate insertion was successful
+                if (coordinateId15 != -1L) {
+                    // Insert address associated with the coordinate
+                    val address15 = Address(
+                        street = "C. Plazuela",
+                        city = "Cifuentes, Guadalajara",
+                        country = "Spain",
+                        number = 4,
+                        zipCode = 19431,
+                        coordinateId = coordinateId15.toInt()
+                    )
+                    val addressId15 = addressDao.upsert(address15)
+                    Log.d(TAG, "Inserted address with ID: $addressId15")
+
+                    // Check if address insertion was successful
+                    if (addressId15 != -1L) {
+                        // Insert shop associated with the address
+                        val carrascosaShop = Shop(
+                            name = "Bar Salon",
+                            description = "Service options\n" +
+                                    "\n" +
+                                    "Dine-in\n" +
+                                    "Offerings\n" +
+                                    "\n" +
+                                    "Alcohol\n" +
+                                    "\n" +
+                                    "Beer\n" +
+                                    "\n" +
+                                    "Food\n" +
+                                    "\n" +
+                                    "Spirits\n" +
+                                    "\n" +
+                                    "Wine",
+                            addressId = addressId15.toInt(),
+                            locationId = coordinateId15.toInt()
+                        )
+                        val shopId15 = shopDao.upsert(carrascosaShop)
+                        Log.d(TAG, "Inserted shop with ID: $shopId15")
                     }
                 }
             }

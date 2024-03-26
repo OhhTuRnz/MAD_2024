@@ -62,52 +62,42 @@ class OpenStreetMap : AppCompatActivity() {
         val appContext = application as App
 
         applyTheme(sharedPreferences)
-
         initializeViewModels(appContext)
-
         setContentView(R.layout.activity_open_street_map)
 
-        Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
+        Configuration.getInstance().load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
 
-        // Check if the intent contains the "locationBundle" extra
-        if (intent.hasExtra("locationBundle")) {
-            // Handle intent with location bundle
-            val bundle = intent.getBundleExtra("locationBundle")
-            latestLocation = bundle?.getParcelable("location")!!
-            updateNearbyStores(location = latestLocation)
-        } else if (intent.hasExtra("shopLocation")) {
-            // Handle intent with shop location
-            val bundle = intent.getBundleExtra("shopLocation")
-            val shopLatitude = intent.getDoubleExtra("shopLatitude", 0.0)
-            val shopLongitude = intent.getDoubleExtra("shopLongitude", 0.0)
-            // Perform actions with shop location
-        }
-
-        // Retrieve latitude and longitude from the intent extras
-        val shopLatitude = intent.getDoubleExtra("shopLatitude", 0.0)
-        val shopLongitude = intent.getDoubleExtra("shopLongitude", 0.0)
-
-        if (shopLatitude != 0.0 && shopLongitude != 0.0) {
-            // Create a GeoPoint for the shop's location
-            val shopLocation = GeoPoint(shopLatitude, shopLongitude)
-            // Set the center of the map to the shop's location
-            map.controller.setCenter(shopLocation)
-            // Add a marker for the shop's location
-            addMarker(shopLocation, "Shop Location")
-        } else {
-            // If shop's location is not provided, use the current location as the center
-            val startPoint = GeoPoint(latestLocation.latitude, latestLocation.longitude)
-            map.controller.setCenter(startPoint)
-            addMarker(startPoint, "My current location")
-        }
-
-        updateNearbyStores(location = latestLocation)
-
-        Configuration.getInstance()
-            .load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
         map = findViewById(R.id.map)
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.controller.setZoom(18.0)
+
+        Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
+
+        // Assuming locationBundle always exists and contains the "location" extra
+        val locationBundle = intent.getBundleExtra("locationBundle")!!
+        latestLocation = locationBundle.getParcelable("location")!!
+
+        // Add marker for user's current location
+        val userLocation = GeoPoint(latestLocation.latitude, latestLocation.longitude)
+        addMarker(userLocation, "My Current Location")
+        map.controller.setCenter(userLocation)
+        map.controller.setZoom(15.0)  // Default zoom level for user's location
+
+        // Handle shop location if provided
+        val shopLatitude = intent.getDoubleExtra("shopLatitude", 0.0)
+        val shopLongitude = intent.getDoubleExtra("shopLongitude", 0.0)
+        handleShopLocation(shopLatitude, shopLongitude)
+
+        updateNearbyStores(location = latestLocation)
+    }
+
+    private fun handleShopLocation(shopLatitude: Double, shopLongitude: Double) {
+        if (shopLatitude != 0.0 && shopLongitude != 0.0) {
+            val shopLocation = GeoPoint(shopLatitude, shopLongitude)
+            addMarker(shopLocation, "Shop Location")
+            map.controller.setCenter(shopLocation)
+            map.controller.setZoom(25.0)  // Closer zoom for specific shop
+        }
     }
 
     private fun updateShopDetails() {
@@ -164,15 +154,16 @@ class OpenStreetMap : AppCompatActivity() {
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         marker.title = title
 
-        // Set the custom icon for the marker
-        if(title == "My current location")
-            marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
-        else
-            marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
+        // Set the custom icon for the marker based on the title
+        when (title) {
+            "My Current Location" -> marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
+            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.shop_marker)
+        }
 
         map.overlays.add(marker)
         map.invalidate() // Reload map
     }
+
 
     /*
     fun addMarkers(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {

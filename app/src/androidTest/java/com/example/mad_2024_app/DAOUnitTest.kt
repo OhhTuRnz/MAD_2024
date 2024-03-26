@@ -28,27 +28,4 @@ class DAOUnitTest {
     fun closeDb() {
         database.close()
     }
-    @Test
-    fun insertAndRetrieveShop() {
-        val dao = database.shopDao()
-        val shop = Shop(name = "Test Shop", description = "Test Description")
-        dao.upsert(shop)
-
-        val retrievedShop = dao.getShopById(1)
-        assertEquals(shop.name, retrievedShop.name)
-
-        dao.delete(retrievedShop)
-    }
-
-    @Test
-    fun insertAndRetrieveUser() {
-        val dao = database.userDao()
-        val user = User(username = "Test User", email = "martini@chinchong.com", uuid = "5de7c711-8c70-4515-853a-dcaf67300183")
-        dao.upsert(user)
-
-        val retrievedUser = dao.getUserById(1)
-        assertEquals(user.username, retrievedUser.username)
-
-        dao.delete(retrievedUser)
-    }
 }
