@@ -296,9 +296,9 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             when (item.itemId) {
                 R.id.nav_favorites -> {
                     // Handle favorites action
-                    Toast.makeText(applicationContext, "Favourites", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Favorites", Toast.LENGTH_SHORT).show()
                     val rootView = findViewById<View>(android.R.id.content)
-                    goFavourite(rootView)
+                    goFavorite(rootView)
                     true
                 }
 
@@ -312,6 +312,9 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
                 R.id.nav_donuts -> {
                     // Handle nearby donuts action
+                    Toast.makeText(applicationContext, "FavDonuts", Toast.LENGTH_SHORT).show()
+                    val rootView = findViewById<View>(android.R.id.content)
+                    goFavDonuts(rootView)
                     true
                 }
 
@@ -572,6 +575,8 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             return favoriteShopIds?.contains(shopId) ?: false
         }
 
+
+
         private fun formatAddressString(address: Address): String {
             return "${address.street}, ${address.number}\n${address.city}, ${address.zipCode}\n${address.country}"
         }
@@ -635,11 +640,16 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         startActivity(intent)
     }
 
-    private fun goFavourite(view: View){
-        // go to favourites
+    private fun goFavorite(view: View) {
         val intent = Intent(this, FavoriteShopsActivity::class.java)
         startActivity(intent)
     }
+
+    private fun goFavDonuts(view: View) {
+        val intent = Intent(this, FavoriteDonutsActivity::class.java)
+        startActivity(intent)
+    }
+
 
     private fun logoutUser() {
         val auth = FirebaseAuth.getInstance()
