@@ -519,7 +519,8 @@ abstract class AppDatabase : RoomDatabase() {
                     if (addressId11 != -1L) {
                         // Insert shop associated with the address
                         val robertsShop1 = Shop(
-                            name = "PANADERÍA ROBERT'S",
+                            name = "" +
+                                    "T'S",
                             description = "Service options\n" +
                                     "\n" +
                                     "Same-day delivery\n" +

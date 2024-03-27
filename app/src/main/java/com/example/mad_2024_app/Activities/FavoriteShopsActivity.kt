@@ -28,10 +28,12 @@ import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
+import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -41,8 +43,11 @@ class FavoriteShopsActivity : AppCompatActivity() {
     private val TAG = "LogoGPSFavShopsActivity"
     private lateinit var latestLocation: Location
     private lateinit var toggle: ActionBarDrawerToggle
+
     private lateinit var favoriteShopsViewModel: FavoriteShopsViewModel
     private lateinit var addressViewModel: AddressViewModel
+
+    private lateinit var addressRepo : AddressRepository
 
     @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -50,14 +55,18 @@ class FavoriteShopsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val appContext = application as App
-        addressViewModel = ViewModelProvider(this).get(AddressViewModel::class.java)
 
         applyTheme(sharedPreferences)
 
         setContentView(R.layout.activity_favorite_shops)
 
         toggleDrawer()
+
+        val appContext = application as App
+
+        addressRepo = DbUtils.getAddressRepository(appContext)
+        val addressFactory = ViewModelFactory(addressRepo)
+        addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
 
         setupShopObserverForNearbyStores(appContext,sharedPreferences)
     }

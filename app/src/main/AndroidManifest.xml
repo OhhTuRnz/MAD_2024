@@ -68,6 +68,5 @@
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
-        <activity android:name=".Activities.TestActivity" />
     </application>
 </manifest>

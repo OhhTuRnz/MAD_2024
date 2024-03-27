@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id = "@+id/bubble_layout"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="?attr/mainBackgroundColor"> <!-- Customize the background as needed -->
+
+    <TextView
+        android:id="@+id/tvShopName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:text="Shop Name" />
+
+    <TextView
+        android:id="@+id/tvShopDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shop Description" />
+
+    <TextView
+        android:id="@+id/tvShopAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shop Address" />
+
+    <!-- Comments Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Comments:" />
+
+        <!-- Add a ScrollView if you expect a lot of comments -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/tvShopComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Customer comments will be shown here" />
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btnViewMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View More"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
+</LinearLayout>
