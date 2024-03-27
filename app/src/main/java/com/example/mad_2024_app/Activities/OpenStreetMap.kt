@@ -154,6 +154,7 @@ class OpenStreetMap : AppCompatActivity() {
 
             marker.relatedObject = shopDetail
 
+            // custom Info Window is instantiated and given to the marker
             val customInfoWindow = CustomInfoWindow(R.layout.layout_donut_shop_info_window, mapView, this)
             marker.setInfoWindow(customInfoWindow)
 
