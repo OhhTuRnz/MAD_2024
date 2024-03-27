@@ -50,7 +50,6 @@ class FavoriteShopsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
         val appContext = application as App
         addressViewModel = ViewModelProvider(this).get(AddressViewModel::class.java)
 
@@ -60,17 +59,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
         toggleDrawer()
 
-        if (!isLoggedIn) {
-            // Redirigir al usuario a la MainActivity
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        } else {
-            // Continuar con la configuración de la actividad
-            setupShopObserverForNearbyStores(appContext,sharedPreferences)
-        }
-
-
+        setupShopObserverForNearbyStores(appContext,sharedPreferences)
     }
 
     private fun setupShopObserverForNearbyStores(appContext: Context, sharedPreferences: SharedPreferences) {

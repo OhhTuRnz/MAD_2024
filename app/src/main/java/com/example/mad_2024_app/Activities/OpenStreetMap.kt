@@ -8,7 +8,10 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +36,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import org.osmdroid.views.overlay.infowindow.InfoWindow
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 
 @Suppress("DEPRECATION")
 class OpenStreetMap : AppCompatActivity() {
@@ -68,6 +73,9 @@ class OpenStreetMap : AppCompatActivity() {
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
 
         map = findViewById(R.id.map)
+
+        setupMapTouchListener()
+
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.controller.setZoom(18.0)
 
@@ -140,9 +148,16 @@ class OpenStreetMap : AppCompatActivity() {
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
             marker.title = "Marker at ${shopDetail.address?.street} [${geoPoint?.latitude}, ${geoPoint?.longitude}]"
             if (geoPoint != null) {
-                addMarker(geoPoint, shopDetail.shop.name)
+                addMarker(geoPoint, shopDetail)
             }
             marker.icon = ContextCompat.getDrawable(this, R.drawable.shop_marker)
+
+            marker.relatedObject = shopDetail
+
+            // custom Info Window is instantiated and given to the marker
+            val customInfoWindow = CustomInfoWindow(R.layout.layout_donut_shop_info_window, mapView, this)
+            marker.setInfoWindow(customInfoWindow)
+
             mapView.overlays.add(marker)
         }
         map.invalidate()
@@ -157,13 +172,35 @@ class OpenStreetMap : AppCompatActivity() {
         // Set the custom icon for the marker based on the title
         when (title) {
             "My Current Location" -> marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
-            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.shop_marker)
+            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
         }
 
         map.overlays.add(marker)
         map.invalidate() // Reload map
     }
 
+    private fun addMarker(point: GeoPoint, shopDetail: ShopDetail) {
+        val marker = Marker(map)
+        marker.position = point
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.title = shopDetail.shop.name
+
+        // Set the custom icon for the marker based on the title
+        when (title) {
+            "My Current Location" -> marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
+            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
+        }
+
+        val customInfoWindow = MarkerInfoWindow(R.layout.layout_donut_shop_info_window, map)
+        // Set the custom info window
+        marker.setInfoWindow(customInfoWindow)
+
+        // Associate the shop detail with the marker
+        marker.relatedObject = shopDetail
+
+        map.overlays.add(marker)
+        map.invalidate() // Reload map
+    }
 
     /*
     fun addMarkers(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {
@@ -242,9 +279,57 @@ class OpenStreetMap : AppCompatActivity() {
         startActivity(intent)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupMapTouchListener() {
+        map.setOnTouchListener { _, event ->
+            closeAllInfoWindows()
+            false
+        }
+    }
+
+    private fun closeAllInfoWindows() {
+        for (overlay in map.overlays) {
+            if (overlay is Marker) {
+                overlay.closeInfoWindow()
+            }
+        }
+    }
+
     data class ShopDetail(
         val shop: Shop,
         val address: Address?,
         val coordinate: Coordinate?
     )
+
+    class CustomInfoWindow(layoutResId: Int, mapView: MapView, private val context: Context) : InfoWindow(layoutResId, mapView) {
+
+        override fun onOpen(item: Any?) {
+            val marker = item as Marker
+            val shopDetail = marker.relatedObject as ShopDetail  // Ensure you set this when creating the marker
+
+            // Find views
+            val nameView = mView.findViewById<TextView>(R.id.tvShopName)
+            val descriptionView = mView.findViewById<TextView>(R.id.tvShopDescription)
+            val addressView = mView.findViewById<TextView>(R.id.tvShopAddress)
+            val commentsView = mView.findViewById<TextView>(R.id.tvShopComments) // TextView or RecyclerView based on your design
+
+            // Set shop details
+            nameView.text = shopDetail.shop.name
+            descriptionView.text = shopDetail.shop.description
+            addressView.text = "${shopDetail.address?.street}, ${shopDetail.coordinate?.latitude}, ${shopDetail.coordinate?.longitude}"
+
+            // Load and display comments for the shop
+            // This requires a method to fetch comments from your database or server
+            loadComments(shopDetail.shop.shopId, commentsView)
+        }
+
+        private fun loadComments(shopId: Int, commentsView: TextView) {
+            // Here you would fetch comments for the given shop ID and update the commentsView.
+            // For simplicity, it's a TextView, but for a real app, you might use a RecyclerView and an adapter.
+        }
+
+        override fun onClose(){
+            super.close()
+        }
+    }
 }
