@@ -24,23 +24,19 @@
             android:text="Favorite donuts"
             android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/tvFileContents"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="File contents will appear here"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ListView
-            android:id="@+id/lvDonuts"
+        <SearchView
+            android:id="@+id/searchView"
             android:layout_width="match_parent"
-            android:layout_height="520dp"
-            android:layout_marginTop="80dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_height="wrap_content"
+            android:queryHint="Search Donuts..."
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="75dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:layout_below="@id/searchView" />
 
         <Button
             android:id="@+id/prev"

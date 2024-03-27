@@ -3,6 +3,7 @@ import com.example.mad_2024_app.App
 import com.example.mad_2024_app.AppDatabase
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.UserRepository
@@ -48,6 +49,12 @@ class DbUtils {
             val database = getDatabase(context)
             val favoriteShopsDao = database.favoriteShopsDao()  // Replace with your actual method name
             return FavoriteShopsRepository(favoriteShopsDao, getCache(context))
+        }
+
+        fun getFavoriteDonutsRepository(context: Context): FavoriteDonutsRepository {
+            val database = getDatabase(context)
+            val favoriteDonutsDao = database.favoriteDonutsDao()
+            return FavoriteDonutsRepository(favoriteDonutsDao, getCache(context))
         }
     }
 }

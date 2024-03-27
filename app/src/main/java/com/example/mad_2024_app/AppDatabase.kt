@@ -28,8 +28,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class,
-    FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 6)
+@Database(
+    entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class,
+        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 6
+)
 @TypeConverters(Converters::class) // Correct placement of annotation
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDAO
@@ -40,6 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteDonutsDao(): FavoriteDonutsDAO
     abstract fun favoriteShopsDao(): FavoriteShopsDAO
     abstract fun shopVisitHistoryDao(): ShopVisitHistoryDAO
+
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -68,6 +71,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val coordinateDao = database.coordinateDao()
                 val addressDao = database.addressDao()
                 val shopDao = database.shopDao()
+                val donutDAO = database.donutDao()
 
                 // Insert coordinate
                 val coordinate1 =
@@ -160,7 +164,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate3 = Coordinate(latitude = 40.4172309597888, longitude = -3.6738480248533203)
+                val coordinate3 =
+                    Coordinate(latitude = 40.4172309597888, longitude = -3.6738480248533203)
                 val coordinateId3 = coordinateDao.upsert(coordinate3)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId3")
 
@@ -204,7 +209,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate4 = Coordinate(latitude = 40.30107009651909, longitude = -3.4422432300331773)
+                val coordinate4 =
+                    Coordinate(latitude = 40.30107009651909, longitude = -3.4422432300331773)
                 val coordinateId4 = coordinateDao.upsert(coordinate4)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId4")
 
@@ -248,7 +254,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate5 = Coordinate(latitude = 40.30067491940748, longitude = -3.43802363634576)
+                val coordinate5 =
+                    Coordinate(latitude = 40.30067491940748, longitude = -3.43802363634576)
                 val coordinateId5 = coordinateDao.upsert(coordinate5)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId5")
 
@@ -290,7 +297,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate6 = Coordinate(latitude = 40.307904197813315, longitude = -3.4514675126743284)
+                val coordinate6 =
+                    Coordinate(latitude = 40.307904197813315, longitude = -3.4514675126743284)
                 val coordinateId6 = coordinateDao.upsert(coordinate6)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId6")
 
@@ -330,7 +338,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate7 = Coordinate(latitude = 40.386265118568275, longitude = -3.626206066547623)
+                val coordinate7 =
+                    Coordinate(latitude = 40.386265118568275, longitude = -3.626206066547623)
                 val coordinateId7 = coordinateDao.upsert(coordinate7)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId7")
 
@@ -370,7 +379,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate8 = Coordinate(latitude = 40.387030121832545, longitude = -3.6369144918894207)
+                val coordinate8 =
+                    Coordinate(latitude = 40.387030121832545, longitude = -3.6369144918894207)
                 val coordinateId8 = coordinateDao.upsert(coordinate8)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId8")
 
@@ -410,7 +420,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate9 = Coordinate(latitude = 40.383055202359586, longitude = -3.6258477233808137)
+                val coordinate9 =
+                    Coordinate(latitude = 40.383055202359586, longitude = -3.6258477233808137)
                 val coordinateId9 = coordinateDao.upsert(coordinate9)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId9")
 
@@ -446,7 +457,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate10 = Coordinate(latitude = 40.38304184920588, longitude = -3.6280389747858615)
+                val coordinate10 =
+                    Coordinate(latitude = 40.38304184920588, longitude = -3.6280389747858615)
                 val coordinateId10 = coordinateDao.upsert(coordinate10)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId10")
 
@@ -484,7 +496,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate11 = Coordinate(latitude = 40.38672980040134, longitude = -3.638607988974512)
+                val coordinate11 =
+                    Coordinate(latitude = 40.38672980040134, longitude = -3.638607988974512)
                 val coordinateId11 = coordinateDao.upsert(coordinate11)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId11")
 
@@ -526,7 +539,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate12 = Coordinate(latitude = 40.50148291838675, longitude = -3.6906254736554396)
+                val coordinate12 =
+                    Coordinate(latitude = 40.50148291838675, longitude = -3.6906254736554396)
                 val coordinateId12 = coordinateDao.upsert(coordinate12)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId12")
 
@@ -568,7 +582,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate13 = Coordinate(latitude = 40.50710527518719, longitude = -3.6948296648973167)
+                val coordinate13 =
+                    Coordinate(latitude = 40.50710527518719, longitude = -3.6948296648973167)
                 val coordinateId13 = coordinateDao.upsert(coordinate13)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId13")
 
@@ -604,7 +619,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate14 = Coordinate(latitude = 40.50353974997118, longitude = -3.708478944806984)
+                val coordinate14 =
+                    Coordinate(latitude = 40.50353974997118, longitude = -3.708478944806984)
                 val coordinateId14 = coordinateDao.upsert(coordinate14)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId14")
 
@@ -646,7 +662,8 @@ abstract class AppDatabase : RoomDatabase() {
                     }
                 }
 
-                val coordinate15 = Coordinate(latitude = 40.72514755869697, longitude = -2.483507878536185)
+                val coordinate15 =
+                    Coordinate(latitude = 40.72514755869697, longitude = -2.483507878536185)
                 val coordinateId15 = coordinateDao.upsert(coordinate15)
                 Log.d(TAG, "Inserted coordinate with ID: $coordinateId15")
 
@@ -689,6 +706,34 @@ abstract class AppDatabase : RoomDatabase() {
                         val shopId15 = shopDao.upsert(carrascosaShop)
                         Log.d(TAG, "Inserted shop with ID: $shopId15")
                     }
+                }
+
+                val donutsList = listOf(
+                    Donut(name = "Glazed Donut", type = "Classic", color = "Golden"),
+                    Donut(name = "Chocolate Donut", type = "Chocolate", color = "Brown"),
+                    Donut(name = "Jelly Donut", type = "Filled", color = "Assorted"),
+                    Donut(name = "Boston Cream Donut", type = "Filled", color = "Chocolate"),
+                    Donut(name = "Maple Bar Donut", type = "Bar", color = "Golden"),
+                    Donut(name = "Old Fashioned Donut", type = "Classic", color = "Golden"),
+                    Donut(name = "Blueberry Donut", type = "Fruit", color = "Blue"),
+                    Donut(name = "Vanilla Cream Donut", type = "Filled", color = "White"),
+                    Donut(name = "Strawberry Donut", type = "Fruit", color = "Red"),
+                    Donut(name = "Cinnamon Sugar Donut", type = "Classic", color = "Brown"),
+                    Donut(name = "Lemon Donut", type = "Citrus", color = "Yellow"),
+                    Donut(name = "Raspberry Donut", type = "Fruit", color = "Pink"),
+                    Donut(name = "Coconut Donut", type = "Coconut", color = "White"),
+                    Donut(name = "Red Velvet Donut", type = "Red Velvet", color = "Red"),
+                    Donut(name = "Pistachio Donut", type = "Nut", color = "Green"),
+                    Donut(name = "Powdered Sugar Donut", type = "Classic", color = "White"),
+                    Donut(name = "Caramel Donut", type = "Filled", color = "Brown"),
+                    Donut(name = "Apple Fritter Donut", type = "Fritter", color = "Assorted"),
+                    Donut(name = "Peanut Butter Donut", type = "Nut", color = "Brown")
+                )
+
+                for (donut in donutsList) {
+                    // Insertamos cada Donut en la base de datos utilizando el método upsert del DAO
+                    val donutId = donutDAO.upsert(donut)
+                    Log.d(TAG, "Inserted donut '${donut.name}' with ID: $donutId")
                 }
             }
         }
