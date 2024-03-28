@@ -9,6 +9,14 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <queries>
+        <!-- For Google Maps -->
+        <package android:name="com.google.android.apps.maps" />
+
+        <!-- For Waze -->
+        <package android:name="com.waze" />
+    </queries>
+
     <application
         android:name=".App"
         android:allowBackup="true"

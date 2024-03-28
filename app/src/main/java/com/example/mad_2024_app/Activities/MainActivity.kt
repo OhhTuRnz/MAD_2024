@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         }
         if(FirebaseAuth.getInstance().currentUser == null) {
             sharedPreferences.edit().apply {
-                putString("anonymousUserId", "c263015c-d101-46d1-b1e5-10aa7422d574")
+                putString("anonymousUserId", userUUID)
                 apply()
             }
         }

@@ -5,18 +5,22 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
@@ -323,6 +327,12 @@ class OpenStreetMap : AppCompatActivity() {
 
             val progressBar = mView.findViewById<ProgressBar>(R.id.progressBar)
 
+            val goButton = mView.findViewById<Button>(R.id.go_button)
+
+            goButton.setOnClickListener {
+                shopDetail.coordinate?.let { it1 -> openGoogleMaps(context, shopDetail.coordinate.latitude, it1.longitude, shopDetail.shop.name) }
+            }
+
             // Show progress bar initially
             commentsContainer.visibility = View.GONE
             overallRatingBarView.visibility = View.GONE
@@ -423,6 +433,19 @@ class OpenStreetMap : AppCompatActivity() {
                 (sortedRatings[middle - 1] + sortedRatings[middle]) / 2.0
             } else {
                 sortedRatings[middle]
+            }
+        }
+
+        private fun openGoogleMaps(context: Context, latitude: Double, longitude: Double, label: String) {
+            val encodedLabel = Uri.encode(label)
+            val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($encodedLabel)")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+
+            if (mapIntent.resolveActivity(context.packageManager) != null) {
+                context.startActivity(mapIntent)
+            } else {
+                Toast.makeText(context, "No Google Maps found", Toast.LENGTH_SHORT).show()
             }
         }
 
