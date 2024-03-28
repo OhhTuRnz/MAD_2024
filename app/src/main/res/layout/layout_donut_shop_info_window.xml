@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id = "@+id/bubble_layout"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
     android:background="?attr/mainBackgroundColor"> <!-- Customize the background as needed -->
@@ -18,7 +18,7 @@
     <TextView
         android:id="@+id/tvShopDescription"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:text="Shop Description" />
 
     <TextView
@@ -27,7 +27,6 @@
         android:layout_height="wrap_content"
         android:text="Shop Address" />
 
-    <!-- Comments Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,12 +39,11 @@
             android:textStyle="bold"
             android:text="Comments:" />
 
-        <!-- Add a ScrollView if you expect a lot of comments -->
+        <!-- ScrollView for comments -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginTop="5dp">
-
             <TextView
                 android:id="@+id/tvShopComments"
                 android:layout_width="match_parent"
@@ -53,11 +51,31 @@
                 android:text="Customer comments will be shown here" />
         </ScrollView>
 
-        <Button
-            android:id="@+id/btnViewMore"
-            android:layout_width="wrap_content"
+        <!-- Nested LinearLayout for buttons with padding -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View More"
-            android:layout_marginTop="5dp"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <Button
+                android:id="@+id/btnViewMore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="View More"
+                android:layout_marginEnd="10dp"/> <!-- Adds margin between the buttons -->
+
+            <Button
+                android:id="@+id/btnDirections"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Directions"
+                android:layout_marginStart="10dp"/> <!-- Adds margin between the buttons -->
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

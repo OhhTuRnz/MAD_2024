@@ -171,7 +171,9 @@ class OpenStreetMap : AppCompatActivity() {
 
         // Set the custom icon for the marker based on the title
         when (title) {
-            "My Current Location" -> marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
+            "My Current Location" -> {
+                marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
+            }
             else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
         }
 
@@ -191,12 +193,12 @@ class OpenStreetMap : AppCompatActivity() {
             else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
         }
 
+        // Associate the shop detail with the marker
+        marker.relatedObject = shopDetail
+
         val customInfoWindow = MarkerInfoWindow(R.layout.layout_donut_shop_info_window, map)
         // Set the custom info window
         marker.setInfoWindow(customInfoWindow)
-
-        // Associate the shop detail with the marker
-        marker.relatedObject = shopDetail
 
         map.overlays.add(marker)
         map.invalidate() // Reload map
@@ -217,10 +219,10 @@ class OpenStreetMap : AppCompatActivity() {
 
     private fun addMarkersAndRoute(mapView: MapView) {
         val routePoints = mutableListOf<GeoPoint>()
-        shopDetails.forEach { detail ->
-            detail.coordinate?.let { coord ->
+        shopDetails.forEach { shopDetail ->
+            shopDetail.coordinate?.let { coord ->
                 val geoPoint = GeoPoint(coord.latitude, coord.longitude)
-                addMarker(geoPoint, detail.shop.name)
+                addMarker(geoPoint, shopDetail.shop.name)
                 routePoints.add(geoPoint)
             }
         }
@@ -303,20 +305,24 @@ class OpenStreetMap : AppCompatActivity() {
 
     class CustomInfoWindow(layoutResId: Int, mapView: MapView, private val context: Context) : InfoWindow(layoutResId, mapView) {
 
+        private val TAG = "MarkerCustomInfoWindow"
+
         override fun onOpen(item: Any?) {
             val marker = item as Marker
-            val shopDetail = marker.relatedObject as ShopDetail  // Ensure you set this when creating the marker
+            val shopDetail = marker.relatedObject as ShopDetail
 
             // Find views
             val nameView = mView.findViewById<TextView>(R.id.tvShopName)
             val descriptionView = mView.findViewById<TextView>(R.id.tvShopDescription)
             val addressView = mView.findViewById<TextView>(R.id.tvShopAddress)
-            val commentsView = mView.findViewById<TextView>(R.id.tvShopComments) // TextView or RecyclerView based on your design
+            val commentsView =
+                mView.findViewById<TextView>(R.id.tvShopComments) // TextView or RecyclerView based on your design
 
             // Set shop details
             nameView.text = shopDetail.shop.name
             descriptionView.text = shopDetail.shop.description
-            addressView.text = "${shopDetail.address?.street}, ${shopDetail.coordinate?.latitude}, ${shopDetail.coordinate?.longitude}"
+            addressView.text =
+                "${shopDetail.address?.street}, ${shopDetail.coordinate?.latitude}, ${shopDetail.coordinate?.longitude}"
 
             // Load and display comments for the shop
             // This requires a method to fetch comments from your database or server
