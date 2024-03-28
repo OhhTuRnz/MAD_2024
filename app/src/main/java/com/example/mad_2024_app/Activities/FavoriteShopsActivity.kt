@@ -7,14 +7,12 @@ import android.content.SharedPreferences
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -30,9 +28,7 @@ import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
-import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
-import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -201,7 +197,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
     fun goSettings(view: View) {
         // go to Settings
-        val intent = Intent(this, Settings::class.java)
+        val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
     }
 
@@ -214,7 +210,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
     fun goProfile(view: View) {
         // go to Settings
-        val intent = Intent(this, Profile::class.java)
+        val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
     }
 

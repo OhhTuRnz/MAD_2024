@@ -17,7 +17,7 @@ import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.example.mad_2024_app.view_models.UserViewModel
 
-class Settings : ComponentActivity(){
+class SettingsActivity : ComponentActivity(){
 
     private lateinit var viewModel: UserViewModel
     private lateinit var userRepo: UserRepository
@@ -62,7 +62,7 @@ class Settings : ComponentActivity(){
             } else {
                 setTheme(R.style.AppTheme_Light)
             }
-            val intent = Intent(this, Settings::class.java)
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
     }

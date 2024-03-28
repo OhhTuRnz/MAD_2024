@@ -263,7 +263,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
 
     fun goSettings(view: View) {
         // go to Settings
-        val intent = Intent(this, Settings::class.java)
+        val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
     }
 
@@ -276,7 +276,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
 
     fun goProfile(view: View) {
         // go to Settings
-        val intent = Intent(this, Profile::class.java)
+        val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
     }
 

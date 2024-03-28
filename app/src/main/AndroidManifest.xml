@@ -44,12 +44,12 @@
             android:exported="true">
         </activity>
         <activity
-            android:name=".Activities.Settings"
+            android:name=".Activities.SettingsActivity"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
         <activity
-            android:name=".Activities.Profile"
+            android:name=".Activities.ProfileActivity"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">
         </activity>
