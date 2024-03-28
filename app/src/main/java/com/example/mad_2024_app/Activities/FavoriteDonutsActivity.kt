@@ -42,7 +42,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val userId = sharedPreferences.getString("userId", null)
+        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
 
         applyTheme(sharedPreferences)
 
@@ -50,26 +50,29 @@ class FavoriteDonutsActivity : AppCompatActivity() {
 
         toggleDrawer()
 
+        if (!isLoggedIn) {
+            // Redirigir al usuario a la MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        } else {
+            // Continuar con la configuración de la actividad
+            setupRecyclerView()
+            setupSearchView()
 
-        // Configurar el RecyclerView
-        recyclerView = findViewById(R.id.recyclerView)
-        donutsAdapter = DonutsAdapter(emptyList()) // Inicializar con una lista vacía
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = donutsAdapter
-
-        // Observar el flujo de donuts desde la base de datos
-        val donutFlow = (application as App).database.donutDao().getAllDonuts()
-        lifecycleScope.launchWhenStarted {
-            donutFlow
-                .distinctUntilChanged() // Filtrar cambios para evitar actualizaciones innecesarias
-                .map { it.toList() } // Convertir el flujo en una lista
-                .collect { donutList ->
-                    // Actualizar el adaptador con la nueva lista de donuts
-                    donutsAdapter.updateDonuts(donutList)
-                }
+            observeDonuts()
         }
 
-        // Configurar el SearchView
+    }
+
+    private fun setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerView)
+        donutsAdapter = DonutsAdapter(emptyList())
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = donutsAdapter
+    }
+
+    private fun setupSearchView() {
         searchView = findViewById(R.id.searchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -82,7 +85,19 @@ class FavoriteDonutsActivity : AppCompatActivity() {
                 return true
             }
         })
+    }
 
+    private fun observeDonuts() {
+        val donutFlow = (application as App).database.donutDao().getAllDonuts()
+        lifecycleScope.launchWhenStarted {
+            donutFlow
+                .distinctUntilChanged() // Filtrar cambios para evitar actualizaciones innecesarias
+                .map { it.toList() } // Convertir el flujo en una lista
+                .collect { donutList ->
+                    // Actualizar el adaptador con la nueva lista de donuts
+                    donutsAdapter.updateDonuts(donutList)
+                }
+        }
     }
 
     class DonutsAdapter(private var originalDonutList: List<Donut>) :
@@ -99,7 +114,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: DonutViewHolder, position: Int) {
             val currentDonut = filteredDonutList[position]
             holder.textViewName.text = currentDonut.name
-            holder.textViewType.text = currentDonut.type
+
             // Añade cualquier otra lógica para mostrar información adicional del donut
         }
 
@@ -107,7 +122,6 @@ class FavoriteDonutsActivity : AppCompatActivity() {
 
         inner class DonutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val textViewName: TextView = itemView.findViewById(R.id.message)
-            val textViewType: TextView = itemView.findViewById(R.id.recyclerView)
             // Añade cualquier otra vista que necesites mostrar en el elemento del RecyclerView
         }
 

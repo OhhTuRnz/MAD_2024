@@ -43,12 +43,10 @@ class FavoriteShopsActivity : AppCompatActivity() {
     private val TAG = "LogoGPSFavShopsActivity"
     private lateinit var latestLocation: Location
     private lateinit var toggle: ActionBarDrawerToggle
-
     private lateinit var favoriteShopsViewModel: FavoriteShopsViewModel
     private lateinit var addressViewModel: AddressViewModel
 
     private lateinit var addressRepo : AddressRepository
-
     @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
