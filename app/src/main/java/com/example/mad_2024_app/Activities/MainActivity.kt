@@ -60,6 +60,8 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
@@ -113,11 +115,54 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
         setupBottomNav()
 
+        setupFragments()
+
+        storeUserIfNotExisting(sharedPreferences)
+
+        val backgroundImageView: ImageView = findViewById(R.id.donutBackground)
+        val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
+        Glide.with(this).load(gifUrl).into(backgroundImageView)
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        setupPermissionLauncher()
+        checkPermissionsAndStartLocationUpdates()
+
+        //setupShopObserverForNearbyStores(appContext, sharedPreferences)
+
+        Log.d(TAG, "onCreate: Main activity is being created")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Log.d(TAG, "OnDestroy: MAIN DESTROYED")
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        // Reset isFirstOpen to true when the app is closed or sent to the background
+        with(sharedPreferences.edit()) {
+            putBoolean("isFirstOpen", true)
+            apply()
+        }
+    }
+
+    private fun setupFragments(){
         //TabLayout
         tabLayout = findViewById(R.id.tabLayout)
         viewPager2 = findViewById(R.id.viewPager2)
 
-        adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        adapter = FragmentPageAdapter(
+            supportFragmentManager,
+            lifecycle,
+            shopViewModel,
+            favoriteShopsViewModel,
+            coordinateViewModel,
+            sharedPreferences,
+            addressViewModel,
+            this,
+            this // for the context
+        )
 
         tabLayout.addTab(tabLayout.newTab().setText("Cercanas"))
         tabLayout.addTab(tabLayout.newTab().setText("Recientes"))
@@ -148,33 +193,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             }
         })
         //Fin
-
-        storeUserIfNotExisting(sharedPreferences)
-
-        val backgroundImageView: ImageView = findViewById(R.id.donutBackground)
-        val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
-        Glide.with(this).load(gifUrl).into(backgroundImageView)
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        setupPermissionLauncher()
-        checkPermissionsAndStartLocationUpdates()
-
-        setupShopObserverForNearbyStores(appContext, sharedPreferences)
-
-        Log.d(TAG, "onCreate: Main activity is being created")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        Log.d(TAG, "OnDestroy: MAIN DESTROYED")
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        // Reset isFirstOpen to true when the app is closed or sent to the background
-        with(sharedPreferences.edit()) {
-            putBoolean("isFirstOpen", true)
-            apply()
-        }
     }
 
     private fun setupShopObserverForNearbyStores(appContext: Context, sharedPreferences: SharedPreferences) {
@@ -185,7 +203,8 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             val favoriteShops = mutableSetOf<Int>()
 
             // Initialize the ListView and adapter
-            val listView = findViewById<ListView>(R.id.lvShops)
+
+            val listView = findViewById<ListView>(R.id.lvNearShops)
             val shopAdapter = ShopAdapter(this, addressViewModel, favoriteShopsViewModel, coordinateViewModel, sharedPreferences, this)
             listView.adapter = shopAdapter
 
@@ -487,6 +506,8 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
         private lateinit var latestLocation : Location
 
+        private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
             Log.d(TAG, "Added ${shops.size} shop(s)")
@@ -544,10 +565,22 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
                 if (isChecked) {
                     Log.d(TAG, "Adding shop ${shop.shopId} to favorites.")
-                    favoriteShopsViewModel.upsertFavoriteShop(FavoriteShops(uuid = uuid, shopId = shop.shopId))
+                    executor.execute {
+                        favoriteShopsViewModel.upsertFavoriteShop(
+                            FavoriteShops(
+                                uuid = uuid,
+                                shopId = shop.shopId
+                            )
+                        )
+                    }
                 } else {
                     Log.d(TAG, "Removing shop ${shop.shopId} from favorites.")
-                    favoriteShopsViewModel.removeFavoriteShopById(uuid = uuid, shopId = shop.shopId)
+                    executor.execute {
+                        favoriteShopsViewModel.removeFavoriteShopById(
+                            uuid = uuid,
+                            shopId = shop.shopId
+                        )
+                    }
                 }
             }
 

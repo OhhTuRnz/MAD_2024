@@ -5,10 +5,12 @@
     android:layout_height="match_parent"
     tools:context=".Controller.Main">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
+        android:id="@+id/lvNearShops"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="400dp"
+        android:layout_marginTop="200dp"
+        android:foregroundTint="@null"
+        android:backgroundTint="@null"/>
 
 </FrameLayout>

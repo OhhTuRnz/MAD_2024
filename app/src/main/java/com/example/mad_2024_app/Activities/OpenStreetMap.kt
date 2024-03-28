@@ -20,21 +20,22 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.database.ShopVisitHistory
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
+import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
@@ -45,6 +46,8 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.infowindow.InfoWindow
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
+import java.util.concurrent.Executors
+import java.util.concurrent.ExecutorService
 
 @Suppress("DEPRECATION")
 class OpenStreetMap : AppCompatActivity() {
@@ -57,10 +60,12 @@ class OpenStreetMap : AppCompatActivity() {
     private lateinit var shopViewModel: ShopViewModel
     private lateinit var addressViewModel: AddressViewModel
     private lateinit var coordinateViewModel: CoordinateViewModel
+    private lateinit var shopVisitHistoryViewModel: ShopVisitHistoryViewModel
 
     private lateinit var coordinateRepo: CoordinateRepository
     private lateinit var shopRepo: ShopRepository
     private lateinit var addressRepo: AddressRepository
+    private lateinit var shopVisitHistoryRepo: ShopVisitHistoryRepository
 
     private var shopDetails: MutableList<ShopDetail> = mutableListOf()
 
@@ -162,7 +167,7 @@ class OpenStreetMap : AppCompatActivity() {
             marker.relatedObject = shopDetail
 
             // custom Info Window is instantiated and given to the marker
-            val customInfoWindow = CustomInfoWindow(R.layout.layout_donut_shop_info_window, mapView, this)
+            val customInfoWindow = CustomInfoWindow(R.layout.layout_donut_shop_info_window, mapView, this, shopVisitHistoryViewModel = shopVisitHistoryViewModel)
             marker.setInfoWindow(customInfoWindow)
 
             mapView.overlays.add(marker)
@@ -256,6 +261,10 @@ class OpenStreetMap : AppCompatActivity() {
         addressRepo = DbUtils.getAddressRepository(appContext)
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
+
+        shopVisitHistoryRepo = DbUtils.getShopVisitHistoryRepository(appContext)
+        val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)
+        shopVisitHistoryViewModel = ViewModelProvider(this, shopVisitHistoryFactory).get(ShopVisitHistoryViewModel::class.java)
     }
 
 
@@ -310,7 +319,7 @@ class OpenStreetMap : AppCompatActivity() {
         val coordinate: Coordinate?
     )
 
-    class CustomInfoWindow(layoutResId: Int, mapView: MapView, private val context: Context) : InfoWindow(layoutResId, mapView) {
+    class CustomInfoWindow(layoutResId: Int, mapView: MapView, private val context: Context, private val shopVisitHistoryViewModel: ShopVisitHistoryViewModel) : InfoWindow(layoutResId, mapView) {
 
         private val TAG = "MarkerCustomInfoWindow"
 
@@ -330,7 +339,7 @@ class OpenStreetMap : AppCompatActivity() {
             val goButton = mView.findViewById<Button>(R.id.go_button)
 
             goButton.setOnClickListener {
-                shopDetail.coordinate?.let { it1 -> openGoogleMaps(context, shopDetail.coordinate.latitude, it1.longitude, shopDetail.shop.name) }
+                shopDetail.coordinate?.let { it1 -> openGoogleMaps(context, shopDetail.coordinate.latitude, it1.longitude, shopDetail.shop.name, shopDetail.shop.shopId, shopVisitHistoryViewModel) }
             }
 
             // Show progress bar initially
@@ -436,10 +445,20 @@ class OpenStreetMap : AppCompatActivity() {
             }
         }
 
-        private fun openGoogleMaps(context: Context, latitude: Double, longitude: Double, label: String) {
+        private fun openGoogleMaps(context: Context, latitude: Double, longitude: Double, label: String, shopId : Int, shopVisitHistoryViewModel: ShopVisitHistoryViewModel) {
             val encodedLabel = Uri.encode(label)
             val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($encodedLabel)")
             val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+
+            val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+            val uuid = sharedPreferences.getString("userId", null)
+
+            val executor = Executors.newSingleThreadExecutor()
+            executor.execute {
+                uuid?.let { ShopVisitHistory(visitorUuid = it, visitedShopId = shopId, timestamp = System.currentTimeMillis() / 1000) }
+                    ?.let { shopVisitHistoryViewModel.upsert(it) }
+            }
+
             mapIntent.setPackage("com.google.android.apps.maps")
 
             if (mapIntent.resolveActivity(context.packageManager) != null) {

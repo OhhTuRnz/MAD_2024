@@ -9,6 +9,7 @@ import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.IRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.repositories.UserRepository
 
 class ViewModelFactory(
@@ -45,6 +46,11 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(FavoriteDonutsViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 return FavoriteDonutsViewModel(repository as FavoriteDonutsRepository) as T
+            }
+
+            modelClass.isAssignableFrom(ShopVisitHistoryViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                return ShopVisitHistoryViewModel(repository as ShopVisitHistoryRepository) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class")

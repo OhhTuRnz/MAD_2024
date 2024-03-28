@@ -23,8 +23,6 @@ class FavoriteShopsViewModel(private val favoriteShopsRepository: FavoriteShopsR
         }
     }
 
-
-
     fun upsertFavoriteShop(favoriteShop: FavoriteShops) = viewModelScope.launch {
         favoriteShopsRepository.upsertFavoriteShop(favoriteShop)
     }
