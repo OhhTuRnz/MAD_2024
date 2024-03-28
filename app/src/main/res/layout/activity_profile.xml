@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="?attr/mainBackgroundColor">
+
+    <!-- Icon (Profile Image) -->
+    <ImageView
+        android:id="@+id/profile_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/donut_icon_1"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:id="@+id/my_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="?android:textColor"
+        android:layout_above="@id/profile_image"
+        android:layout_marginTop="0dp"
+        android:padding="10dp"
+    />
+    <!-- Editable Text Field for Name -->
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Change your name here"
+        android:textColor="?android:textColor"
+        android:layout_below="@id/profile_image"
+        android:layout_marginTop="20dp"
+        android:padding="10dp"/>
+
+    <!-- Back Button -->
+    <Button
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/buttonColor"
+        android:text="Back"
+        android:layout_below="@id/edit_name"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?attr/buttonColor"
+        android:text="Save and back"
+        android:layout_below="@id/edit_name"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"/>
+
+</RelativeLayout>
