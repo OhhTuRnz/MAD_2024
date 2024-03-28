@@ -252,6 +252,12 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
                 apply()
             }
         }
+        if(FirebaseAuth.getInstance().currentUser == null) {
+            sharedPreferences.edit().apply {
+                putString("anonymousUserId", "c263015c-d101-46d1-b1e5-10aa7422d574")
+                apply()
+            }
+        }
 
         // Check and store user (the method will handle insertion if user doesn't exist)
         userViewModel.checkAndStoreUser(userUUID)
@@ -661,11 +667,19 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
     private fun logoutUser() {
         val auth = FirebaseAuth.getInstance()
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
         if (auth.currentUser != null) {
             // User is logged in, proceed with logout
             auth.signOut()
             Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
 
+            val userUUID = sharedPreferences.getString("anonymousUserId", null)
+
+            sharedPreferences.edit().apply {
+                putString("userId", userUUID)
+                apply()
+            }
             // Redirect to login screen or another appropriate activity
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)

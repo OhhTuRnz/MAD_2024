@@ -29,4 +29,5 @@
     <color name="buttonColorDark">@color/purple_200</color> <!-- weak orange -->
 
     <color name="googleSignInColor">#EF5350</color> <!-- weak orange -->
+    <color name="Star">#EF5350</color> <!-- weak orange -->
 </resources>

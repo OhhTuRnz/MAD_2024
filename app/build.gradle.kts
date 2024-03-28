@@ -84,6 +84,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("androidx.activity:activity:1.8.2")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.11.0")
     kapt("androidx.room:room-compiler:2.6.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
@@ -94,7 +95,7 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test:runner:1.5.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -104,5 +105,5 @@ dependencies {
     // FIREBASE
     implementation("com.google.firebase:firebase-auth")
     implementation("com.firebaseui:firebase-ui-auth:8.0.1")
-    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
 }

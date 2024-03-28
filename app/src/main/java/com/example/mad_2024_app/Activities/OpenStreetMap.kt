@@ -8,9 +8,10 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -28,8 +29,10 @@ import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
-import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -313,25 +316,114 @@ class OpenStreetMap : AppCompatActivity() {
 
             // Find views
             val nameView = mView.findViewById<TextView>(R.id.tvShopName)
-            val descriptionView = mView.findViewById<TextView>(R.id.tvShopDescription)
             val addressView = mView.findViewById<TextView>(R.id.tvShopAddress)
-            val commentsView =
-                mView.findViewById<TextView>(R.id.tvShopComments) // TextView or RecyclerView based on your design
+            val overallRatingBarView = mView.findViewById<RatingBar>(R.id.overallRatingBar)
+
+            val commentsContainer = mView.findViewById<LinearLayout>(R.id.llCommentsContainer)
+
+            val progressBar = mView.findViewById<ProgressBar>(R.id.progressBar)
+
+            // Show progress bar initially
+            commentsContainer.visibility = View.GONE
+            overallRatingBarView.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
 
             // Set shop details
             nameView.text = shopDetail.shop.name
-            descriptionView.text = shopDetail.shop.description
             addressView.text =
-                "${shopDetail.address?.street}, ${shopDetail.coordinate?.latitude}, ${shopDetail.coordinate?.longitude}"
+                "${shopDetail.address?.street}, ${shopDetail.address?.number}, ${shopDetail.address?.zipCode}"
 
             // Load and display comments for the shop
             // This requires a method to fetch comments from your database or server
-            loadComments(shopDetail.shop.shopId, commentsView)
+            loadComments(shopDetail, commentsContainer, overallRatingBarView, progressBar, context)
         }
 
-        private fun loadComments(shopId: Int, commentsView: TextView) {
-            // Here you would fetch comments for the given shop ID and update the commentsView.
-            // For simplicity, it's a TextView, but for a real app, you might use a RecyclerView and an adapter.
+        private fun loadComments(shopDetail: ShopDetail, commentsContainer: LinearLayout, overallRatingBar : RatingBar, progressBar: ProgressBar, context: Context) {
+            val db = Firebase.firestore
+            val shopName = shopDetail.shop.name.replace(" ", "_")
+            Log.d(TAG, "Loading comment. shopId: ${shopName+"@"+shopDetail.coordinate?.longitude+";"+shopDetail.coordinate?.latitude}")
+            db.collection("comments")
+                .whereEqualTo("shopId", shopName+"@"+shopDetail.coordinate?.longitude.toString()+";"+shopDetail.coordinate?.latitude.toString())
+                //.orderBy("timestamp", Query.Direction.DESCENDING) // If you have a timestamp field
+                .get()
+                .addOnSuccessListener { documents ->
+                    commentsContainer.removeAllViews()
+                    Log.d(TAG, "Success on retrieving comments")
+                    var totalRating = 0.0
+                    var ratingCount = 0
+                    val ratings = mutableListOf<Double>()
+
+                    for (document in documents) {
+                        val commentText = document.getString("comment") ?: "No comments yet"
+                        val ratingValue = document.getDouble("rating") ?: 0.0
+                        totalRating += ratingValue
+                        ratingCount++
+
+                        val commentView = TextView(context).apply {
+                            text = commentText
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                        }
+
+                        val ratingBar = RatingBar(context, null, android.R.attr.ratingBarStyleSmall).apply {
+                            rating = ratingValue.toFloat()
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                            )
+                        }
+
+                        ratings.add(ratingValue)
+
+                        // Add the comment and rating to the container
+                        commentsContainer.addView(commentView)
+                        commentsContainer.addView(ratingBar)
+                    }
+                    if (ratings.isNotEmpty()) {
+                        val medianRating = calculateMedian(ratings)
+                        overallRatingBar.rating = medianRating.toFloat()
+                    } else {
+                        overallRatingBar.rating = 0f
+                    }
+
+                    progressBar.visibility = View.GONE
+                    commentsContainer.visibility = View.VISIBLE
+                    overallRatingBar.visibility = View.VISIBLE
+
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting comments: ", exception)
+                    commentsContainer.removeAllViews()
+
+                    val errorTextView = TextView(context).apply {
+                        text = "Failed to load comments."
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+
+                    commentsContainer.addView(errorTextView) // Add the error message to the container
+
+                    progressBar.visibility = View.GONE
+                    commentsContainer.visibility = View.VISIBLE
+                    overallRatingBar.visibility = View.VISIBLE
+                }
+        }
+
+        private fun calculateMedian(ratings: MutableList<Double>): Double {
+            if (ratings.isEmpty()) return 0.0
+
+            val sortedRatings = ratings.sorted()
+            val middle = sortedRatings.size / 2
+
+            return if (sortedRatings.size % 2 == 0) {
+                (sortedRatings[middle - 1] + sortedRatings[middle]) / 2.0
+            } else {
+                sortedRatings[middle]
+            }
         }
 
         override fun onClose(){
