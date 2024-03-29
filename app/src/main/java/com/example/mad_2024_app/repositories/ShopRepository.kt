@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 
+@Singleton
 class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<String, Any>) : IRepository{
     private val TAG = "ShopRepo"
     private val modelName = "Shop"
@@ -98,5 +100,10 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
             }
             emit(shop) // Emit user from database or null if not found
         }
+    }.flowOn(Dispatchers.IO)
+
+    fun getShopByLocationId(locationId: Int): Flow<Shop?> = flow {
+        val shop = shopDao.getShopByLocationId(locationId).firstOrNull()
+        emit(shop)
     }.flowOn(Dispatchers.IO)
 }

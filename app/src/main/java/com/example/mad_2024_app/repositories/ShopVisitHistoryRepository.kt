@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
 
+@Singleton
 class ShopVisitHistoryRepository(
     private val shopVisitDAO: ShopVisitHistoryDAO,
     private val cache: Cache<String, Any>

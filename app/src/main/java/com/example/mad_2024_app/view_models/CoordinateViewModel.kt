@@ -15,21 +15,21 @@ class CoordinateViewModel(private val coordinateRepository: CoordinateRepository
     private val TAG = "CoordinateViewModel"
 
     fun getCoordinateById(coordinateId: Int, callback: (Coordinate?) -> Unit) = viewModelScope.launch {
-        coordinateRepository.getAddressById(coordinateId).collect { coordinate ->
+        coordinateRepository.getCoordinateById(coordinateId).collect { coordinate ->
             callback(coordinate)
         }
     }
 
     fun upsertCoordinate(coordinate: Coordinate) = viewModelScope.launch {
-        coordinateRepository.upsertAddress(coordinate)
+        coordinateRepository.upsertCoordinate(coordinate)
     }
 
     fun deleteCoordinate(coordinate: Coordinate) = viewModelScope.launch {
-        coordinateRepository.deleteAddress(coordinate)
+        coordinateRepository.deleteCoordinate(coordinate)
     }
 
     fun deleteCoordinateById(coordinateId: Int) = viewModelScope.launch {
-        coordinateRepository.deleteAddressById(coordinateId)
+        coordinateRepository.deleteCoordinateById(coordinateId)
     }
 
     // Additional methods as needed

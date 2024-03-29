@@ -26,4 +26,7 @@ interface ShopDAO {
 
     @Query("SELECT * FROM Shop WHERE locationId IN (SELECT coordinateId FROM Coordinate WHERE latitude >= :minLat AND latitude <= :maxLat AND longitude >= :minLon AND longitude <= :maxLon)")
     fun getShopsWithinBounds(minLat: Double, maxLat: Double, minLon: Double, maxLon: Double): Flow<List<Shop>>
+
+    @Query("SELECT * FROM Shop WHERE locationId = :coordinateId")
+    fun getShopByLocationId(coordinateId: Int) : Flow<Shop>
 }

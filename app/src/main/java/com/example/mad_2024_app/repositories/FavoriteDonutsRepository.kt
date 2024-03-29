@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
 
+@Singleton
 class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO, private val cache: Cache<String, Any>) : IRepository {
 
     private val TAG: String = "FavoriteDonutsRepo"

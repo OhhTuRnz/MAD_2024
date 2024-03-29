@@ -489,6 +489,14 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         Utils.writeLocationToCSV(this, location)
 
         updateNearbyStores(location)
+
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        sharedPreferences.edit().apply {
+            putString("latestLatitude", location.latitude.toString())
+            putString("latestLongitude", location.longitude.toString())
+            apply()
+        }
     }
 
     private fun updateNearbyStores(location: Location) {

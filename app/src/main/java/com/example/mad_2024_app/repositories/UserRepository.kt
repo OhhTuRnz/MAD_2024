@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
 
+@Singleton
 class UserRepository(private val userDao: UserDAO, private val cache: Cache<String, Any>) : IRepository{
     private val TAG : String = "UserRepo"
     private val modelName = "User"

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
 
+@Singleton
 class AddressRepository(private val addressDAO: AddressDAO, private val cache: Cache<String, Any>) : IRepository {
 
     private val TAG: String = "AddressRepo"
@@ -44,13 +46,15 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun upsertAddress(address: Address) {
+    suspend fun upsertAddress(address: Address) : Long {
         val upsertedId = addressDAO.upsert(address)
         // Update cache after insertion
         if (upsertedId != -1L) {
             cache.put(modelName + upsertedId.toString(), address)
         }
         Utils.printCacheContents(TAG, cache)
+
+        return upsertedId
     }
 
     suspend fun deleteAddress(address: Address) {
@@ -64,6 +68,11 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
         // Remove address from cache after deletion
         cache.invalidate(modelName+addressId.toString())
     }
+
+    fun getAddressByLocationId(locationId: Int): Flow<Address?> = flow {
+        val shop = addressDAO.getAddressByLocationId(locationId).firstOrNull()
+        emit(shop)
+    }.flowOn(Dispatchers.IO)
 
     // Additional methods as needed
 }
