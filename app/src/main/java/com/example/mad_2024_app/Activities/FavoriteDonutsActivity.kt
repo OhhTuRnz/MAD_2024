@@ -35,9 +35,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
     private val TAG = "LogoGPSFavDonutActivity"
     private lateinit var latestLocation: Location
     private lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var searchView: SearchView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var donutsAdapter: DonutsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,117 +48,7 @@ class FavoriteDonutsActivity : AppCompatActivity() {
 
         toggleDrawer()
 
-        if (!isLoggedIn) {
-            // Redirigir al usuario a la MainActivity
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        } else {
-            // Continuar con la configuración de la actividad
-            setupRecyclerView()
-            setupSearchView()
 
-            observeDonuts()
-        }
-
-    }
-
-    private fun setupRecyclerView() {
-        recyclerView = findViewById(R.id.recyclerView)
-        donutsAdapter = DonutsAdapter(emptyList())
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = donutsAdapter
-    }
-
-    private fun setupSearchView() {
-        searchView = findViewById(R.id.searchView)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // Filtrar la lista de donuts con el texto de búsqueda
-                donutsAdapter.filter.filter(newText)
-                return true
-            }
-        })
-    }
-
-    private fun observeDonuts() {
-        val donutFlow = (application as App).database.donutDao().getAllDonuts()
-        lifecycleScope.launchWhenStarted {
-            donutFlow
-                .distinctUntilChanged() // Filtrar cambios para evitar actualizaciones innecesarias
-                .map { it.toList() } // Convertir el flujo en una lista
-                .collect { donutList ->
-                    // Actualizar el adaptador con la nueva lista de donuts
-                    donutsAdapter.updateDonuts(donutList)
-                }
-        }
-    }
-
-    class DonutsAdapter(private var originalDonutList: List<Donut>) :
-        RecyclerView.Adapter<DonutsAdapter.DonutViewHolder>(), Filterable {
-
-        private var filteredDonutList: List<Donut> = originalDonutList
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DonutViewHolder {
-            val itemView =
-                LayoutInflater.from(parent.context).inflate(R.layout.activity_favorite_donuts, parent, false)
-            return DonutViewHolder(itemView)
-        }
-
-        override fun onBindViewHolder(holder: DonutViewHolder, position: Int) {
-            val currentDonut = filteredDonutList[position]
-            holder.textViewName.text = currentDonut.name
-
-            // Añade cualquier otra lógica para mostrar información adicional del donut
-        }
-
-        override fun getItemCount() = filteredDonutList.size
-
-        inner class DonutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val textViewName: TextView = itemView.findViewById(R.id.message)
-            // Añade cualquier otra vista que necesites mostrar en el elemento del RecyclerView
-        }
-
-        // Implementa la lógica del filtro para el SearchView
-        override fun getFilter(): Filter {
-            return object : Filter() {
-                override fun performFiltering(constraint: CharSequence?): FilterResults {
-                    val filteredList = mutableListOf<Donut>()
-                    if (constraint.isNullOrBlank()) {
-                        filteredList.addAll(originalDonutList)
-                    } else {
-                        val filterPattern = constraint.toString().lowercase(Locale.ROOT).trim()
-                        for (donut in originalDonutList) {
-                            if (donut.name.lowercase(Locale.ROOT).contains(filterPattern)) {
-                                filteredList.add(donut)
-                            }
-                        }
-                    }
-                    val filterResults = FilterResults()
-                    filterResults.values = filteredList
-                    return filterResults
-                }
-
-                @SuppressLint("NotifyDataSetChanged")
-                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                    @Suppress("UNCHECKED_CAST")
-                    filteredDonutList = results?.values as List<Donut>
-                    notifyDataSetChanged()
-                }
-            }
-        }
-
-        // Método para actualizar la lista de donuts en el adaptador
-        @SuppressLint("NotifyDataSetChanged")
-        fun updateDonuts(newDonutList: List<Donut>) {
-            originalDonutList = newDonutList
-            filteredDonutList = newDonutList
-            notifyDataSetChanged()
-        }
     }
 
     private fun applyTheme(sharedPreferences: SharedPreferences) {

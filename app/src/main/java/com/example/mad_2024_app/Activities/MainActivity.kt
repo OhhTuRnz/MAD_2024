@@ -37,22 +37,20 @@ import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.Controller.FragmentPageAdapter
-
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
-import com.example.mad_2024_app.database.ShopVisitHistory
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
-import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
+import com.example.mad_2024_app.repositories.DonutRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
-import com.example.mad_2024_app.view_models.FavoriteDonutsViewModel
+import com.example.mad_2024_app.view_models.DonutViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
@@ -78,7 +76,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
     private lateinit var addressViewModel: AddressViewModel
     private lateinit var favoriteShopsViewModel : FavoriteShopsViewModel
     private lateinit var coordinateViewModel : CoordinateViewModel
-    private lateinit var favoriteDonutsViewModel : FavoriteDonutsViewModel
+    private lateinit var donutsViewModel : DonutViewModel
     private lateinit var shopVisitHistoryViewModel : ShopVisitHistoryViewModel
 
     private lateinit var userRepo: UserRepository
@@ -86,7 +84,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
     private lateinit var addressRepo: AddressRepository
     private lateinit var favoriteShopsRepo : FavoriteShopsRepository
     private lateinit var coordinateRepo: CoordinateRepository
-    private lateinit var favoriteDonutsRepo: FavoriteDonutsRepository
+    private lateinit var donutsRepo: DonutRepository
     private lateinit var shopVisitHistoryRepo : ShopVisitHistoryRepository
 
     private lateinit var listView: ListView
@@ -258,9 +256,9 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         val coordinateFactory = ViewModelFactory(coordinateRepo)
         coordinateViewModel = ViewModelProvider(this, coordinateFactory).get(CoordinateViewModel::class.java)
 
-        favoriteDonutsRepo = DbUtils.getFavoriteDonutsRepository(appContext)
-        val favoriteDonutsFactory = ViewModelFactory(favoriteDonutsRepo)
-        favoriteDonutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(FavoriteDonutsViewModel::class.java)
+        donutsRepo = DbUtils.getDonutsRepository(appContext)
+        val favoriteDonutsFactory = ViewModelFactory(donutsRepo)
+        donutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(DonutViewModel::class.java)
 
         shopVisitHistoryRepo = DbUtils.getShopVisitHistoryRepository(appContext)
         val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)

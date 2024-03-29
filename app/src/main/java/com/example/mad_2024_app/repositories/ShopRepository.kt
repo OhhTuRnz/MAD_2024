@@ -1,6 +1,7 @@
 package com.example.mad_2024_app.repositories
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.example.mad_2024_app.DAOs.ShopDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
@@ -78,9 +79,10 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         }
     }.flowOn(Dispatchers.IO) // Perform the flow operations on the IO dispatcher
 
-    fun getAllShops(): Flow<List<Shop>> {
+    /*fun getAllShops(): Flow<List<Shop>> {
         return shopDao.getAllShops()
-    }
+    }*/
+    fun getAllShops(): LiveData<List<Shop>> = shopDao.getAllShops()
 
     fun getShopById(shopId: Int): Flow<Shop?> = flow {
         // Check if user is present in cache
