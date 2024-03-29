@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.ShopRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
@@ -36,11 +38,7 @@ class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
         }
     }
 
-    /*
-    fun getAllShops() = viewModelScope.launch {
-        shopRepository.getAllShops().collect { shops ->
-            _shopsNearCoordinates.postValue(shops)
-        }
+    suspend fun getShopByIdPreCollect(shopId: Int) : Flow<Shop?> {
+        return shopRepository.getShopById(shopId)
     }
-     */
 }

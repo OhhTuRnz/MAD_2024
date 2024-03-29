@@ -707,6 +707,78 @@ abstract class AppDatabase : RoomDatabase() {
                         val shopId15 = shopDao.upsert(carrascosaShop)
                         Log.d(TAG, "Inserted shop with ID: $shopId15")
                     }
+                    val coordinate16 =
+                        Coordinate(latitude = 36.71210457229509, longitude = -4.431699546343177)
+                    val coordinateId16 = coordinateDao.upsert(coordinate16)
+                    Log.d(TAG, "Inserted coordinate with ID: $coordinateId16")
+
+                    // Check if coordinate insertion was successful
+                    if (coordinateId16 != -1L) {
+                        // Insert address associated with the coordinate
+                        val address16 = Address(
+                            street = "C. Plazuela",
+                            city = "Cifuentes, Guadalajara",
+                            country = "Spain",
+                            number = 4,
+                            zipCode = 19431,
+                            coordinateId = coordinateId16.toInt()
+                        )
+                        val addressId16 = addressDao.upsert(address16)
+                        Log.d(TAG, "Inserted address with ID: $addressId16")
+
+                        // Check if address insertion was successful
+                        if (addressId16 != -1L) {
+                            // Insert shop associated with the address
+                            val dunkinZambrano = Shop(
+                                name = "DUNKIN´ESPAÑA Zambrano",
+                                description = "Service options\n" +
+                                        "\n" +
+                                        "Delivery\n" +
+                                        "\n" +
+                                        "Takeaway\n" +
+                                        "\n" +
+                                        "Dine-in\n" +
+                                        "Accessibility\n" +
+                                        "\n" +
+                                        "Wheelchair-accessible entrance\n" +
+                                        "\n" +
+                                        "Wheelchair-accessible toilet\n" +
+                                        "Offerings\n" +
+                                        "\n" +
+                                        "Coffee\n" +
+                                        "Dining options\n" +
+                                        "\n" +
+                                        "Breakfast\n" +
+                                        "\n" +
+                                        "Brunch\n" +
+                                        "\n" +
+                                        "Dessert\n" +
+                                        "Amenities\n" +
+                                        "\n" +
+                                        "Bar on site\n" +
+                                        "\n" +
+                                        "Toilets\n" +
+                                        "Atmosphere\n" +
+                                        "\n" +
+                                        "Casual\n" +
+                                        "Planning\n" +
+                                        "\n" +
+                                        "Accepts reservations\n" +
+                                        "Payments\n" +
+                                        "\n" +
+                                        "Credit cards\n" +
+                                        "\n" +
+                                        "Debit cards\n" +
+                                        "Children\n" +
+                                        "\n" +
+                                        "Good for kids",
+                                addressId = addressId16.toInt(),
+                                locationId = coordinateId16.toInt()
+                            )
+                            val shopId16 = shopDao.upsert(dunkinZambrano)
+                            Log.d(TAG, "Inserted shop with ID: $shopId16")
+                        }
+                    }
                 }
 
                 val donutsList = listOf(

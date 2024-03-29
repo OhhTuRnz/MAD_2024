@@ -104,7 +104,7 @@ class Main : Fragment() {
 
             favoriteShopsViewModel.getFavoriteShopsByUser(userId)
             // Observing favorite shops and updating the adapter's favorite shops set
-            favoriteShopsViewModel.favoriteShops.observe(this, Observer { favoriteShopsList ->
+            favoriteShopsViewModel.favoriteShops.observe(viewLifecycleOwner, Observer { favoriteShopsList ->
                 if (favoriteShopsList != null) {
                     // Extracting shop IDs from the favorite shops list
                     val favoriteShopIds = favoriteShopsList.map { it.shopId }.toSet()
@@ -114,7 +114,7 @@ class Main : Fragment() {
             })
 
             // Observing shops near coordinates to update the adapter's shop list
-            shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
+            shopViewModel.shopsNearCoordinates.observe(viewLifecycleOwner, Observer { shops ->
                 if (shops != null) {
                     shopAdapter.setShops(shops)
                 }

@@ -1,8 +1,10 @@
 package com.example.mad_2024_app.repositories
 
+import android.util.Log
 import com.example.mad_2024_app.DAOs.ShopDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.database.User
 import com.google.common.cache.Cache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -79,4 +81,22 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
     fun getAllShops(): Flow<List<Shop>> {
         return shopDao.getAllShops()
     }
+
+    fun getShopById(shopId: Int): Flow<Shop?> = flow {
+        // Check if user is present in cache
+        val cachedUser = cache.getIfPresent(modelName+shopId) as Shop?
+        if (cachedUser != null) {
+            Log.d(TAG, "Cache hit for userUUID: $shopId")
+            emit(cachedUser) // Emit cached user
+        } else {
+            Log.d(TAG, "Cache miss for userUUID: $shopId")
+            // If user is not in cache, fetch from database and emit result
+            val shop = shopDao.getShopById(shopId).firstOrNull()
+            shop?.let {
+                cache.put(modelName+shopId, it) // Cache the user if found
+                Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${it.shopId}")
+            }
+            emit(shop) // Emit user from database or null if not found
+        }
+    }.flowOn(Dispatchers.IO)
 }

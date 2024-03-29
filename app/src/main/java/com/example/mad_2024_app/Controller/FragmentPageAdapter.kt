@@ -2,7 +2,6 @@ package com.example.mad_2024_app.Controller
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -12,17 +11,19 @@ import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
+import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
 
 class FragmentPageAdapter(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
     private val shopViewModel: ShopViewModel,
+    private val shopVisitHistoryViewModel: ShopVisitHistoryViewModel,
     private val favoriteShopsViewModel: FavoriteShopsViewModel,
     private val coordinateViewModel: CoordinateViewModel,
     private val sharedPreferences: SharedPreferences,
     private val addressViewModel: AddressViewModel,
     private val locationProvider: ILocationProvider,
-    private val context: Context
+    private val context: Context,
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     private val NUM_PAGES = 2
 
@@ -38,7 +39,13 @@ class FragmentPageAdapter(
                 coordinateViewModel, sharedPreferences, addressViewModel,
                 locationProvider, context
             )
-            1 -> Second()
+            1 -> Second.newInstance(
+                shopViewModel,
+                favoriteShopsViewModel,
+                shopVisitHistoryViewModel,
+                coordinateViewModel, sharedPreferences, addressViewModel,
+                locationProvider, context
+            )
             else -> throw IllegalArgumentException("Invalid position")
         }
     }

@@ -12,14 +12,14 @@ import kotlinx.coroutines.launch
 
 class ShopVisitHistoryViewModel(private val shopVisitHistoryRepository: ShopVisitHistoryRepository) : ViewModel() {
 
-    private val _visitHistory = MutableLiveData<List<ShopVisitHistory>?>()
-    val visitHistory: LiveData<List<ShopVisitHistory>?> = _visitHistory
+    private val _userVisitHistory = MutableLiveData<List<ShopVisitHistory>?>()
+    val userVisitHistory: LiveData<List<ShopVisitHistory>?> = _userVisitHistory
     private val TAG = "ShopVisitHistoryViewModel"
 
-    fun getVisitsByUser(uuid: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getVisitsByUser(uuid: String) = viewModelScope.launch(Dispatchers.Main) {
         shopVisitHistoryRepository.getVisitsByUser(uuid).collect { visits ->
             Log.d(TAG, "Retrieving visits for UUID: $uuid")
-            _visitHistory.value = visits
+            _userVisitHistory.value = visits
         }
     }
 
