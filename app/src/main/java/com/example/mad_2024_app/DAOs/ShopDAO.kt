@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Delete
@@ -13,7 +14,7 @@ interface ShopDAO {
     suspend fun upsert(shop: Shop): Long
 
     @Query("SELECT * FROM Shop")
-    fun getAllShops(): Flow<List<Shop>>
+    fun getAllShops(): LiveData<List<Shop>>
 
     @Query("SELECT * FROM Shop WHERE shopId = :shopId")
     fun getShopById(shopId: Int): Flow<Shop>

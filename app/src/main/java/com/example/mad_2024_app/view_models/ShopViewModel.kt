@@ -16,6 +16,7 @@ class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
 
     private val _shopsNearCoordinates = MutableLiveData<List<Shop>?>()
     val shopsNearCoordinates: LiveData<List<Shop>?> = _shopsNearCoordinates
+    val allShops: LiveData<List<Shop>> = shopRepository.getAllShops()
 
     val addressIds = MutableLiveData<List<Int>>()
 
@@ -38,7 +39,8 @@ class ShopViewModel(private val shopRepository: ShopRepository) : ViewModel() {
         }
     }
 
-    suspend fun getShopByIdPreCollect(shopId: Int) : Flow<Shop?> {
+    suspend fun getShopByIdPreCollect(shopId: Int): Flow<Shop?> {
         return shopRepository.getShopById(shopId)
     }
+
 }
