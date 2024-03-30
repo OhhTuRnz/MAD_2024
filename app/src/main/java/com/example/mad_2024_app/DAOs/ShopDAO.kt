@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Delete
+import androidx.room.Update
 import androidx.room.Upsert
 import com.example.mad_2024_app.database.Shop
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,9 @@ interface ShopDAO {
 
     @Delete
     suspend fun delete(shop: Shop)
+
+    @Query("UPDATE Shop SET lastAccessed = :lastAccessed WHERE shopId = :shopId")
+    suspend fun updateLastAccessed(shopId: Int, lastAccessed: Long)
 
     @Query("DELETE FROM Shop WHERE shopId = :shopId")
     suspend fun deleteById(shopId: Int)

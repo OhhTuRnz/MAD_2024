@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class,
-        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 9
+        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 10
 )
 @TypeConverters(Converters::class) // Correct placement of annotation
 abstract class AppDatabase : RoomDatabase() {
@@ -116,7 +116,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Same-day delivery",
                             addressId = addressId.toInt(),
-                            locationId = coordinateId1.toInt()
+                            locationId = coordinateId1.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId = shopDao.upsert(tresOlivosShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId")
@@ -157,7 +158,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Delivery",
                             addressId = addressId2.toInt(),
-                            locationId = coordinateId2.toInt()
+                            locationId = coordinateId2.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId2 = shopDao.upsert(montecarmeloShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId2")
@@ -202,7 +204,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId3.toInt(),
-                            locationId = coordinateId3.toInt()
+                            locationId = coordinateId3.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId3 = shopDao.upsert(retiroShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId3")
@@ -247,7 +250,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId4.toInt(),
-                            locationId = coordinateId4.toInt()
+                            locationId = coordinateId4.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId4 = shopDao.upsert(argandaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId4")
@@ -290,7 +294,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId5.toInt(),
-                            locationId = coordinateId5.toInt()
+                            locationId = coordinateId5.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId5 = shopDao.upsert(plazaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId5")
@@ -331,7 +336,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId6.toInt(),
-                            locationId = coordinateId6.toInt()
+                            locationId = coordinateId6.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId6 = shopDao.upsert(palmerasShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId6")
@@ -372,7 +378,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Kerbside pickup",
                             addressId = addressId7.toInt(),
-                            locationId = coordinateId7.toInt()
+                            locationId = coordinateId7.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId7 = shopDao.upsert(rosaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId7")
@@ -413,7 +420,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId8.toInt(),
-                            locationId = coordinateId8.toInt()
+                            locationId = coordinateId8.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId8 = shopDao.upsert(familiarShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId8")
@@ -450,7 +458,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId9.toInt(),
-                            locationId = coordinateId9.toInt()
+                            locationId = coordinateId9.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId9 = shopDao.upsert(mercadonaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId9")
@@ -489,7 +498,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId10.toInt(),
-                            locationId = coordinateId10.toInt()
+                            locationId = coordinateId10.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId10 = shopDao.upsert(supecoShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId10")
@@ -533,7 +543,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId11.toInt(),
-                            locationId = coordinateId11.toInt()
+                            locationId = coordinateId11.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId11 = shopDao.upsert(robertsShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId11")
@@ -576,7 +587,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId12.toInt(),
-                            locationId = coordinateId12.toInt()
+                            locationId = coordinateId12.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId12 = shopDao.upsert(briocherieShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId12")
@@ -613,7 +625,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId13.toInt(),
-                            locationId = coordinateId13.toInt()
+                            locationId = coordinateId13.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId13 = shopDao.upsert(bergueShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId13")
@@ -656,7 +669,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Takeaway",
                             addressId = addressId14.toInt(),
-                            locationId = coordinateId14.toInt()
+                            locationId = coordinateId14.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId14 = shopDao.upsert(panariaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId14")
@@ -702,7 +716,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Wine",
                             addressId = addressId15.toInt(),
-                            locationId = coordinateId15.toInt()
+                            locationId = coordinateId15.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId15 = shopDao.upsert(carrascosaShop)
                         Log.d(TAG, "Inserted shop with ID: $shopId15")
@@ -773,7 +788,8 @@ abstract class AppDatabase : RoomDatabase() {
                                         "\n" +
                                         "Good for kids",
                                 addressId = addressId16.toInt(),
-                                locationId = coordinateId16.toInt()
+                                locationId = coordinateId16.toInt(),
+                                lastAccessed = System.currentTimeMillis()
                             )
                             val shopId16 = shopDao.upsert(dunkinZambrano)
                             Log.d(TAG, "Inserted shop with ID: $shopId16")

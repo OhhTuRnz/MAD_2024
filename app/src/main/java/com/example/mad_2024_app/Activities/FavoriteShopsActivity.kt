@@ -25,6 +25,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
@@ -56,11 +57,9 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
-        val appContext = application as App
-
         applyTheme(sharedPreferences)
 
-        initializeViewModels(appContext)
+        initializeViewModels()
 
         setContentView(R.layout.activity_favorite_shops)
 
@@ -88,16 +87,16 @@ class FavoriteShopsActivity : AppCompatActivity() {
         }
     }*/
 
-    private fun initializeViewModels(appContext: Context){
-        shopRepo = DbUtils.getShopRepository(appContext)
+    private fun initializeViewModels(){
+        shopRepo = RepositoryProvider.getShopRepository()
         val shopFactory = ViewModelFactory(shopRepo)
         shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
 
-        addressRepo = DbUtils.getAddressRepository(appContext)
+        addressRepo = RepositoryProvider.getAddressRepository()
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
 
-        favoriteShopsRepo = DbUtils.getFavoriteShopsRepository(appContext)
+        favoriteShopsRepo = RepositoryProvider.getFavoriteShopsRepository()
         val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
         favoriteShopsViewModel = ViewModelProvider(this, favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
     }

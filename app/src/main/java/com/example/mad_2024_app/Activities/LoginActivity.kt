@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.User
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.UserViewModel
@@ -80,7 +81,7 @@ class LoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_login)
 
-        userRepo = DbUtils.getUserRepository(application as App)
+        userRepo = RepositoryProvider.getUserRepository()
         val userFactory = ViewModelFactory(userRepo)
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
 

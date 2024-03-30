@@ -100,10 +100,8 @@ class OpenStreetMap : AppCompatActivity() {
         val locationBundle = intent.getBundleExtra("locationBundle")!!
         latestLocation = locationBundle.getParcelable("location")!!
 
-        val appContext = application as App
-
         applyTheme(sharedPreferences)
-        initializeViewModels(appContext)
+        initializeViewModels()
         setContentView(R.layout.activity_open_street_map)
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osm", MODE_PRIVATE))
@@ -163,7 +161,7 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun displayClustersIfNeeded() {
-        if (map.zoomLevelDouble <= 15 && !showingIndividualMarkers) {
+        if (map.zoomLevelDouble <= 15) {
             displayClusters()
         }
     }
@@ -407,7 +405,7 @@ class OpenStreetMap : AppCompatActivity() {
         return BitmapDrawable(resources, bitmap)
     }
 
-    private fun initializeViewModels(appContext: Context){
+    private fun initializeViewModels(){
         coordinateRepo = RepositoryProvider.getCoordinateRepository()
         val coordinateFactory = ViewModelFactory(coordinateRepo)
         coordinateViewModel = ViewModelProvider(this, coordinateFactory)[CoordinateViewModel::class.java]

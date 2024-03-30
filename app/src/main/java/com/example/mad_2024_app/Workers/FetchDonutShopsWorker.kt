@@ -153,7 +153,7 @@ class FetchDonutShopsWorker(
                         // If the shop does not exist, upsert it with the addressId
                         if (existingShop == null) {
                             Log.d(TAG, "Upserting shop with name: $name and description: $description")
-                            val shop = Shop(name = name, description = combinedDescription, addressId = addressId.toInt(), locationId = coordinateId.toInt())
+                            val shop = Shop(name = name, description = combinedDescription, addressId = addressId.toInt(), locationId = coordinateId.toInt(), lastAccessed = System.currentTimeMillis())
                             shopRepo.upsert(shop)
                         }
                     }

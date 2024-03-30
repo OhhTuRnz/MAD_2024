@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.example.mad_2024_app.view_models.UserViewModel
@@ -42,8 +43,7 @@ class SettingsActivity : ComponentActivity(){
         //displayUserId(sharedPreferences)
 
         // Initialize ViewModel with ViewModelFactory
-        val appContext = application as App
-        userRepo = DbUtils.getUserRepository(appContext)
+        userRepo = RepositoryProvider.getUserRepository()
         val factory = ViewModelFactory(userRepo)
         viewModel = ViewModelProvider(this, factory).get(UserViewModel::class.java)
 

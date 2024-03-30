@@ -107,11 +107,9 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
-        val appContext = application as App
-
         applyTheme(sharedPreferences)
 
-        initializeViewModels(appContext)
+        initializeViewModels()
 
         setContentView(R.layout.activity_main)
 
@@ -236,7 +234,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         }
     }
 
-    private fun initializeViewModels(appContext: Context){
+    private fun initializeViewModels(){
         userRepo = RepositoryProvider.getUserRepository()
         val userFactory = ViewModelFactory(userRepo)
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
@@ -299,19 +297,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             setTheme(R.style.AppTheme_Dark)
         } else {
             setTheme(R.style.AppTheme_Light)
-        }
-    }
-
-    fun onNextButtonClick(view: View) {
-        if (::latestLocation.isInitialized) {
-            val intent = Intent(this, SecondActivity::class.java).apply {
-                putExtra("locationBundle", Bundle().apply {
-                    putParcelable("location", latestLocation)
-                })
-            }
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -480,10 +465,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
     override fun onLocationChanged(location: Location) {
         latestLocation = location
-        runOnUiThread {
-            val textView: TextView = findViewById(R.id.mainTextView)
-            textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
-        }
+
         saveCoordinatesToFile(location.latitude, location.longitude, filesDir)
         Utils.writeLocationToCSV(this, location)
 
