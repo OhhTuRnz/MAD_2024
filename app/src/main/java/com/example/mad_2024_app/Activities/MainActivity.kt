@@ -37,6 +37,7 @@ import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.Controller.FragmentPageAdapter
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.FavoriteShops
@@ -236,31 +237,31 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
     }
 
     private fun initializeViewModels(appContext: Context){
-        userRepo = DbUtils.getUserRepository(appContext)
+        userRepo = RepositoryProvider.getUserRepository()
         val userFactory = ViewModelFactory(userRepo)
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
 
-        shopRepo = DbUtils.getShopRepository(appContext)
+        shopRepo = RepositoryProvider.getShopRepository()
         val shopFactory = ViewModelFactory(shopRepo)
         shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
 
-        addressRepo = DbUtils.getAddressRepository(appContext)
+        addressRepo = RepositoryProvider.getAddressRepository()
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
 
-        favoriteShopsRepo = DbUtils.getFavoriteShopsRepository(appContext)
+        favoriteShopsRepo = RepositoryProvider.getFavoriteShopsRepository()
         val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
         favoriteShopsViewModel = ViewModelProvider(this, favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
 
-        coordinateRepo = DbUtils.getCoordinateRepository(appContext)
+        coordinateRepo = RepositoryProvider.getCoordinateRepository()
         val coordinateFactory = ViewModelFactory(coordinateRepo)
         coordinateViewModel = ViewModelProvider(this, coordinateFactory).get(CoordinateViewModel::class.java)
 
-        donutsRepo = DbUtils.getDonutsRepository(appContext)
-        val donutsFactory = ViewModelFactory(donutsRepo)
-        donutsViewModel = ViewModelProvider(this, donutsFactory).get(DonutViewModel::class.java)
+        donutsRepo = RepositoryProvider.getDonutRepository()
+        val favoriteDonutsFactory = ViewModelFactory(donutsRepo)
+        donutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(DonutViewModel::class.java)
 
-        shopVisitHistoryRepo = DbUtils.getShopVisitHistoryRepository(appContext)
+        shopVisitHistoryRepo = RepositoryProvider.getShopVisitHistoryRepository()
         val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)
         shopVisitHistoryViewModel = ViewModelProvider(this, shopVisitHistoryFactory).get(ShopVisitHistoryViewModel::class.java)
     }

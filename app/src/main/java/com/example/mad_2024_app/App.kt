@@ -17,6 +17,7 @@ import com.example.mad_2024_app.Network.OverpassAPIService
 import com.example.mad_2024_app.Workers.FetchDonutShopsWorker
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.DonutRepository
 import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
@@ -39,20 +40,31 @@ class App : Application() {
     private val TAG = "Application"
 
     lateinit var database: AppDatabase
+        private set
 
     lateinit var userRepo : UserRepository
+        private set
 
     lateinit var shopRepo : ShopRepository
+        private set
 
     lateinit var addressRepo : AddressRepository
+        private set
 
     lateinit var coordinateRepo : CoordinateRepository
+        private set
 
     lateinit var favoriteShopsRepo : FavoriteShopsRepository
+        private set
 
     lateinit var favoriteDonutsRepo: FavoriteDonutsRepository
+        private set
 
     lateinit var shopVisitHistoryRepo: ShopVisitHistoryRepository
+        private set
+
+    lateinit var donutRepo : DonutRepository
+        private set
 
     val cache: Cache<String, Any> by lazy {
         CacheBuilder.newBuilder()
@@ -95,6 +107,7 @@ class App : Application() {
         val shopDao = database.shopDao()
         val addressDao = database.addressDao()
         val coordinateDao = database.coordinateDao()
+        val donutDao = database.donutDao()
         val favoriteShopsDao = database.favoriteShopsDao()
         val favoriteDonutsDao = database.favoriteDonutsDao()
         val shopVisitHistoryDao = database.shopVisitHistoryDao()
@@ -104,6 +117,7 @@ class App : Application() {
         shopRepo = ShopRepository(shopDao, cache)
         addressRepo = AddressRepository(addressDao, cache)
         coordinateRepo = CoordinateRepository(coordinateDao, cache)
+        donutRepo = DonutRepository(donutDao, cache)
         favoriteShopsRepo = FavoriteShopsRepository(favoriteShopsDao, cache)
         favoriteDonutsRepo = FavoriteDonutsRepository(favoriteDonutsDao, cache)
         shopVisitHistoryRepo = ShopVisitHistoryRepository(shopVisitHistoryDao, cache)
@@ -113,6 +127,7 @@ class App : Application() {
             shopRepo,
             addressRepo,
             coordinateRepo,
+            donutRepo,
             favoriteShopsRepo,
             favoriteDonutsRepo,
             shopVisitHistoryRepo
@@ -159,7 +174,7 @@ class App : Application() {
             .build()
 
         // Build your PeriodicWorkRequest with the constraints
-        val fetchDonutShopsWorkRequest = PeriodicWorkRequestBuilder<FetchDonutShopsWorker>(5, TimeUnit.SECONDS)
+        val fetchDonutShopsWorkRequest = PeriodicWorkRequestBuilder<FetchDonutShopsWorker>(1, TimeUnit.HOURS)
             .setInputData(inputData)
             .setConstraints(constraints)
             .setBackoffCriteria(

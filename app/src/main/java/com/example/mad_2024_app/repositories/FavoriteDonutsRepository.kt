@@ -17,13 +17,13 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
     private val modelName: String = "FavoriteDonuts"
 
     fun getFavoriteDonutsByUser(userId: String?): Flow<List<Donut>> = flow {
-        val cachedDonuts = cache.getIfPresent(modelName + userId.toString()) as List<Donut>?
+        val cachedDonuts = cache.getIfPresent("$modelName@$userId") as List<Donut>?
         if (cachedDonuts != null) {
             emit(cachedDonuts)
         } else {
             val donuts = favoriteDonutsDAO.getFavoriteDonutsByUser(userId).firstOrNull()
             donuts?.let {
-                cache.put(modelName + userId.toString(), it)
+                cache.put("$modelName@$userId", it)
             }
             emit(donuts ?: emptyList())
         }
@@ -33,23 +33,23 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
         val upsertedId = favoriteDonutsDAO.upsert(favoriteDonut)
         // If it's a new insert, the DAO will return the new row ID. If it's an update, it'll return the ID of the updated row.
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), favoriteDonut)
+            cache.put("$modelName@$upsertedId", favoriteDonut)
         }
     }
 
     suspend fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts) {
         favoriteDonutsDAO.removeFavoriteDonut(favoriteDonut)
-        cache.invalidate(modelName + favoriteDonut.userId)
+        cache.invalidate("$modelName@${favoriteDonut.userId}")
     }
 
     suspend fun removeFavoriteDonutById(userId: Int, donutId: Int) {
         Log.d(TAG, "Removing donut with id $donutId for user with id: $userId")
         favoriteDonutsDAO.removeFavoriteDonutById(userId, donutId)
-        cache.invalidate(modelName + userId.toString())
+        cache.invalidate("$modelName@$userId@donutId")
     }
 
     suspend fun isDonutFavorite(userId: Int, donutId: Int): Boolean {
-        val cacheKey = modelName + userId.toString() + donutId.toString()
+        val cacheKey = "$modelName@$userId@$donutId"
         val cachedValue = cache.getIfPresent(cacheKey) as Boolean?
 
         return if (cachedValue != null) {

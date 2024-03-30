@@ -29,7 +29,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         val upsertedId = shopDao.upsert(shop)
 
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), shop)
+            cache.put("$modelName@$upsertedId", shop)
         }
     }
 
@@ -57,7 +57,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         val cacheKey = "${location.latitude},${location.longitude},$radius"
 
         // Check cache
-        val cachedShops = cache.getIfPresent(modelName+cacheKey) as? List<Shop>
+        val cachedShops = cache.getIfPresent("$modelName@$cacheKey") as? List<Shop>
         if (cachedShops != null) {
             emit(cachedShops)
         } else {
@@ -76,7 +76,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
             val shops = shopDao.getShopsWithinBounds(minLat, maxLat, minLon, maxLon).firstOrNull() ?: emptyList()
 
             // Cache the result and emit
-            cache.put(modelName+cacheKey, shops)
+            cache.put("$modelName@$cacheKey", shops)
             emit(shops)
         }
     }.flowOn(Dispatchers.IO) // Perform the flow operations on the IO dispatcher
@@ -88,7 +88,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
 
     fun getShopById(shopId: Int): Flow<Shop?> = flow {
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(modelName+shopId) as Shop?
+        val cachedUser = cache.getIfPresent("$modelName@$shopId") as Shop?
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $shopId")
             emit(cachedUser) // Emit cached user
@@ -97,7 +97,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
             // If user is not in cache, fetch from database and emit result
             val shop = shopDao.getShopById(shopId).firstOrNull()
             shop?.let {
-                cache.put(modelName+shopId, it) // Cache the user if found
+                cache.put("$modelName@$shopId", it) // Cache the user if found
                 Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${it.shopId}")
             }
             emit(shop) // Emit user from database or null if not found

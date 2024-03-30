@@ -3,6 +3,7 @@ package com.example.mad_2024_app
 import android.app.Application
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.DonutRepository
 import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
@@ -14,6 +15,7 @@ object RepositoryProvider {
     private lateinit var shopRepo: ShopRepository
     private lateinit var addressRepo: AddressRepository
     private lateinit var coordinateRepo: CoordinateRepository
+    private lateinit var donutRepo : DonutRepository
     private lateinit var favoriteShopsRepo: FavoriteShopsRepository
     private lateinit var favoriteDonutsRepo: FavoriteDonutsRepository
     private lateinit var shopVisitHistoryRepo: ShopVisitHistoryRepository
@@ -23,6 +25,7 @@ object RepositoryProvider {
         shopRepo: ShopRepository,
         addressRepo: AddressRepository,
         coordinateRepo: CoordinateRepository,
+        donutRepo: DonutRepository,
         favoriteShopsRepo: FavoriteShopsRepository,
         favoriteDonutsRepo: FavoriteDonutsRepository,
         shopVisitHistoryRepo: ShopVisitHistoryRepository,
@@ -32,6 +35,7 @@ object RepositoryProvider {
         this.shopRepo = shopRepo
         this.addressRepo = addressRepo
         this.coordinateRepo = coordinateRepo
+        this.donutRepo = donutRepo
         this.favoriteShopsRepo = favoriteShopsRepo
         this.favoriteDonutsRepo = favoriteDonutsRepo
         this.shopVisitHistoryRepo = shopVisitHistoryRepo
@@ -66,5 +70,7 @@ object RepositoryProvider {
         return shopVisitHistoryRepo
     }
 
-    // Add getter methods for other repositories here...
+    fun getDonutRepository(): DonutRepository {
+        return donutRepo
+    }
 }

@@ -22,13 +22,13 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
 
         // Update cache after insertion
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), user)
+            cache.put("$modelName@$upsertedId", user)
         }
     }
 
     fun getUserById(userId: Int): Flow<User?> = flow {
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(modelName+userId.toString()) as User?
+        val cachedUser = cache.getIfPresent("$modelName@$userId") as User?
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userId: $userId")
             emit(cachedUser) // Emit cached user
@@ -37,7 +37,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
             // If user is not in cache, fetch from database and emit result
             val user = userDao.getUserById(userId).firstOrNull()
             user?.let {
-                cache.put(modelName+userId.toString(), it) // Cache the user if found
+                cache.put("$modelName@$userId", it) // Cache the user if found
                 Log.d(TAG, "DatabaseInsertId: Adding user to cache with userId: ${it.userId}")
             }
             emit(user) // Emit user from database or null if not found
@@ -46,7 +46,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
 
     fun getUserByUUID(userUUID: String): Flow<User?> = flow {
         // Check if user is present in cache
-        val cachedUser = cache.getIfPresent(modelName+userUUID) as User?
+        val cachedUser = cache.getIfPresent("$modelName@$userUUID") as User?
         if (cachedUser != null) {
             Log.d(TAG, "Cache hit for userUUID: $userUUID")
             emit(cachedUser) // Emit cached user
@@ -55,7 +55,7 @@ class UserRepository(private val userDao: UserDAO, private val cache: Cache<Stri
             // If user is not in cache, fetch from database and emit result
             val user = userDao.getUserByUUID(userUUID).firstOrNull()
             user?.let {
-                cache.put(modelName+userUUID, it) // Cache the user if found
+                cache.put("$modelName@$userUUID", it) // Cache the user if found
                 Log.d(TAG, "DatabaseInsertUUID: Adding user to cache with uuid: ${it.uuid}")
             }
             emit(user) // Emit user from database or null if not found

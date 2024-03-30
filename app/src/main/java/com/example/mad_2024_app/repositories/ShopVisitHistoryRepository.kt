@@ -20,7 +20,7 @@ class ShopVisitHistoryRepository(
     private val modelName = "ShopVisit"
 
     fun getVisitsByUser(uuid: String): Flow<List<ShopVisitHistory>> = flow {
-        val cacheKey = modelName + uuid.orEmpty()
+        val cacheKey = "$modelName@$uuid"
         val cachedVisits = cache.getIfPresent(cacheKey) as List<ShopVisitHistory>?
         if (cachedVisits != null) {
             emit(cachedVisits)
@@ -36,18 +36,18 @@ class ShopVisitHistoryRepository(
     suspend fun upsert(shopVisit: ShopVisitHistory) {
         val insertedId = shopVisitDAO.upsert(shopVisit)
         if (insertedId != -1L) {
-            cache.put(modelName + insertedId.toString(), shopVisit)
+            cache.put("$modelName@$insertedId", shopVisit)
         }
     }
 
     suspend fun removeVisit(shopVisit: ShopVisitHistory) {
         shopVisitDAO.deleteVisitHistory(shopVisit)
-        cache.invalidate(modelName + shopVisit.visitorUuid)
+        cache.invalidate("$modelName@$shopVisit.visitorUuid@$shopVisit.visitedShopId@$shopVisit.timestamp")
     }
 
     suspend fun removeVisitById(visitorUuid: String, visitedShopId : Int, timestamp: Long) {
         shopVisitDAO.deleteVisitHistoryById(visitorUuid, visitedShopId, timestamp)
-        cache.invalidate(modelName + visitorUuid + visitedShopId + timestamp)
+        cache.invalidate("$modelName@$visitorUuid@$visitedShopId@$timestamp")
     }
 
     suspend fun removeUserVisitHistory(visitorUuid : String) {
