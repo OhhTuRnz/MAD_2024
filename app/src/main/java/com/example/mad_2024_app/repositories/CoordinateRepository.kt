@@ -38,7 +38,7 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
         } else {
             val address = coordinateDAO.getCoordinateById(addressId).firstOrNull()
             address?.let {
-                cache.put(modelName+addressId.toString(), it)
+                cache.put("$modelName@$addressId", it)
             }
             emit(address)
         }
@@ -47,7 +47,7 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     suspend fun upsertCoordinate(coordinate: Coordinate) : Long {
         val upsertedId = coordinateDAO.upsert(coordinate)
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), coordinate)
+            cache.put("$modelName@$upsertedId", coordinate)
         }
         return upsertedId
     }
@@ -55,13 +55,13 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     suspend fun deleteCoordinate(coordinate: Coordinate) {
         coordinateDAO.delete(coordinate)
         // Remove address from cache after deletion
-        cache.invalidate(modelName+coordinate.coordinateId.toString())
+        cache.invalidate("$modelName@${coordinate.coordinateId}")
     }
 
-    suspend fun deleteCoordinateById(addressId: Int) {
-        coordinateDAO.deleteById(addressId)
+    suspend fun deleteCoordinateById(coordinateId: Int) {
+        coordinateDAO.deleteById(coordinateId)
         // Remove address from cache after deletion
-        cache.invalidate(modelName+addressId.toString())
+        cache.invalidate("$modelName@$coordinateId")
     }
 
     fun getCoordinateByLatitudeAndLongitude(latitude: Double, longitude: Double): Flow<Coordinate?> = flow {
@@ -69,7 +69,7 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
         coordinate?.let {
             Log.d(TAG, "Coordinate found with ID: ${it.coordinateId}")
             // Use the coordinate ID as part of the cache key
-            val cacheKey = "$modelName${it.coordinateId}"
+            val cacheKey = "$modelName@${it.coordinateId}"
             val cachedCoordinate = cache.getIfPresent(cacheKey) as Coordinate?
 
             if (cachedCoordinate != null) {

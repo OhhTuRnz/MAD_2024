@@ -19,13 +19,13 @@ class FavoriteShopsRepository(private val favoriteShopsDAO: FavoriteShopsDAO, pr
     private val modelName: String = "FavoriteShops"
 
     fun getFavoriteShopsByUser(uuid: String?): Flow<List<Shop>> = flow {
-        val cachedShops = cache.getIfPresent(modelName+uuid.toString()) as List<Shop>?
+        val cachedShops = cache.getIfPresent("$modelName@$uuid") as List<Shop>?
         if (cachedShops != null) {
             emit(cachedShops)
         } else {
             val shops = favoriteShopsDAO.getFavoriteShopsByUser(uuid).firstOrNull()
             shops?.let {
-                cache.put(modelName+uuid.toString(), it)
+                cache.put("$modelName@$uuid", it)
             }
             emit(shops ?: emptyList())
         }
@@ -35,23 +35,25 @@ class FavoriteShopsRepository(private val favoriteShopsDAO: FavoriteShopsDAO, pr
         val upsertedId = favoriteShopsDAO.upsert(favoriteShop)
         // If it's a new insert, the DAO will return the new row ID. If it's an update, it'll return the ID of the updated row.
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), favoriteShop)
+            cache.put("$modelName@$upsertedId", favoriteShop)
         }
+
+        Utils.printCacheContents(TAG, cache)
     }
 
     suspend fun removeFavoriteShop(favoriteShop: FavoriteShops) {
         favoriteShopsDAO.removeFavoriteShop(favoriteShop)
-        cache.invalidate(modelName+favoriteShop.uuid)
+        cache.invalidate("$modelName@$favoriteShop.uuid")
     }
 
     suspend fun removeFavoriteShopById(uuid: String?, shopId: Int) {
         Log.d(TAG, "Removing shop with id $shopId for user with uuid: $uuid")
         favoriteShopsDAO.removeFavoriteShopById(uuid, shopId)
-        cache.invalidate(modelName+uuid.toString())
+        cache.invalidate("$modelName@$uuid@$shopId")
     }
 
     suspend fun isShopFavorite(uuid: String?, shopId: Int): Boolean {
-        val cacheKey = modelName+uuid.toString()+shopId.toString()
+        val cacheKey = modelName+"@"+uuid.toString()+"@"+shopId.toString()
         val cachedValue = cache.getIfPresent(cacheKey) as Boolean?
 
         return if (cachedValue != null) {
