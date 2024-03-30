@@ -798,25 +798,25 @@ abstract class AppDatabase : RoomDatabase() {
                 }
 
                 val donutsList = listOf(
-                    Donut(name = "Glazed Donut", type = "Classic", color = "Golden"),
-                    Donut(name = "Chocolate Donut", type = "Chocolate", color = "Brown"),
-                    Donut(name = "Jelly Donut", type = "Filled", color = "Assorted"),
-                    Donut(name = "Boston Cream Donut", type = "Filled", color = "Chocolate"),
-                    Donut(name = "Maple Bar Donut", type = "Bar", color = "Golden"),
-                    Donut(name = "Old Fashioned Donut", type = "Classic", color = "Golden"),
-                    Donut(name = "Blueberry Donut", type = "Fruit", color = "Blue"),
-                    Donut(name = "Vanilla Cream Donut", type = "Filled", color = "White"),
-                    Donut(name = "Strawberry Donut", type = "Fruit", color = "Red"),
-                    Donut(name = "Cinnamon Sugar Donut", type = "Classic", color = "Brown"),
-                    Donut(name = "Lemon Donut", type = "Citrus", color = "Yellow"),
-                    Donut(name = "Raspberry Donut", type = "Fruit", color = "Pink"),
-                    Donut(name = "Coconut Donut", type = "Coconut", color = "White"),
-                    Donut(name = "Red Velvet Donut", type = "Red Velvet", color = "Red"),
-                    Donut(name = "Pistachio Donut", type = "Nut", color = "Green"),
-                    Donut(name = "Powdered Sugar Donut", type = "Classic", color = "White"),
-                    Donut(name = "Caramel Donut", type = "Filled", color = "Brown"),
-                    Donut(name = "Apple Fritter Donut", type = "Fritter", color = "Assorted"),
-                    Donut(name = "Peanut Butter Donut", type = "Nut", color = "Brown")
+                    Donut(name = "Glazed Donut", type = "Classic", color = "Golden", image = R.drawable.glazeddonut),
+                    Donut(name = "Chocolate Donut", type = "Chocolate", color = "Brown", image = R.drawable.chocolate_donuts),
+                    Donut(name = "Jelly Donut", type = "Filled", color = "Assorted", image = R.drawable.jelly_donut),
+                    Donut(name = "Boston Cream Donut", type = "Filled", color = "Chocolate", image = R.drawable.boston_cream_doughnuts),
+                    Donut(name = "Maple Bar Donut", type = "Bar", color = "Golden", image = R.drawable.maple_bars_donut),
+                    Donut(name = "Old Fashioned Donut", type = "Classic", color = "Golden", image = R.drawable.old_fashioned_glazeddonuts),
+                    Donut(name = "Blueberry Donut", type = "Fruit", color = "Blue", image = R.drawable.blueberry_donut),
+                    Donut(name = "Vanilla Cream Donut", type = "Filled", color = "White", image = R.drawable.vanilla_cream_filleddonuts),
+                    Donut(name = "Strawberry Donut", type = "Fruit", color = "Red", image = R.drawable.strawberry_donut),
+                    Donut(name = "Cinnamon Sugar Donut", type = "Classic", color = "Brown", image = R.drawable.cinnamon_sugardonuts),
+                    Donut(name = "Lemon Donut", type = "Citrus", color = "Yellow", image = R.drawable.lemonglazeddonuts),
+                    Donut(name = "Raspberry Donut", type = "Fruit", color = "Pink", image = R.drawable.raspberrydoughnuts),
+                    Donut(name = "Coconut Donut", type = "Coconut", color = "White", image = R.drawable.coconut_donut),
+                    Donut(name = "Red Velvet Donut", type = "Red Velvet", color = "Red", image = R.drawable.red_velvet_donuts),
+                    Donut(name = "Pistachio Donut", type = "Nut", color = "Green", image = R.drawable.pistachiodonuts),
+                    Donut(name = "Powdered Sugar Donut", type = "Classic", color = "White", image = R.drawable.powderedsugardonuts),
+                    Donut(name = "Caramel Donut", type = "Filled", color = "Brown", image = R.drawable.caramel_cream_filled_doughnuts),
+                    Donut(name = "Apple Fritter Donut", type = "Fritter", color = "Assorted", image = R.drawable.apple_fritter_donuts),
+                    Donut(name = "Peanut Butter Donut", type = "Nut", color = "Brown", image = R.drawable.peanut_butter_glazeddonuts)
                 )
 
                 for (donut in donutsList) {
