@@ -1,6 +1,5 @@
 package com.example.mad_2024_app.Activities
 
-import DbUtils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -23,7 +22,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
@@ -54,6 +52,16 @@ class FavoriteShopsActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Check user login status using Firebase Auth
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // User not logged in, redirect to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
