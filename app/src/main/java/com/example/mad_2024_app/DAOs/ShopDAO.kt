@@ -23,6 +23,9 @@ interface ShopDAO {
     @Delete
     suspend fun delete(shop: Shop)
 
+    @Query("DELETE FROM Shop WHERE lastAccessed < :threshold")
+    suspend fun deleteOldShops(threshold: Long)
+
     @Query("UPDATE Shop SET lastAccessed = :lastAccessed WHERE shopId = :shopId")
     suspend fun updateLastAccessed(shopId: Int, lastAccessed: Long)
 

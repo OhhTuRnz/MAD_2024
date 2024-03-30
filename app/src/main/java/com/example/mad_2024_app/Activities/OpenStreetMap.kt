@@ -59,7 +59,8 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import java.util.concurrent.Executors
 import kotlinx.coroutines.*
 
-@Suppress("DEPRECATION")
+private val permanentMarkers: MutableList<Marker> = mutableListOf()
+
 class OpenStreetMap : AppCompatActivity() {
     private val TAG = "LogoGPSOpenStreetMapActivity"
 
@@ -135,23 +136,33 @@ class OpenStreetMap : AppCompatActivity() {
 
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
 
-        // Add marker for user's current location
-        val userLocation = GeoPoint(latestLocation.latitude, latestLocation.longitude)
-        addMarker(userLocation, "My Current Location")
+        val userLocation = addCurrentLocationMarker()
 
-        // Handle shop location if provided
-        val shopLatitude = intent.getDoubleExtra("shopLatitude", Double.POSITIVE_INFINITY)
-        val shopLongitude = intent.getDoubleExtra("shopLongitude", Double.POSITIVE_INFINITY)
+        val shopLocationBundle = intent.getBundleExtra("shopLocation")
+        val shopLatitude = shopLocationBundle?.getDouble("shopLatitude", Double.POSITIVE_INFINITY) ?: Double.POSITIVE_INFINITY
+        val shopLongitude = shopLocationBundle?.getDouble("shopLongitude", Double.POSITIVE_INFINITY) ?: Double.POSITIVE_INFINITY
+
 
         if(shopLatitude == Double.POSITIVE_INFINITY || shopLongitude == Double.POSITIVE_INFINITY){
             map.controller.setCenter(userLocation)
             map.controller.setZoom(15.0)
+            updateNearbyStores(location = latestLocation, nearShopRadius)
         }
         else{
+            val shopLocation = Location("").apply {
+                latitude = shopLatitude
+                longitude = shopLongitude
+            }
             handleShopLocation(shopLatitude, shopLongitude)
+            updateNearbyStores(location = shopLocation, 50)
         }
+    }
 
-        updateNearbyStores(location = latestLocation, nearShopRadius)
+    private fun addCurrentLocationMarker() : GeoPoint{
+        val userLocation = GeoPoint(latestLocation.latitude, latestLocation.longitude)
+        addMarker(userLocation, "My Current Location")
+
+        return userLocation
     }
 
     private fun displayIndividualMarkersIfNeeded(location: Location) {
@@ -179,11 +190,14 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun handleShopLocation(shopLatitude: Double, shopLongitude: Double) {
-        if (shopLatitude != 0.0 && shopLongitude != 0.0) {
+        if (shopLatitude != Double.POSITIVE_INFINITY && shopLongitude != Double.POSITIVE_INFINITY) {
             val shopLocation = GeoPoint(shopLatitude, shopLongitude)
+
+            Log.d(TAG, "Adding shop from list to map")
             addMarker(shopLocation, "Shop Location")
+
             map.controller.setCenter(shopLocation)
-            map.controller.setZoom(20.0)  // Closer zoom for specific shop
+            map.controller.setZoom(17.0)
         }
     }
 
@@ -276,7 +290,8 @@ class OpenStreetMap : AppCompatActivity() {
 
     private fun addClusterMarkersToMap(mapView: MapView) {
         for (cluster in clusters) {
-            if (cluster.markers.size == 1) {
+            if (cluster.markers.size <= 3) {
+                addMarker(cluster.geoPoint!!, cluster.markers.first().title)
                 mapView.overlays.add(cluster.markers.first())
             } else {
                 val clusterMarker = Marker(mapView)
@@ -301,7 +316,7 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun addMarkers(mapView: MapView) {
-        mapView.overlays.clear()
+        map.overlays.removeAll { it !in permanentMarkers } // Remove all markers except the current location marker
 
         if (showingIndividualMarkers) {
             // Add individual shop markers
@@ -310,6 +325,7 @@ class OpenStreetMap : AppCompatActivity() {
                 val shopGeoPoint = shopDetail.coordinate?.let { GeoPoint(it.latitude, it.longitude) }
                 shopGeoPoint?.let {
                     mapView.overlays.add(addShopMarker(mapView, shopDetail, it))
+                    addMarker(shopGeoPoint, shopDetail)
                 }
             }
         } else {
@@ -363,8 +379,10 @@ class OpenStreetMap : AppCompatActivity() {
             "My Current Location" -> {
                 marker.icon = ContextCompat.getDrawable(this, R.drawable.current_location_marker)
             }
-            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.donut_marker)
+            else -> marker.icon = ContextCompat.getDrawable(this, R.drawable.shop_marker)
         }
+
+        permanentMarkers.add(marker)
 
         map.overlays.add(marker)
         map.invalidate()
@@ -383,7 +401,7 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun createClusterIcon(clusterSize: Int): Drawable {
-        val baseIcon = ContextCompat.getDrawable(this, R.drawable.cluster_icon) // Your base icon
+        val baseIcon = ContextCompat.getDrawable(this, R.drawable.cluster_marker) // Your base icon
         val bitmap = Bitmap.createBitmap(baseIcon!!.intrinsicWidth, baseIcon.intrinsicHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         baseIcon.setBounds(0, 0, canvas.width, canvas.height)
@@ -392,8 +410,8 @@ class OpenStreetMap : AppCompatActivity() {
         // Drawing the text (number of items in the cluster) on the icon
         val text = clusterSize.toString()
         val paint = Paint().apply {
-            color = Color.WHITE // Text color
-            textSize = 30F // Set text size
+            color = Color.BLACK // Text color
+            textSize = 50F // Set text size
             typeface = Typeface.DEFAULT_BOLD
             textAlign = Paint.Align.CENTER
         }

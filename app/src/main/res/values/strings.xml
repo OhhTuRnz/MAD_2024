@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LogoGPS</string>
+    <string name="app_name">CopFinder</string>
     <string name="button_next">Next Activity</string>
     <string name="button_previous">Prev Activity</string>
     <string name="Hello_World">Hello World!</string>

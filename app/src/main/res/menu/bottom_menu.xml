@@ -11,5 +11,5 @@
     <item
         android:id="@+id/nav_donuts"
         android:icon="@drawable/donut_menu"
-        android:title=""/>
+        android:title="" />
 </menu>

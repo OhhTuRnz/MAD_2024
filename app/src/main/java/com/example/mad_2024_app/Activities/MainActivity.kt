@@ -202,9 +202,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         val userId = sharedPreferences.getString("userId", null)
 
         if (userId != null) {
-            // Initialize an empty set to hold favorite shop IDs
-            val favoriteShops = mutableSetOf<Int>()
-
             // Initialize the ListView and adapter
 
             val listView = findViewById<ListView>(R.id.lvNearShops)
@@ -285,7 +282,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             }
         }
 
-        // Check and store user (the method will handle insertion if user doesn't exist)
         userViewModel.checkAndStoreUser(userUUID)
     }
 

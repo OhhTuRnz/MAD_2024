@@ -8,7 +8,7 @@
     <ListView
         android:id="@+id/lvRecentShops"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="490dp"
         android:layout_marginTop="200dp"
         android:foregroundTint="@null"
         android:backgroundTint="@null"/>

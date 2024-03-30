@@ -8,12 +8,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.mad_2024_app.Network.OverpassAPIService
+import com.example.mad_2024_app.Workers.DeleteOldShopsWorker
 import com.example.mad_2024_app.Workers.FetchDonutShopsWorker
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
@@ -163,20 +164,14 @@ class App : Application() {
         })
 
         // Define constraints
-        val constraints = Constraints.Builder()
+        val constraintsFetchShops = Constraints.Builder()
             .setRequiresBatteryNotLow(true)  // Don't run if the battery is low
             .setRequiredNetworkType(NetworkType.CONNECTED) // Need to be connected
             .build()
 
-        val inputData = Data.Builder()
-            .putString("key1", "value1") // Example parameter 1
-            .putInt("key2", 123) // Example parameter 2
-            .build()
-
         // Build your PeriodicWorkRequest with the constraints
         val fetchDonutShopsWorkRequest = PeriodicWorkRequestBuilder<FetchDonutShopsWorker>(1, TimeUnit.HOURS)
-            .setInputData(inputData)
-            .setConstraints(constraints)
+            .setConstraints(constraintsFetchShops)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
                 5,
@@ -190,6 +185,28 @@ class App : Application() {
             "fetchDonutShops",
             ExistingPeriodicWorkPolicy.KEEP,  // or REPLACE, depending on your needs
             fetchDonutShopsWorkRequest
+        )
+
+        // Define constraints
+        val constraintsOldShopsDeleter = Constraints.Builder()
+            .setRequiresBatteryNotLow(true)  // Don't run if the battery is low
+            .setRequiredNetworkType(NetworkType.CONNECTED) // Need to be connected
+            .build()
+
+        val deleteOldShopsWorkRequest = PeriodicWorkRequestBuilder<DeleteOldShopsWorker>(30, TimeUnit.DAYS)
+            .setConstraints(constraintsOldShopsDeleter)
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                5,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+
+// Enqueue the work request
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "deleteOldShopsWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            deleteOldShopsWorkRequest
         )
     }
 }
