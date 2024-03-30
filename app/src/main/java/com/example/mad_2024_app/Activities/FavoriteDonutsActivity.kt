@@ -1,54 +1,106 @@
 package com.example.mad_2024_app.Activities
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.SearchView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.Donut
+import com.example.mad_2024_app.repositories.DonutRepository
+import com.example.mad_2024_app.view_models.DonutViewModel
+import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import java.util.Locale
 
 
 class FavoriteDonutsActivity : AppCompatActivity() {
     private val TAG = "LogoGPSFavDonutActivity"
     private lateinit var latestLocation: Location
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var donutViewModel: DonutViewModel
+    private lateinit var donutRepo: DonutRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Check user login status before proceeding
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // User is not logged in, redirect to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Close current activity
+            return
+        }
+
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
+
+        val appContext = application as App
 
         applyTheme(sharedPreferences)
+
+        initializeViewModels(appContext)
 
         setContentView(R.layout.activity_favorite_donuts)
 
         toggleDrawer()
 
+        setupList()
+    }
 
+    private fun setupList() {
+        val listView = findViewById<ListView>(R.id.lvDonuts)
+        donutViewModel.allDonuts.observe(this, Observer { donuts ->
+            if (donuts != null) {
+                val adapter = DonutAdapter(this, donuts)
+                listView.adapter = adapter
+            } else {
+                Log.d(TAG, "No donuts found")
+            }
+        })
+    }
+
+    class DonutAdapter(context: Context, private val donuts: List<Donut>) :
+        ArrayAdapter<Donut>(context, 0,donuts) {
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val listItemView = convertView ?: inflater.inflate(R.layout.donut_list_item, parent, false)
+
+            val donut = getItem(position) as Donut
+            listItemView.findViewById<TextView>(R.id.donut_name).text = donut.name
+            listItemView.findViewById<TextView>(R.id.donut_type).text = donut.type
+            val imageView = listItemView.findViewById<ImageView>(R.id.image_view)
+
+            // Carga la imagen usando Glide (asumiendo que donut.image contiene una URL o ruta de drawable)
+            Glide.with(context)
+                .load(donut.image)
+                .into(imageView)
+            return listItemView
+        }
+    }
+
+    private fun initializeViewModels(appContext: App) {
+        donutRepo = DbUtils.getDonutsRepository(appContext)
+        val donutFactory = ViewModelFactory(donutRepo)
+        donutViewModel = ViewModelProvider(this, donutFactory)[DonutViewModel::class.java]
     }
 
     private fun applyTheme(sharedPreferences: SharedPreferences) {

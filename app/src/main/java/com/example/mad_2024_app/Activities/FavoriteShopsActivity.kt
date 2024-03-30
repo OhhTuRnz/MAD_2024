@@ -65,16 +65,16 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
         toggleDrawer()
 
-        //setupList(sharedPreferences)
+        setupList(sharedPreferences)
     }
 
-    /*private fun setupList(sharedPreferences: SharedPreferences) {
+    private fun setupList(sharedPreferences: SharedPreferences) {
         val listView = findViewById<ListView>(R.id.lvShops)
 
         // Observe the LiveData returned by getFavoriteShopsByUser()
         val userId = sharedPreferences.getString("userId", null)
         if (userId != null) {
-            favoriteShopsViewModel.getFavoriteShopsByUser(userId).observe(this, Observer { favoriteShops ->
+            favoriteShopsViewModel.favoriteShops.observe(this, Observer { favoriteShops ->
                 if (favoriteShops != null) {
                     val adapter = FavoriteShopAdapter(this, favoriteShops, addressViewModel)
                     listView.adapter = adapter
@@ -85,7 +85,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
         } else {
             Log.e(TAG, "User ID not found in SharedPreferences.")
         }
-    }*/
+    }
 
     private fun initializeViewModels(){
         shopRepo = RepositoryProvider.getShopRepository()
@@ -251,7 +251,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
     }
 
 
-    class FavoriteShopAdapter(context: Context, private val shops: List<Shop>,private val addressViewModel: AddressViewModel,) :
+    class FavoriteShopAdapter(context: Context, private val shops: List<Shop>,private val addressViewModel: AddressViewModel) :
         ArrayAdapter<Shop>(context, 0, shops) {
         private val inflater: LayoutInflater = LayoutInflater.from(context)
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
