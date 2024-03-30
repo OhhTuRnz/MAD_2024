@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class,
-        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 10
+        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 11
 )
 @TypeConverters(Converters::class) // Correct placement of annotation
 abstract class AppDatabase : RoomDatabase() {

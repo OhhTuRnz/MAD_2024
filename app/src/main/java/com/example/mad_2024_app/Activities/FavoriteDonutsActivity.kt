@@ -82,19 +82,21 @@ class FavoriteDonutsActivity : AppCompatActivity() {
         ArrayAdapter<Donut>(context, 0,donuts) {
         private val inflater: LayoutInflater = LayoutInflater.from(context)
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val listItemView = convertView ?: inflater.inflate(R.layout.donut_list_item, parent, false)
+            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.donut_list_item, parent, false)
+            val donut = donuts[position]
 
-            val donut = getItem(position) as Donut
-            listItemView.findViewById<TextView>(R.id.donut_name).text = donut.name
-            listItemView.findViewById<TextView>(R.id.donut_type).text = donut.type
-            val imageView = listItemView.findViewById<ImageView>(R.id.image_view)
+            val imageView = view.findViewById<ImageView>(R.id.image_view)
+            Glide.with(context).load(donut.image).into(imageView)
 
-            // Carga la imagen usando Glide (asumiendo que donut.image contiene una URL o ruta de drawable)
-            Glide.with(context)
-                .load(donut.image)
-                .into(imageView)
-            return listItemView
+            val nameTextView = view.findViewById<TextView>(R.id.donut_name)
+            nameTextView.text = donut.name
+
+            val typeTextView = view.findViewById<TextView>(R.id.donut_type)
+            typeTextView.text = donut.type
+
+            return view
         }
+
     }
 
     private fun initializeViewModels(appContext: App) {
