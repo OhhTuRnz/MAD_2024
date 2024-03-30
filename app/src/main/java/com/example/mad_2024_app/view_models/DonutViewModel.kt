@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class DonutViewModel(private val donutsRepository: DonutRepository) : ViewModel() {
 
     private val _allDonuts = MutableLiveData<List<Donut>?>()
-    val allDonuts: LiveData<List<Donut>?> = _allDonuts
+    val allDonuts: LiveData<List<Donut>> = donutsRepository.getAllDonuts()
 
     private val _donutById = MutableLiveData<Donut?>()
     val donutById: LiveData<Donut?> = _donutById
@@ -26,10 +26,9 @@ class DonutViewModel(private val donutsRepository: DonutRepository) : ViewModel(
 
     // Function to get all donuts
     fun getAllDonuts() = viewModelScope.launch {
-        donutsRepository.getAllDonuts().collect { donuts ->
-            _allDonuts.postValue(donuts)
-        }
+        donutsRepository.getAllDonuts() // No collect needed here
     }
+
 
     // Function to get a donut by ID (pre-collect version)
     suspend fun getDonutByIdPreCollect(donutId: Int): Flow<Donut?> {

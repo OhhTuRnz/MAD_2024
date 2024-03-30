@@ -257,8 +257,8 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         coordinateViewModel = ViewModelProvider(this, coordinateFactory).get(CoordinateViewModel::class.java)
 
         donutsRepo = DbUtils.getDonutsRepository(appContext)
-        val favoriteDonutsFactory = ViewModelFactory(donutsRepo)
-        donutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(DonutViewModel::class.java)
+        val donutsFactory = ViewModelFactory(donutsRepo)
+        donutsViewModel = ViewModelProvider(this, donutsFactory).get(DonutViewModel::class.java)
 
         shopVisitHistoryRepo = DbUtils.getShopVisitHistoryRepository(appContext)
         val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)

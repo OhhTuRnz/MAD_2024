@@ -1,7 +1,9 @@
 package com.example.mad_2024_app.repositories
 
+import androidx.lifecycle.LiveData
 import com.example.mad_2024_app.DAOs.DonutDAO
 import com.example.mad_2024_app.database.Donut
+import com.example.mad_2024_app.database.Shop
 import com.google.common.cache.Cache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -14,20 +16,7 @@ class DonutRepository(private val donutsDAO: DonutDAO, private val cache: Cache<
     private val TAG: String = "DonutsRepo"
     private val modelName: String = "Donut"
 
-    fun getAllDonuts(): Flow<List<Donut>> = flow {
-        // Check if donuts are present in cache
-        val cachedDonuts = cache.getIfPresent("allDonuts") as List<Donut>?
-        if (cachedDonuts != null) {
-            emit(cachedDonuts) // Emit cached donuts if present
-        } else {
-            // If donuts are not in cache, fetch from database and emit result
-            val donuts = donutsDAO.getAllDonuts().firstOrNull()
-            donuts?.let {
-                cache.put("allDonuts", it) // Cache the donuts if found
-            }
-            emit(donuts ?: emptyList()) // Emit donuts from database or an empty list if not found
-        }
-    }.flowOn(Dispatchers.IO)
+    fun getAllDonuts(): LiveData<List<Donut>> = donutsDAO.getAllDonuts()
 
     fun getDonutById(donutId: Int): Flow<Donut?> = flow {
         // Check if donut is present in cache
