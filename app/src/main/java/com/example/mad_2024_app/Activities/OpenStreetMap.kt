@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.Shop
@@ -133,8 +134,6 @@ class OpenStreetMap : AppCompatActivity() {
                                 shopDetails.add(shopDetail)
                                 Log.d(TAG, "Shops updated: ${shopDetails.size}")
                                 addMarkers(map)
-                                addMarkersAndRoute(map)
-                                // If needed, update the UI or notify an adapter here
                             }
                         }
                     }
@@ -145,7 +144,7 @@ class OpenStreetMap : AppCompatActivity() {
 
     private fun updateNearbyStores(location: Location) {
         val coordinate = Coordinate(latitude=location.latitude, longitude=location.longitude)
-        val radius = 5000 // meters
+        val radius = 2000 // meters
 
         shopViewModel.getAllShopsNearCoordinates(coordinate, radius)
 
@@ -216,53 +215,20 @@ class OpenStreetMap : AppCompatActivity() {
         map.invalidate() // Reload map
     }
 
-    /*
-    fun addMarkers(mapView: MapView, locationsCoords: List<GeoPoint>, locationsNames: List<String>) {
-        for (shopDetail in shopDetails) {
-            shopDetail.coordinate?.let { coord ->
-                val geoPoint = GeoPoint(coord.latitude, coord.longitude)
-                addMarker(geoPoint, shopDetail.shop.name)
-            }
-        }
-        map.invalidate() // Refresh the map to display the new markers
-    }
-
-     */
-
-    private fun addMarkersAndRoute(mapView: MapView) {
-        val routePoints = mutableListOf<GeoPoint>()
-        shopDetails.forEach { shopDetail ->
-            shopDetail.coordinate?.let { coord ->
-                val geoPoint = GeoPoint(coord.latitude, coord.longitude)
-                addMarker(geoPoint, shopDetail.shop.name)
-                routePoints.add(geoPoint)
-            }
-        }
-
-        if (routePoints.isNotEmpty()) {
-            val route = Polyline().apply {
-                setPoints(routePoints)
-                color = ContextCompat.getColor(this@OpenStreetMap, R.color.teal_700)
-            }
-            map.overlays.add(route)
-        }
-        map.invalidate()
-    }
-
     private fun initializeViewModels(appContext: Context){
-        coordinateRepo = DbUtils.getCoordinateRepository(appContext)
+        coordinateRepo = RepositoryProvider.getCoordinateRepository()
         val coordinateFactory = ViewModelFactory(coordinateRepo)
         coordinateViewModel = ViewModelProvider(this, coordinateFactory)[CoordinateViewModel::class.java]
 
-        shopRepo = DbUtils.getShopRepository(appContext)
+        shopRepo = RepositoryProvider.getShopRepository()
         val shopFactory = ViewModelFactory(shopRepo)
         shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
 
-        addressRepo = DbUtils.getAddressRepository(appContext)
+        addressRepo = RepositoryProvider.getAddressRepository()
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
 
-        shopVisitHistoryRepo = DbUtils.getShopVisitHistoryRepository(appContext)
+        shopVisitHistoryRepo = RepositoryProvider.getShopVisitHistoryRepository()
         val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)
         shopVisitHistoryViewModel = ViewModelProvider(this, shopVisitHistoryFactory).get(ShopVisitHistoryViewModel::class.java)
     }

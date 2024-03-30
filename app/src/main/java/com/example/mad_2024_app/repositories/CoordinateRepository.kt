@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.repositories
 
+import android.util.Log
 import com.example.mad_2024_app.DAOs.CoordinateDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.google.common.cache.Cache
@@ -31,17 +32,15 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     }.flowOn(Dispatchers.IO)
 
     fun getCoordinateById(addressId: Int): Flow<Coordinate?> = flow {
-        // Check if address is present in cache
         val cachedAddress = cache.getIfPresent(modelName+addressId.toString()) as Coordinate?
         if (cachedAddress != null) {
-            emit(cachedAddress) // Emit cached address if present
+            emit(cachedAddress)
         } else {
-            // If address is not in cache, fetch from database and emit result
             val address = coordinateDAO.getCoordinateById(addressId).firstOrNull()
             address?.let {
-                cache.put(modelName+addressId.toString(), it) // Cache the address if found
+                cache.put(modelName+addressId.toString(), it)
             }
-            emit(address) // Emit address from database or null if not found
+            emit(address)
         }
     }.flowOn(Dispatchers.IO)
 
@@ -68,6 +67,7 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
     fun getCoordinateByLatitudeAndLongitude(latitude: Double, longitude: Double): Flow<Coordinate?> = flow {
         val coordinate = coordinateDAO.getCoordinateByLatitudeAndLongitude(latitude, longitude).firstOrNull()
         coordinate?.let {
+            Log.d(TAG, "Coordinate found with ID: ${it.coordinateId}")
             // Use the coordinate ID as part of the cache key
             val cacheKey = "$modelName${it.coordinateId}"
             val cachedCoordinate = cache.getIfPresent(cacheKey) as Coordinate?
@@ -78,7 +78,10 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
                 cache.put(cacheKey, it) // Cache the new coordinate
                 emit(it) // Emit the new coordinate
             }
-        } ?: emit(null) // Emit null if the coordinate is not found
+        } ?: run {
+            Log.d(TAG, "No coordinate found for latitude: $latitude and longitude: $longitude")
+            emit(null) // Emit null if the coordinate is not found
+        }
     }.flowOn(Dispatchers.IO)
 
 }

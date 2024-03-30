@@ -61,16 +61,49 @@ class FetchDonutShopsWorker(
                     if (element.has("tags")) {
                         val tags = element.getJSONObject("tags")
 
+                        val description = ""
+
                         // Extract shop details
                         val name = tags.optString("name", "")
-                        val description = tags.optString("description", null)
+
+                        // Extract additional details
+                        val cuisine = tags.optString("cuisine", null)
+                        val wifi = tags.optString("internet_access", null)
+                        val phone = tags.optString("phone", null)
+                        val outdoorSeating = tags.optString("outdoor_seating", null)
+                        val openingHours = tags.optString("opening_hours", null)
+
+                        Log.d(TAG, "cuisine: $cuisine wifi: $wifi phone: $phone outdoorSeating: $outdoorSeating openingHours: $openingHours")
+
+                        // You can create a combined description or a separate field for these additional details
+                        val combinedDescription = buildString {
+                            if (!cuisine.isNullOrEmpty()) {
+                                append("\nCuisine: $cuisine")
+                            }
+                            if (!outdoorSeating.isNullOrEmpty()) {
+                                append("\nIndoor Seating: $outdoorSeating")
+                            }
+                            if (!wifi.isNullOrEmpty()) {
+                                append("\nWiFi: $wifi")
+                            }
+                            if (!phone.isNullOrEmpty()) {
+                                append("\nPhone: $phone")
+                            }
+                            if (!openingHours.isNullOrEmpty()) {
+                                append("\nOpening Hours: $openingHours")
+                            }
+                            if (isEmpty()) {
+                                append("No additional information available")
+                            }
+                        }
+
 
                         // Extract address details
                         val street = tags.optString("addr:street", "")
-                        val city = tags.optString("addr:city", null)
+                        val city = tags.optString("addr:city", "")
                         val zipCode = tags.optInt("addr:postcode", 0)
                         val number = tags.optInt("addr:housenumber", 0)
-                        val country = tags.optString("addr:country", null)
+                        val country = tags.optString("addr:country", "")
 
                         // Extract coordinate details
                         val elementLatitude = element.getDouble("lat")
@@ -79,7 +112,7 @@ class FetchDonutShopsWorker(
                         Log.d(TAG, "Upserting Coordinate")
 
                         // Check for existing coordinate
-                        val existingCoordinateFlow = coordinateRepo.getCoordinateByLatitudeAndLongitude(latitude, longitude)
+                        val existingCoordinateFlow = coordinateRepo.getCoordinateByLatitudeAndLongitude(elementLatitude, elementLongitude)
                         val existingCoordinate = existingCoordinateFlow.firstOrNull()
 
                         val coordinateId : Long
@@ -96,6 +129,8 @@ class FetchDonutShopsWorker(
                         else{
                             coordinateId = existingCoordinate.coordinateId.toLong()
                         }
+
+                        Log.d(TAG, "Coordinate with latitude: $elementLatitude and longitude $elementLongitude has ID: $coordinateId")
                         val existingAddressFlow = addressRepo.getAddressByLocationId(coordinateId.toInt())
                         val existingShopFlow = shopRepo.getShopByLocationId(coordinateId.toInt())
 
@@ -116,11 +151,10 @@ class FetchDonutShopsWorker(
                         }
 
                         // If the shop does not exist, upsert it with the addressId
-                        if (existingShop == null && addressId != Long.MAX_VALUE) {
-                            val shop = Shop(name = name, description = description, addressId = addressId.toInt(), locationId = coordinateId.toInt())
+                        if (existingShop == null) {
+                            Log.d(TAG, "Upserting shop with name: $name and description: $description")
+                            val shop = Shop(name = name, description = combinedDescription, addressId = addressId.toInt(), locationId = coordinateId.toInt())
                             shopRepo.upsert(shop)
-                        } else {
-                            // Optionally update the existing shop with new information
                         }
                     }
                 }
