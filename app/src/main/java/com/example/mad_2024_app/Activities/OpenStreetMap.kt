@@ -27,8 +27,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.App
+import com.example.mad_2024_app.Controller.ShopDetailsFragment
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
@@ -44,6 +46,7 @@ import com.example.mad_2024_app.view_models.CoordinateViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.osmdroid.config.Configuration
@@ -194,7 +197,6 @@ class OpenStreetMap : AppCompatActivity() {
             val shopLocation = GeoPoint(shopLatitude, shopLongitude)
 
             Log.d(TAG, "Adding shop from list to map")
-            addMarker(shopLocation, "Shop Location")
 
             map.controller.setCenter(shopLocation)
             map.controller.setZoom(17.0)
@@ -512,8 +514,15 @@ class OpenStreetMap : AppCompatActivity() {
 
             val goButton = mView.findViewById<Button>(R.id.go_button)
 
+            val moreButton = mView.findViewById<Button>(R.id.more_button)
+
             goButton.setOnClickListener {
                 shopDetail.coordinate?.let { it1 -> openGoogleMaps(context, shopDetail.coordinate.latitude, it1.longitude, shopDetail.shop.name, shopDetail.shop.shopId, shopVisitHistoryViewModel) }
+                this.close()
+            }
+
+            moreButton.setOnClickListener {
+                openDetailedShopView(shopDetail)
                 this.close()
             }
 
@@ -538,7 +547,7 @@ class OpenStreetMap : AppCompatActivity() {
             Log.d(TAG, "Loading comment. shopId: ${shopName+"@"+shopDetail.coordinate?.longitude+";"+shopDetail.coordinate?.latitude}")
             db.collection("comments")
                 .whereEqualTo("shopId", shopName+"@"+shopDetail.coordinate?.longitude.toString()+";"+shopDetail.coordinate?.latitude.toString())
-                //.orderBy("timestamp", Query.Direction.DESCENDING) // If you have a timestamp field
+                .orderBy("timestamp", Query.Direction.DESCENDING) // If you have a timestamp field
                 .get()
                 .addOnSuccessListener { documents ->
                     commentsContainer.removeAllViews()
@@ -618,6 +627,16 @@ class OpenStreetMap : AppCompatActivity() {
             } else {
                 sortedRatings[middle]
             }
+        }
+
+        private fun openDetailedShopView(shopDetail: ShopDetail) {
+            val shopDetailsFragment = ShopDetailsFragment.newInstance(
+                shopDetail.shop.name,
+                "${shopDetail.address?.street}, ${shopDetail.address?.number}, ${shopDetail.address?.zipCode}",
+                shopDetail.coordinate?.latitude ?: Double.POSITIVE_INFINITY,
+                shopDetail.coordinate?.longitude ?: Double.POSITIVE_INFINITY
+            )
+            shopDetailsFragment.show((context as FragmentActivity).supportFragmentManager, "shopDetails")
         }
 
         private fun openGoogleMaps(context: Context, latitude: Double, longitude: Double, label: String, shopId : Int, shopVisitHistoryViewModel: ShopVisitHistoryViewModel) {
