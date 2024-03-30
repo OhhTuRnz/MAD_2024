@@ -60,7 +60,7 @@ class AddressRepository(private val addressDAO: AddressDAO, private val cache: C
     suspend fun deleteAddress(address: Address) {
         addressDAO.delete(address)
         // Remove address from cache after deletion
-        cache.invalidate("$modelName@${address.addressId.toString()})
+        cache.invalidate("$modelName@${address.addressId.toString()}")
     }
 
     suspend fun deleteAddressById(addressId: Int) {

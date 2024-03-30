@@ -41,6 +41,16 @@ class FavoriteDonutsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Check user login status before proceeding
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // User is not logged in, redirect to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish() // Close current activity
+            return
+        }
+
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
         val appContext = application as App
@@ -83,8 +93,6 @@ class FavoriteDonutsActivity : AppCompatActivity() {
             Glide.with(context)
                 .load(donut.image)
                 .into(imageView)
-
-
             return listItemView
         }
     }
