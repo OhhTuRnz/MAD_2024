@@ -63,6 +63,33 @@ Here are some snapshots of CopFinder in action:
       CopFinder Donuts List. You can see a list with lots of donuts. Select the ones you like more.
     </td>
   </tr>
+  <tr>
+    <td>
+      <img src="images/WhatsApp Image 2024-03-31 at 11.47.31 PM (1).jpeg" alt="CopFinder Cluster" style="width: 80%;"/>
+    </td>
+    <td>
+      <img src="images/WhatsApp Image 2024-03-31 at 11.47.29 PM.jpeg" alt="CopFinder List" style="width: 80%;"/>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">
+      CopFinder Clusters
+    </td>
+    <td style="text-align:center;">
+      CopFinder Profile
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="images/WhatsApp Image 2024-03-31 at 11.47.29 PM (2).jpeg" alt="CopFinder Cluster" style="width: 80%;"/>
+    </td>
+
+  </tr>
+  <tr>
+    <td style="text-align:center;">
+      CopFinder Dark mode
+    
+  </tr>
 </table>
 
 ## Demo Video
