@@ -38,6 +38,7 @@ import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import okhttp3.internal.notifyAll
 
 class FavoriteShopsActivity : AppCompatActivity() {
 
@@ -80,6 +81,7 @@ class FavoriteShopsActivity : AppCompatActivity() {
 
         setupShopObserverForFavoriteShops(sharedPreferences)
     }
+
 
     private fun setupShopObserverForFavoriteShops(sharedPreferences: SharedPreferences) {
         val userId = sharedPreferences.getString("userId", null)
