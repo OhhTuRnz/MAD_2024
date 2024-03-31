@@ -66,6 +66,7 @@ class ShopRepository(private val shopDao: ShopDAO, private val cache: Cache<Stri
         // Check cache
         val cachedShops = cache.getIfPresent("$modelName@$cacheKey") as? List<Shop>
         if (cachedShops != null) {
+            Log.d(TAG, "Cache hit for nearby stores key: $cacheKey")
             cachedShops.forEach { shop -> updateLastAccessed(shop.shopId) }
             emit(cachedShops)
         } else {

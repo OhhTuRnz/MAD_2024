@@ -577,6 +577,8 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
                         )
                     }
                 }
+
+                notifyDataSetChanged()
             }
 
             // Find the map button (ImageView) in the inflated view

@@ -30,7 +30,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.mad_2024_app.App
 import com.example.mad_2024_app.Controller.ShopDetailsFragment
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.RepositoryProvider
@@ -59,7 +58,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.infowindow.InfoWindow
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import java.util.concurrent.Executors
 import kotlinx.coroutines.*
 
@@ -140,7 +138,9 @@ class OpenStreetMap : AppCompatActivity() {
         centerMapButton.setOnClickListener {
             latestLocation.let {
                 val mapController = map.controller
-                mapController.setZoom(15.0)
+
+                map.controller.animateTo(GeoPoint(it.latitude, it.longitude), 15.0, 1000L)
+
                 mapController.setCenter(GeoPoint(it.latitude, it.longitude))
             }
         }
@@ -194,7 +194,15 @@ class OpenStreetMap : AppCompatActivity() {
 
     private fun displayIndividualMarkers(location: Location) {
         updateNearbyStores(location = location, clusterRadius)
+        shopDetails.forEach { shopDetail ->
+            val shopGeoPoint = shopDetail.coordinate?.let { GeoPoint(it.latitude, it.longitude) }
+            shopGeoPoint?.let {
+                val marker = createShopMarker(map, shopDetail, it)
+                map.overlays.add(marker)
+            }
+        }
         showingIndividualMarkers = true
+        map.invalidate()
     }
 
     private fun displayClusters() {
@@ -210,7 +218,10 @@ class OpenStreetMap : AppCompatActivity() {
 
             Log.d(TAG, "Adding shop from list to map")
 
-            map.controller.setCenter(shopLocation)
+            map.controller.setCenter(GeoPoint(latestLocation.latitude, latestLocation.longitude))
+
+            map.controller.animateTo(GeoPoint(shopLatitude, shopLongitude), 17.0, 2000L)
+
             map.controller.setZoom(17.0)
         }
     }
@@ -269,7 +280,7 @@ class OpenStreetMap : AppCompatActivity() {
         // Compare existing clusters with new shop details
         // Update clusters only if there are changes
         val newShopsSet = shopDetails.map { it.shop.shopId }.toSet()
-        val existingShopsSet = clusters.flatMap { it.markers.map { marker -> (marker.relatedObject as ShopDetail).shop.shopId } }.toSet()
+        val existingShopsSet = clusters.flatMap { it.markers.map { marker -> (marker?.relatedObject as ShopDetail).shop.shopId } }.toSet()
 
         if (newShopsSet != existingShopsSet) {
             // Recreate clusters
@@ -280,24 +291,25 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun createClusters() {
-        //val clusterRadius = 1000.0 // Radius in meters for clustering
+        shopDetails.forEach { shopDetail ->
+            val shopGeoPoint = shopDetail.coordinate?.let { GeoPoint(it.latitude, shopDetail.coordinate.longitude) }
+            var foundCluster = false
 
-        for (shopDetail in shopDetails) {
-            var addedToCluster = false
-            val shopGeoPoint = shopDetail.coordinate?.let { GeoPoint(it.latitude, it.longitude) }
-
-            for (cluster in clusters) {
-                val distance = shopGeoPoint?.distanceToAsDouble(cluster.geoPoint)
-                if (distance != null && distance < clusterRadius) {
-                    cluster.markers.add(addShopMarker(map, shopDetail, shopGeoPoint))
-                    addedToCluster = true
-                    break
+            clusters.forEach { cluster ->
+                if (shopGeoPoint != null) {
+                    if (shopGeoPoint.distanceToAsDouble(cluster.geoPoint) < clusterRadius) {
+                        val marker = createShopMarker(map, shopDetail, shopGeoPoint)
+                        cluster.markers.add(marker)
+                        foundCluster = true
+                    }
                 }
             }
 
-            if (!addedToCluster && shopGeoPoint != null) {
-                val newCluster = MarkerCluster(mutableListOf(addShopMarker(map, shopDetail, shopGeoPoint)), shopGeoPoint)
-                clusters.add(newCluster)
+            if (!foundCluster) {
+                val newMarker =
+                    shopGeoPoint?.let { createShopMarker(map, shopDetail, it) } // Method to create marker
+                MarkerCluster(mutableListOf(newMarker), mutableListOf(shopDetail), shopGeoPoint)
+                    .let { clusters.add(it) }
             }
         }
     }
@@ -305,7 +317,7 @@ class OpenStreetMap : AppCompatActivity() {
     private fun addClusterMarkersToMap(mapView: MapView) {
         for (cluster in clusters) {
             if (cluster.markers.size <= 3) {
-                addMarker(cluster.geoPoint!!, cluster.markers.first().title)
+                cluster.markers.first()?.let { addMarker(cluster.geoPoint!!, it.title) }
                 mapView.overlays.add(cluster.markers.first())
             } else {
                 val clusterMarker = Marker(mapView)
@@ -338,7 +350,7 @@ class OpenStreetMap : AppCompatActivity() {
             for (shopDetail in shopDetails) {
                 val shopGeoPoint = shopDetail.coordinate?.let { GeoPoint(it.latitude, it.longitude) }
                 shopGeoPoint?.let {
-                    mapView.overlays.add(addShopMarker(mapView, shopDetail, it))
+                    mapView.overlays.add(createShopMarker(mapView, shopDetail, it))
                     addMarker(shopGeoPoint, shopDetail)
                 }
             }
@@ -351,18 +363,29 @@ class OpenStreetMap : AppCompatActivity() {
     }
 
     private fun handleClusterClick(clusterMarker: Marker, mapView: MapView) {
-        // Retrieve the cluster's location
-        val clusterLocation = clusterMarker.position
+        val cluster = findClusterByGeoPoint(clusterMarker.position)
+
+        mapView.overlays.removeAll { it !in permanentMarkers } // Remove all non-permanent markers
+
+        // Add all markers from this cluster to the map
+        cluster?.markers?.forEach { marker ->
+            if (marker != null) {
+                mapView.overlays.add(marker)
+            }
+        }
 
         // Change the zoom level if desired
         val zoomLevel = mapView.zoomLevelDouble + 1  // Zoom in closer
-        mapView.controller.animateTo(clusterLocation, zoomLevel, 1000L)
+        mapView.controller.animateTo(clusterMarker.position, zoomLevel, 1000L)
 
-        // Indicate that individual markers should be displayed
-        showingIndividualMarkers = true
+        mapView.invalidate() // Redraw the map
     }
 
-    private fun addShopMarker(mapView: MapView, shopDetail: ShopDetail, geoPoint: GeoPoint): Marker {
+    private fun findClusterByGeoPoint(geoPoint: GeoPoint): MarkerCluster? {
+        return clusters.firstOrNull { it.geoPoint == geoPoint }
+    }
+
+    private fun createShopMarker(mapView: MapView, shopDetail: ShopDetail, geoPoint: GeoPoint): Marker {
         val marker = Marker(mapView)
         marker.position = geoPoint
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -378,7 +401,8 @@ class OpenStreetMap : AppCompatActivity() {
 
     // Cluster data class
     data class MarkerCluster(
-        val markers: MutableList<Marker> = mutableListOf(),
+        val markers: MutableList<Marker?> = mutableListOf(),
+        val shopDetails: MutableList<ShopDetail> = mutableListOf(),
         val geoPoint: GeoPoint? = null
     )
 
