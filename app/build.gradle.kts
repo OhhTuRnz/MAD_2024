@@ -85,6 +85,7 @@ dependencies {
     implementation("androidx.activity:activity:1.8.2")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-firestore-ktx:24.11.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     kapt("androidx.room:room-compiler:2.6.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
@@ -106,4 +107,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.firebaseui:firebase-ui-auth:8.0.1")
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    // RETROFIT
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // OKHTTP
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
 }

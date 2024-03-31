@@ -10,5 +10,6 @@ data class Donut(
     @PrimaryKey(autoGenerate = true) val donutId: Int = 0,
     @ColumnInfo(name = "name") val name: String,
     val type: String,
-    val color: String? = null
+    val color: String? = null,
+    val image: Int = 0
 )

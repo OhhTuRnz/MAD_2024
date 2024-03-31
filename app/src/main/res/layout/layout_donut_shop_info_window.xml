@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id = "@+id/bubble_layout"
-    android:layout_width="400dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:weightSum="2"
     android:padding="10dp"
     android:background="?attr/mainBackgroundColor"> <!-- Customize the background as needed -->
 
@@ -19,7 +20,8 @@
         android:id="@+id/tvShopAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Shop Address" />
+        android:text="Shop Address"
+        android:layout_marginTop="30dp"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -27,7 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:layout_marginTop="30dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +44,7 @@
             android:layout_height="wrap_content"
             android:fillViewport="true"
             android:layout_marginTop="5dp">
-            
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,7 +55,8 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:layout_gravity="center"
-                    android:text="Rating" />
+                    android:text="Rating"
+                    android:layout_marginTop="30dp"/>
 
                 <!-- Overall Rating Bar -->
                 <RatingBar
@@ -114,22 +118,24 @@
             android:paddingEnd="16dp">
 
             <Button
-                android:id="@+id/btnViewMore"
+                android:id="@+id/more_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:backgroundTint="?attr/buttonColor"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:text="More"
-                android:layout_marginEnd="10dp"/>
+                android:backgroundTint="?attr/buttonColor"
+                android:text="Comment"
+                android:minWidth="120dp"/>
 
             <Button
-                android:id="@+id/btnDirections"
+                android:id="@+id/go_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:backgroundTint="?attr/buttonColor"
                 android:layout_weight="1"
                 android:layout_marginStart="10dp"
-                android:text="Go"/>
+                android:text="Go"
+                android:minWidth="120dp"/>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

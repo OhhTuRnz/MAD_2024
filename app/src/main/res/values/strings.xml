@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">LogoGPS</string>
-    <string name="button_next">Next Activity</string>
-    <string name="button_previous">Prev Activity</string>
+    <string name="app_name">CopFinder</string>
+    <string name="button_next">Go Next</string>
+    <string name="button_previous">Go Back</string>
     <string name="Hello_World">Hello World!</string>
     <string name="OpenMapsTitle">OpenStreetMaps</string>
     <string name="Settings">Settings</string>

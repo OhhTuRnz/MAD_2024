@@ -1,14 +1,15 @@
 package com.example.mad_2024_app.view_models
 
-import android.location.Address
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.DonutRepository
 import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.IRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.repositories.UserRepository
 
 class ViewModelFactory(
@@ -40,6 +41,16 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(FavoriteShopsViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 return FavoriteShopsViewModel(repository as FavoriteShopsRepository) as T
+            }
+
+            modelClass.isAssignableFrom(DonutViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                return DonutViewModel(repository as DonutRepository) as T
+            }
+
+            modelClass.isAssignableFrom(ShopVisitHistoryViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                return ShopVisitHistoryViewModel(repository as ShopVisitHistoryRepository) as T
             }
 
             modelClass.isAssignableFrom(FavoriteDonutsViewModel::class.java) -> {

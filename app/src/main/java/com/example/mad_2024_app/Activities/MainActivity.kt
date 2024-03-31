@@ -37,22 +37,24 @@ import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.Controller.FragmentPageAdapter
-
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Coordinate
 import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
-import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
+import com.example.mad_2024_app.repositories.DonutRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
-import com.example.mad_2024_app.view_models.FavoriteDonutsViewModel
+import com.example.mad_2024_app.view_models.DonutViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
+import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -60,6 +62,8 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
@@ -73,17 +77,18 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
     private lateinit var addressViewModel: AddressViewModel
     private lateinit var favoriteShopsViewModel : FavoriteShopsViewModel
     private lateinit var coordinateViewModel : CoordinateViewModel
-    private lateinit var favoriteDonutsViewModel : FavoriteDonutsViewModel
+    private lateinit var donutsViewModel : DonutViewModel
+    private lateinit var shopVisitHistoryViewModel : ShopVisitHistoryViewModel
 
     private lateinit var userRepo: UserRepository
     private lateinit var shopRepo: ShopRepository
     private lateinit var addressRepo: AddressRepository
     private lateinit var favoriteShopsRepo : FavoriteShopsRepository
     private lateinit var coordinateRepo: CoordinateRepository
-    private lateinit var favoriteDonutsRepo: FavoriteDonutsRepository
+    private lateinit var donutsRepo: DonutRepository
+    private lateinit var shopVisitHistoryRepo : ShopVisitHistoryRepository
 
     private lateinit var listView: ListView
-    private lateinit var shopAdapter: ShopAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: FragmentPageAdapter
@@ -101,11 +106,9 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
-        val appContext = application as App
-
         applyTheme(sharedPreferences)
 
-        initializeViewModels(appContext)
+        initializeViewModels()
 
         setContentView(R.layout.activity_main)
 
@@ -113,11 +116,55 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
         setupBottomNav()
 
+        setupFragments()
+
+        storeUserIfNotExisting(sharedPreferences)
+
+        val backgroundImageView: ImageView = findViewById(R.id.donutBackground)
+        val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
+        Glide.with(this).load(gifUrl).into(backgroundImageView)
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        setupPermissionLauncher()
+        checkPermissionsAndStartLocationUpdates()
+
+        //setupShopObserverForNearbyStores(appContext, sharedPreferences)
+
+        Log.d(TAG, "onCreate: Main activity is being created")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Log.d(TAG, "OnDestroy: MAIN DESTROYED")
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        // Reset isFirstOpen to true when the app is closed or sent to the background
+        with(sharedPreferences.edit()) {
+            putBoolean("isFirstOpen", true)
+            apply()
+        }
+    }
+
+    private fun setupFragments(){
         //TabLayout
         tabLayout = findViewById(R.id.tabLayout)
         viewPager2 = findViewById(R.id.viewPager2)
 
-        adapter = FragmentPageAdapter(supportFragmentManager, lifecycle)
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        adapter = FragmentPageAdapter(
+            supportFragmentManager,
+            lifecycle,
+            shopViewModel,
+            shopVisitHistoryViewModel,
+            favoriteShopsViewModel,
+            coordinateViewModel,
+            sharedPreferences,
+            addressViewModel,
+            this,
+            this // for the context
+        )
 
         tabLayout.addTab(tabLayout.newTab().setText("Cercanas"))
         tabLayout.addTab(tabLayout.newTab().setText("Recientes"))
@@ -148,94 +195,35 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             }
         })
         //Fin
-
-        storeUserIfNotExisting(sharedPreferences)
-
-        val backgroundImageView: ImageView = findViewById(R.id.donutBackground)
-        val gifUrl = "https://art.ngfiles.com/images/2478000/2478561_slavetomyself_spinning-donut-gif.gif?f1650761565"
-        Glide.with(this).load(gifUrl).into(backgroundImageView)
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        setupPermissionLauncher()
-        checkPermissionsAndStartLocationUpdates()
-
-        setupShopObserverForNearbyStores(appContext, sharedPreferences)
-
-        Log.d(TAG, "onCreate: Main activity is being created")
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        Log.d(TAG, "OnDestroy: MAIN DESTROYED")
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        // Reset isFirstOpen to true when the app is closed or sent to the background
-        with(sharedPreferences.edit()) {
-            putBoolean("isFirstOpen", true)
-            apply()
-        }
-    }
-
-    private fun setupShopObserverForNearbyStores(appContext: Context, sharedPreferences: SharedPreferences) {
-        val userId = sharedPreferences.getString("userId", null)
-
-        if (userId != null) {
-            // Initialize an empty set to hold favorite shop IDs
-            val favoriteShops = mutableSetOf<Int>()
-
-            // Initialize the ListView and adapter
-            val listView = findViewById<ListView>(R.id.lvShops)
-            val shopAdapter = ShopAdapter(this, addressViewModel, favoriteShopsViewModel, coordinateViewModel, sharedPreferences, this)
-            listView.adapter = shopAdapter
-
-            favoriteShopsViewModel.getFavoriteShopsByUser(userId)
-            // Observing favorite shops and updating the adapter's favorite shops set
-            favoriteShopsViewModel.favoriteShops.observe(this, Observer { favoriteShopsList ->
-                if (favoriteShopsList != null) {
-                    // Extracting shop IDs from the favorite shops list
-                    val favoriteShopIds = favoriteShopsList.map { it.shopId }.toSet()
-                    Log.d(TAG, "Size of favorite shops: ${favoriteShopIds.size}")
-                    shopAdapter.setFavoriteShopsIds(favoriteShopIds)
-                }
-            })
-
-            // Observing shops near coordinates to update the adapter's shop list
-            shopViewModel.shopsNearCoordinates.observe(this, Observer { shops ->
-                if (shops != null) {
-                    shopAdapter.setShops(shops)
-                }
-            })
-        } else {
-            // Handle case where user ID is not available
-            Log.e(TAG, "User ID not found in SharedPreferences.")
-        }
-    }
-
-    private fun initializeViewModels(appContext: Context){
-        userRepo = DbUtils.getUserRepository(appContext)
+    private fun initializeViewModels(){
+        userRepo = RepositoryProvider.getUserRepository()
         val userFactory = ViewModelFactory(userRepo)
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
 
-        shopRepo = DbUtils.getShopRepository(appContext)
+        shopRepo = RepositoryProvider.getShopRepository()
         val shopFactory = ViewModelFactory(shopRepo)
         shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
 
-        addressRepo = DbUtils.getAddressRepository(appContext)
+        addressRepo = RepositoryProvider.getAddressRepository()
         val addressFactory = ViewModelFactory(addressRepo)
         addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
 
-        favoriteShopsRepo = DbUtils.getFavoriteShopsRepository(appContext)
+        favoriteShopsRepo = RepositoryProvider.getFavoriteShopsRepository()
         val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
         favoriteShopsViewModel = ViewModelProvider(this, favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
 
-        coordinateRepo = DbUtils.getCoordinateRepository(appContext)
+        coordinateRepo = RepositoryProvider.getCoordinateRepository()
         val coordinateFactory = ViewModelFactory(coordinateRepo)
         coordinateViewModel = ViewModelProvider(this, coordinateFactory).get(CoordinateViewModel::class.java)
 
-        favoriteDonutsRepo = DbUtils.getFavoriteDonutsRepository(appContext)
-        val favoriteDonutsFactory = ViewModelFactory(favoriteDonutsRepo)
-        favoriteDonutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(FavoriteDonutsViewModel::class.java)
+        donutsRepo = RepositoryProvider.getDonutRepository()
+        val favoriteDonutsFactory = ViewModelFactory(donutsRepo)
+        donutsViewModel = ViewModelProvider(this, favoriteDonutsFactory).get(DonutViewModel::class.java)
+
+        shopVisitHistoryRepo = RepositoryProvider.getShopVisitHistoryRepository()
+        val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)
+        shopVisitHistoryViewModel = ViewModelProvider(this, shopVisitHistoryFactory).get(ShopVisitHistoryViewModel::class.java)
     }
 
     private fun storeUserIfNotExisting(sharedPreferences: SharedPreferences) {
@@ -254,12 +242,11 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         }
         if(FirebaseAuth.getInstance().currentUser == null) {
             sharedPreferences.edit().apply {
-                putString("anonymousUserId", "c263015c-d101-46d1-b1e5-10aa7422d574")
+                putString("anonymousUserId", userUUID)
                 apply()
             }
         }
 
-        // Check and store user (the method will handle insertion if user doesn't exist)
         userViewModel.checkAndStoreUser(userUUID)
     }
 
@@ -271,19 +258,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
             setTheme(R.style.AppTheme_Dark)
         } else {
             setTheme(R.style.AppTheme_Light)
-        }
-    }
-
-    fun onNextButtonClick(view: View) {
-        if (::latestLocation.isInitialized) {
-            val intent = Intent(this, SecondActivity::class.java).apply {
-                putExtra("locationBundle", Bundle().apply {
-                    putParcelable("location", latestLocation)
-                })
-            }
-            startActivity(intent)
-        } else {
-            Toast.makeText(this, "Location not available yet.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -452,14 +426,19 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
 
     override fun onLocationChanged(location: Location) {
         latestLocation = location
-        runOnUiThread {
-            val textView: TextView = findViewById(R.id.mainTextView)
-            textView.text = "Latitude: ${location.latitude}, Longitude: ${location.longitude}"
-        }
+
         saveCoordinatesToFile(location.latitude, location.longitude, filesDir)
         Utils.writeLocationToCSV(this, location)
 
         updateNearbyStores(location)
+
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+        sharedPreferences.edit().apply {
+            putString("latestLatitude", location.latitude.toString())
+            putString("latestLongitude", location.longitude.toString())
+            apply()
+        }
     }
 
     private fun updateNearbyStores(location: Location) {
@@ -472,128 +451,6 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
         // Use the ViewModel to fetch stores
         shopViewModel.getAllShopsNearCoordinates(coordinate, radius)
 
-    }
-
-    class ShopAdapter(private val context: Context, private val addressViewModel: AddressViewModel,
-                      private val favoriteShopsViewModel: FavoriteShopsViewModel,
-                      private val coordinateViewModel: CoordinateViewModel,
-                      private val sharedPreferences: SharedPreferences,
-                      private val locationProvider: ILocationProvider) : BaseAdapter() {
-        private var shops: MutableList<Shop> = mutableListOf()
-        private var favoriteShopsIds: Set<Int> = emptySet()
-        private val TAG = "ShopAdapter"
-
-        private val inflater: LayoutInflater = LayoutInflater.from(context)
-
-        private lateinit var latestLocation : Location
-
-        fun setShops(newShops: List<Shop>) {
-            Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
-            shops.clear()
-            shops.addAll(newShops)
-            notifyDataSetChanged()
-        }
-
-        fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
-            Log.d(TAG, "Adding Favorite Shops")
-            Log.d(TAG, "Added ${newFavoriteShopsIds.size} shop(s)")
-            favoriteShopsIds = newFavoriteShopsIds
-            notifyDataSetChanged()
-        }
-
-        override fun getCount(): Int = shops.size
-
-        override fun getItem(position: Int): Any = shops[position]
-
-        override fun getItemId(position: Int): Long = position.toLong()
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val listItemView = convertView ?: inflater.inflate(R.layout.shop_list_item, parent, false)
-
-            val shop = getItem(position) as Shop
-            listItemView.findViewById<TextView>(R.id.shop_name).text = shop.name
-
-            // Fetch and display the address
-            shop.addressId?.let { addressId ->
-                addressViewModel.getAddressById(addressId) { address ->
-                    address?.let {
-                        listItemView.findViewById<TextView>(R.id.shop_address).text = formatAddressString(it)
-                    }
-                }
-            }
-
-            // Find the like button (CheckBox) in the inflated view
-            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button) as CheckBox
-
-            // Check if the shop is a favorite and update the checkbox state
-            val isFavorite = shop.shopId in favoriteShopsIds
-            likeButton.isChecked = isFavorite
-
-            // Set OnCheckedChangeListener for the likeButton (CheckBox)
-            likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                // Inside this block, you can put your logic for handling the checkbox state change
-                Log.d(TAG, "Checkbox state changed: $isChecked")
-
-                val uuid = sharedPreferences.getString("userId", null)
-
-                if (uuid == null) {
-                    Log.e(TAG, "User ID is null.")
-                    return@setOnCheckedChangeListener
-                }
-
-                if (isChecked) {
-                    Log.d(TAG, "Adding shop ${shop.shopId} to favorites.")
-                    favoriteShopsViewModel.upsertFavoriteShop(FavoriteShops(uuid = uuid, shopId = shop.shopId))
-                } else {
-                    Log.d(TAG, "Removing shop ${shop.shopId} from favorites.")
-                    favoriteShopsViewModel.removeFavoriteShopById(uuid = uuid, shopId = shop.shopId)
-                }
-            }
-
-            // Find the map button (ImageView) in the inflated view
-            val mapButton = listItemView.findViewById<ImageView>(R.id.map_button)
-
-            shop.locationId?.let { locationId ->
-                coordinateViewModel.getCoordinateById(locationId) { coordinate ->
-                    coordinate?.let {
-                        // Set OnClickListener for the mapButton (ImageView)
-                        mapButton.setOnClickListener { view ->
-                            latestLocation = locationProvider.getLatestLocation()!!
-                            // Inside this block, call the goMaps function and pass the appropriate parameters
-                            if (::latestLocation.isInitialized) {
-                                val intent = Intent(view.context, OpenStreetMap::class.java).apply {
-                                    putExtra("locationBundle", Bundle().apply {
-                                        putParcelable("location", latestLocation)
-                                    })
-                                    putExtra("shopLocation", Bundle().apply {
-                                        putDouble("shopLatitude", coordinate.latitude)
-                                        putDouble("shopLongitude", coordinate.longitude)
-                                    })
-                                }
-                                view.context.startActivity(intent)
-                            } else {
-                                Toast.makeText(view.context, "Location not available yet.", Toast.LENGTH_SHORT).show()
-                                // Optionally, you can trigger location update here
-                            }
-                        }
-                    }
-                }
-            }
-
-            return listItemView
-        }
-
-        private fun isShopFavorite(shopId: Int): Boolean {
-            val favoriteShopIds: Set<Int>? = favoriteShopsIds
-            return favoriteShopIds?.contains(shopId) ?: false
-        }
-
-
-
-        private fun formatAddressString(address: Address): String {
-            return "${address.street}, ${address.number}\n${address.city}, ${address.zipCode}\n${address.country}"
-        }
     }
 
     @Deprecated("This declaration overrides deprecated member but not marked as deprecated itself. Please add @Deprecated annotation or suppress. See https://youtrack.jetbrains.com/issue/KT-47902 for details")
@@ -657,6 +514,7 @@ class MainActivity : AppCompatActivity(), LocationListener, ILocationProvider {
     private fun goFavorite(view: View) {
         val intent = Intent(this, FavoriteShopsActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun goFavDonuts(view: View) {

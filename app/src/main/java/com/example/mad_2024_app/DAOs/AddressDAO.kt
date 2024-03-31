@@ -18,6 +18,9 @@ interface AddressDAO {
     @Query("SELECT * FROM Address WHERE addressId = :addressId")
     fun getAddressById(addressId: Int): Flow<Address>
 
+    @Query("SELECT * FROM Address WHERE coordinateId = :coordinateId")
+    fun getAddressByLocationId(coordinateId: Int) : Flow<Address>
+
     @Delete
     suspend fun delete(address: Address)
 

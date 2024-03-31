@@ -25,36 +25,6 @@
             android:focusableInTouchMode="true"/>
 
         <Button
-            android:id="@+id/mainButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="35dp"
-            android:layout_marginBottom="70dp"
-            android:backgroundTint="?attr/buttonColor"
-            android:backgroundTintMode="src_atop"
-            android:onClick="onNextButtonClick"
-            android:text="@string/button_next" />
-
-        <Button
-            android:id="@+id/mainButton2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginEnd="35dp"
-            android:layout_marginBottom="70dp"
-            android:backgroundTint="?attr/buttonColor"
-            android:backgroundTintMode="src_atop"
-            android:drawableStart="@drawable/map"
-            android:drawablePadding="10dp"
-            android:onClick="goMaps"
-            android:text="@string/OpenMapsTitle"
-            android:textAllCaps="false" />
-
-        <Button
             android:id="@+id/settingsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,31 +46,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/mainTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/mainButton"
-            android:layout_centerHorizontal="true"
-            android:text="@string/Hello_World" />
-
-        <ListView
-            android:id="@+id/lvShops"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginTop="200dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:foregroundTint="@null"
-            android:backgroundTint="@null"/>
-
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
-            app:menu="@menu/bottom_menu" />
+            app:menu="@menu/bottom_menu"
+            android:backgroundTint="?attr/mainBackgroundColor"/>
 
 
         <com.google.android.material.tabs.TabLayout
@@ -120,8 +72,8 @@
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

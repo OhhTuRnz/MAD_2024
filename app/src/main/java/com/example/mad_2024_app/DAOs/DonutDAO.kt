@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.DAOs
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Delete
@@ -13,7 +14,7 @@ interface DonutDAO {
     suspend fun upsert(donut: Donut) : Long
 
     @Query("SELECT * FROM Donut")
-    fun getAllDonuts(): Flow<List<Donut>>
+    fun getAllDonuts(): LiveData<List<Donut>>
 
     @Query("SELECT * FROM Donut WHERE donutId = :donutId")
     fun getDonutById(donutId: Int): Flow<Donut>

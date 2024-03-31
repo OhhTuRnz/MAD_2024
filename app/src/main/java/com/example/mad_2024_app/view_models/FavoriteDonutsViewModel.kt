@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mad_2024_app.database.FavoriteDonuts
 import com.example.mad_2024_app.database.Donut
 import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FavoriteDonutsViewModel(private val favoriteDonutsRepository: FavoriteDonutsRepository) : ViewModel() {
@@ -17,28 +18,28 @@ class FavoriteDonutsViewModel(private val favoriteDonutsRepository: FavoriteDonu
     private val _favoriteDonuts = MutableLiveData<List<Donut>>()
     val favoriteDonuts: LiveData<List<Donut>> = _favoriteDonuts
 
-    fun getFavoriteDonutsByUser(userId: String?) = viewModelScope.launch {
-        favoriteDonutsRepository.getFavoriteDonutsByUser(userId).collect { donuts ->
+    fun getFavoriteDonutsByUser(uuid: String) = viewModelScope.launch {
+        favoriteDonutsRepository.getFavoriteDonutsByUser(uuid).collect { donuts ->
             _favoriteDonuts.postValue(donuts)
         }
     }
 
-    fun upsertFavoriteDonut(favoriteDonut: FavoriteDonuts) = viewModelScope.launch {
+    fun upsertFavoriteDonut(favoriteDonut: FavoriteDonuts) = viewModelScope.launch(Dispatchers.IO) {
         favoriteDonutsRepository.upsertFavoriteDonut(favoriteDonut)
     }
 
-    fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts) = viewModelScope.launch {
+    fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts) = viewModelScope.launch(Dispatchers.IO) {
         favoriteDonutsRepository.removeFavoriteDonut(favoriteDonut)
     }
 
-    fun removeFavoriteDonutById(userId: Int, donutId: Int) = viewModelScope.launch {
-        favoriteDonutsRepository.removeFavoriteDonutById(userId, donutId)
+    fun removeFavoriteDonutById(uuid: String, donutId: Int) = viewModelScope.launch(Dispatchers.IO){
+        favoriteDonutsRepository.removeFavoriteDonutById(uuid, donutId)
     }
 
-    fun isDonutFavorite(userId: Int, donutId: Int): LiveData<Boolean> {
+    fun isDonutFavorite(uuid: String, donutId: Int): LiveData<Boolean> {
         val isFavorite = MutableLiveData<Boolean>()
         viewModelScope.launch {
-            isFavorite.value = favoriteDonutsRepository.isDonutFavorite(userId, donutId)
+            isFavorite.value = favoriteDonutsRepository.isDonutFavorite(uuid, donutId)
         }
         return isFavorite
     }
