@@ -83,7 +83,7 @@ class ShopDetailsFragment : DialogFragment() {
     private fun submitCommentToFirestore(shopName: String, latitude: Double, longitude: Double, rating : Float, comment: String, userId: String) {
         val commentShopName = shopName.replace(" ", "_" )
         val commentData = hashMapOf(
-            "shopId" to "$commentShopName@$latitude;$longitude",
+            "shopId" to "$commentShopName@${latitude};${longitude}",
             "userUuid" to userId,
             "comment" to comment,
             "rating" to rating.toDouble(),

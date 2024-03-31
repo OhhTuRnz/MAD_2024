@@ -18,6 +18,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RatingBar
@@ -135,7 +136,18 @@ class OpenStreetMap : AppCompatActivity() {
             }
         })
 
+        val centerMapButton: ImageButton = findViewById(R.id.button_center_map)
+        centerMapButton.setOnClickListener {
+            latestLocation.let {
+                val mapController = map.controller
+                mapController.setZoom(15.0)
+                mapController.setCenter(GeoPoint(it.latitude, it.longitude))
+            }
+        }
+
         map.setTileSource(TileSourceFactory.MAPNIK)
+
+        map.setMultiTouchControls(true)
 
         Log.d(TAG, "onCreate: The activity OpenMaps is being created.")
 
@@ -544,10 +556,10 @@ class OpenStreetMap : AppCompatActivity() {
         private fun loadComments(shopDetail: ShopDetail, commentsContainer: LinearLayout, overallRatingBar : RatingBar, progressBar: ProgressBar, context: Context) {
             val db = Firebase.firestore
             val shopName = shopDetail.shop.name.replace(" ", "_")
-            Log.d(TAG, "Loading comment. shopId: ${shopName+"@"+shopDetail.coordinate?.longitude+";"+shopDetail.coordinate?.latitude}")
+            Log.d(TAG, "Loading comment. shopId: ${shopName+"@"+shopDetail.coordinate?.latitude+";"+shopDetail.coordinate?.longitude}")
             db.collection("comments")
-                .whereEqualTo("shopId", shopName+"@"+shopDetail.coordinate?.longitude.toString()+";"+shopDetail.coordinate?.latitude.toString())
-                .orderBy("timestamp", Query.Direction.DESCENDING) // If you have a timestamp field
+                .whereEqualTo("shopId", shopName+"@"+shopDetail.coordinate?.latitude.toString()+";"+shopDetail.coordinate?.longitude.toString())
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener { documents ->
                     commentsContainer.removeAllViews()
@@ -562,6 +574,7 @@ class OpenStreetMap : AppCompatActivity() {
                         totalRating += ratingValue
                         ratingCount++
 
+                        Log.d(TAG, "commentText: $commentText, ratingValue: $ratingValue")
                         val commentView = TextView(context).apply {
                             text = commentText
                             layoutParams = LinearLayout.LayoutParams(
