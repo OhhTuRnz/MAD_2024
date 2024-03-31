@@ -41,6 +41,10 @@ import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -295,8 +299,6 @@ class Main : Fragment() {
             }
 
             setFavoriteShopsIds(updatedFavoriteShopsIds)
-
-            notifyDataSetChanged()
         }
 
 

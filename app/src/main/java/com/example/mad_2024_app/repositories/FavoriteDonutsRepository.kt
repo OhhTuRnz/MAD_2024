@@ -19,18 +19,22 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
     fun getFavoriteDonutsByUser(uuid: String): Flow<List<Donut>> = flow {
         val cachedDonuts = cache.getIfPresent("$modelName@$uuid") as List<Donut>?
         if (cachedDonuts != null) {
+            Log.d(TAG, "Returning cached donuts for user with id: $uuid: $cachedDonuts")
             emit(cachedDonuts)
         } else {
             val donuts = favoriteDonutsDAO.getFavoriteDonutsByUser(uuid).firstOrNull()
             donuts?.let {
+                Log.d(TAG, "Caching donuts for user with id: $uuid: $it")
                 cache.put("$modelName@$uuid", it)
             }
             emit(donuts ?: emptyList())
         }
+        Utils.printCacheContents(TAG, cache)
     }.flowOn(Dispatchers.IO)
 
     suspend fun upsertFavoriteDonut(favoriteDonut: FavoriteDonuts) {
         val upsertedId = favoriteDonutsDAO.upsert(favoriteDonut)
+        Log.d(TAG, "Upserted favorite donut with id: $upsertedId")
         // If it's a new insert, the DAO will return the new row ID. If it's an update, it'll return the ID of the updated row.
         if (upsertedId != -1L) {
             cache.put("$modelName@$upsertedId", favoriteDonut)
