@@ -1,4 +1,4 @@
-# MAD_2024
+# CopFinder
 ## Workspace
 
 Github:
@@ -8,11 +8,11 @@ Github:
 Workspace: https://upm365.sharepoint.com/sites/Logopedas/SitePages/Tracking.aspx
 
 ## Description
-Welcome to **LogoGPS**, a mobile application designed with real-time location tracking. Our app shows the nearest donuts shops around you as you move, along with some information about them. You can save your favorites shops and your favorites donuts and see them whenever you want.
+Welcome to **CopFinder**, a mobile application designed with real-time location tracking. Our app shows the nearest donuts shops around you as you move, along with some information about them. You can save your favorites shops and your favorites donuts and see them whenever you want.
 
 ## Screenshots and navigation
 
-Here are some snapshots of LogoGPS in action:
+Here are some snapshots of CopFinder in action:
 
 <table>
   <tr>
@@ -47,14 +47,19 @@ Functional features:
 Technical features:
 - Persistence in shared preferences.
 - Persistence in Room database.
+- Cache.
 - Firebase Realtime database.
 - Firebase authentication.
 - Maps: Openstreetmaps, with zoom function.
 - Menu: BottomMenu, DrawerMenu, TabMenu.
 - Implemented images with Glide.
 - Security with location permissions.
-- Sensors: GPS coordinates
-- Dark mode
+- Sensors: GPS coordinates.
+- Dark mode.
+- API ()
+- Recent shops visited
+- Ratting system and comments
+- Access to Google Maps
 
 ## How to Use
 
@@ -67,4 +72,4 @@ List of MAD developers:
 - ALEJANDRO CARRASCO ARAGON (alejandro.carrasco.aragon@alumnos.upm.es)
 - ALVARO TAJUELO GOMEZ (alvaro.tgomez@alumnos.upm.es)
 
-Join us and sweeten your life with LogoGPS!
+Join us and sweeten your life with CopFinder!
