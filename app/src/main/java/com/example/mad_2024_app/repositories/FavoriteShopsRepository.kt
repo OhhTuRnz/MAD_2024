@@ -34,6 +34,7 @@ class FavoriteShopsRepository(private val favoriteShopsDAO: FavoriteShopsDAO, pr
 
     suspend fun upsertFavoriteShop(favoriteShop: FavoriteShops) {
         val upsertedId = favoriteShopsDAO.upsert(favoriteShop)
+        cache.invalidate("$modelName@${favoriteShop.uuid}")
         // If it's a new insert, the DAO will return the new row ID. If it's an update, it'll return the ID of the updated row.
         if (upsertedId != -1L) {
             cache.put("$modelName@${favoriteShop.uuid}@${favoriteShop.shopId}", favoriteShop)

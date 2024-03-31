@@ -35,6 +35,7 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
     suspend fun upsertFavoriteDonut(favoriteDonut: FavoriteDonuts) {
         val upsertedId = favoriteDonutsDAO.upsert(favoriteDonut)
         Log.d(TAG, "Upserted favorite donut with id: $upsertedId")
+        cache.invalidate("$modelName@${favoriteDonut.uuid}")
         // If it's a new insert, the DAO will return the new row ID. If it's an update, it'll return the ID of the updated row.
         if (upsertedId != -1L) {
             cache.put("$modelName@${favoriteDonut.uuid}@${favoriteDonut.donutId}", favoriteDonut)
@@ -42,16 +43,16 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
     }
 
     suspend fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts) {
-        favoriteDonutsDAO.removeFavoriteDonut(favoriteDonut)
         cache.invalidate("$modelName@${favoriteDonut.uuid}@${favoriteDonut.donutId}")
         cache.invalidate("$modelName@${favoriteDonut.uuid}")
+        favoriteDonutsDAO.removeFavoriteDonut(favoriteDonut)
     }
 
     suspend fun removeFavoriteDonutById(uuid: String, donutId: Int) {
         Log.d(TAG, "Removing donut with id $donutId for user with id: $uuid")
-        favoriteDonutsDAO.removeFavoriteDonutById(uuid, donutId)
         cache.invalidate("$modelName@$uuid@$donutId")
         cache.invalidate("$modelName@$uuid")
+        favoriteDonutsDAO.removeFavoriteDonutById(uuid, donutId)
     }
 
     suspend fun isDonutFavorite(uuid: String, donutId: Int): Boolean {
