@@ -143,10 +143,15 @@ class Main : Fragment() {
 
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
+
+            // Sort shops so that favorite shops come first
+            val sortedShops = newShops.sortedWith(compareBy { !favoriteShopsIds.contains(it.shopId) })
+
             shops.clear()
-            shops.addAll(newShops)
+            shops.addAll(sortedShops)
             notifyDataSetChanged()
+
+            Log.d(TAG, "Added ${shops.size} shop(s)")
         }
 
         fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
