@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.repositories.AddressRepository
 import com.example.mad_2024_app.repositories.CoordinateRepository
 import com.example.mad_2024_app.repositories.DonutRepository
+import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.IRepository
 import com.example.mad_2024_app.repositories.ShopRepository
@@ -50,6 +51,11 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(ShopVisitHistoryViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 return ShopVisitHistoryViewModel(repository as ShopVisitHistoryRepository) as T
+            }
+
+            modelClass.isAssignableFrom(FavoriteDonutsViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                return FavoriteDonutsViewModel(repository as FavoriteDonutsRepository) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class")

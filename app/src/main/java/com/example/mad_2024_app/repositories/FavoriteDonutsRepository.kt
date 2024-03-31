@@ -16,14 +16,14 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
     private val TAG: String = "FavoriteDonutsRepo"
     private val modelName: String = "FavoriteDonuts"
 
-    fun getFavoriteDonutsByUser(userId: String?): Flow<List<Donut>> = flow {
-        val cachedDonuts = cache.getIfPresent("$modelName@$userId") as List<Donut>?
+    fun getFavoriteDonutsByUser(uuid: String): Flow<List<Donut>> = flow {
+        val cachedDonuts = cache.getIfPresent("$modelName@$uuid") as List<Donut>?
         if (cachedDonuts != null) {
             emit(cachedDonuts)
         } else {
-            val donuts = favoriteDonutsDAO.getFavoriteDonutsByUser(userId).firstOrNull()
+            val donuts = favoriteDonutsDAO.getFavoriteDonutsByUser(uuid).firstOrNull()
             donuts?.let {
-                cache.put("$modelName@$userId", it)
+                cache.put("$modelName@$uuid", it)
             }
             emit(donuts ?: emptyList())
         }
@@ -39,23 +39,23 @@ class FavoriteDonutsRepository(private val favoriteDonutsDAO: FavoriteDonutsDAO,
 
     suspend fun removeFavoriteDonut(favoriteDonut: FavoriteDonuts) {
         favoriteDonutsDAO.removeFavoriteDonut(favoriteDonut)
-        cache.invalidate("$modelName@${favoriteDonut.userId}")
+        cache.invalidate("$modelName@${favoriteDonut.uuid}")
     }
 
-    suspend fun removeFavoriteDonutById(userId: Int, donutId: Int) {
-        Log.d(TAG, "Removing donut with id $donutId for user with id: $userId")
-        favoriteDonutsDAO.removeFavoriteDonutById(userId, donutId)
-        cache.invalidate("$modelName@$userId@donutId")
+    suspend fun removeFavoriteDonutById(uuid: String, donutId: Int) {
+        Log.d(TAG, "Removing donut with id $donutId for user with id: $uuid")
+        favoriteDonutsDAO.removeFavoriteDonutById(uuid, donutId)
+        cache.invalidate("$modelName@$uuid@donutId")
     }
 
-    suspend fun isDonutFavorite(userId: Int, donutId: Int): Boolean {
-        val cacheKey = "$modelName@$userId@$donutId"
+    suspend fun isDonutFavorite(uuid: String, donutId: Int): Boolean {
+        val cacheKey = "$modelName@$uuid@$donutId"
         val cachedValue = cache.getIfPresent(cacheKey) as Boolean?
 
         return if (cachedValue != null) {
             cachedValue
         } else {
-            val isFavorite = favoriteDonutsDAO.isFavorite(userId, donutId)
+            val isFavorite = favoriteDonutsDAO.isFavorite(uuid, donutId)
             cache.put(cacheKey, isFavorite)
             isFavorite
         }

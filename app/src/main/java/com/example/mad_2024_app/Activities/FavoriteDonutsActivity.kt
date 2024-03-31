@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
@@ -23,9 +24,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Donut
+import com.example.mad_2024_app.database.FavoriteDonuts
 import com.example.mad_2024_app.repositories.DonutRepository
+import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
 import com.example.mad_2024_app.view_models.DonutViewModel
+import com.example.mad_2024_app.view_models.FavoriteDonutsViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -37,6 +42,10 @@ class FavoriteDonutsActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var donutViewModel: DonutViewModel
     private lateinit var donutRepo: DonutRepository
+    private lateinit var favoriteDonutsViewModel: FavoriteDonutsViewModel
+    private lateinit var favoriteDonutRepo: FavoriteDonutsRepository
+
+    private lateinit var donutAdapter: DonutAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,38 +60,77 @@ class FavoriteDonutsActivity : AppCompatActivity() {
             return
         }
 
-        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-
         val appContext = application as App
+
+        val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
         applyTheme(sharedPreferences)
 
-        initializeViewModels(appContext)
+        initializeViewModels()
 
         setContentView(R.layout.activity_favorite_donuts)
 
         toggleDrawer()
 
-        setupList()
+        setupList(appContext, sharedPreferences)
     }
 
-    private fun setupList() {
+    private fun setupList(appContext : Context, sharedPreferences: SharedPreferences) {
         val listView = findViewById<ListView>(R.id.lvDonuts)
         donutViewModel.allDonuts.observe(this, Observer { donuts ->
             if (donuts != null) {
-                val adapter = DonutAdapter(this, donuts)
-                listView.adapter = adapter
+                donutAdapter = DonutAdapter(this, donuts, favoriteDonutsViewModel)
+
+                setupDonutObserverForFavoriteDonuts(appContext, donutAdapter = donutAdapter, sharedPreferences = sharedPreferences)
+
+                listView.adapter = donutAdapter
             } else {
                 Log.d(TAG, "No donuts found")
             }
         })
     }
 
-    class DonutAdapter(context: Context, private val donuts: List<Donut>) :
+    private fun setupDonutObserverForFavoriteDonuts(appContext: Context, donutAdapter : DonutAdapter, sharedPreferences: SharedPreferences) {
+        val uuid = sharedPreferences.getString("userId", null)
+
+        if (uuid != null) {
+            favoriteDonutsViewModel.getFavoriteDonutsByUser(uuid)
+            favoriteDonutsViewModel.favoriteDonuts.observe(this, Observer { favoriteDonutsList ->
+                if (favoriteDonutsList != null) {
+                    val favoriteDonutsIds = favoriteDonutsList.map { it.donutId }.toSet()
+                    donutAdapter.setFavoriteDonutsIds(favoriteDonutsIds)
+                }
+            })
+        } else {
+            Log.e(TAG, "User ID not found in SharedPreferences.")
+        }
+    }
+
+
+
+    class DonutAdapter(context: Context, private val donuts: List<Donut>, private val favoriteDonutViewModel: FavoriteDonutsViewModel) :
         ArrayAdapter<Donut>(context, 0,donuts) {
         private val inflater: LayoutInflater = LayoutInflater.from(context)
+
+        private val TAG = "DonutAdapter"
+
+        private var favoriteDonutsIds: Set<Int> = emptySet()
+
+        fun setFavoriteDonutsIds(newFavoriteDonutsIds: Set<Int>) {
+            this.favoriteDonutsIds = newFavoriteDonutsIds
+
+            Log.d(TAG, "Favorite donuts updated: ${favoriteDonutsIds}")
+
+            notifyDataSetChanged()
+        }
+
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.donut_list_item, parent, false)
+            val view = convertView ?: LayoutInflater.from(context)
+                .inflate(R.layout.donut_list_item, parent, false)
+
+            val sharedPreferences =
+                context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
             val donut = donuts[position]
 
             val imageView = view.findViewById<ImageView>(R.id.image_view)
@@ -94,15 +142,48 @@ class FavoriteDonutsActivity : AppCompatActivity() {
             val typeTextView = view.findViewById<TextView>(R.id.donut_type)
             typeTextView.text = donut.type
 
+            val likeButton = view.findViewById<CheckBox>(R.id.like_button_donut)
+
+            val isFavorite = donut.donutId in favoriteDonutsIds
+
+            Log.d(TAG, "like button is checked: $isFavorite for donut: ${donut.donutId}" +
+                    " in list of favorite donuts: ${favoriteDonutsIds.toString()}")
+
+            likeButton.isChecked = isFavorite
+
+            likeButton.setOnClickListener { view ->
+                val isChecked = likeButton.isChecked
+                val uuid = sharedPreferences.getString("userId", null) ?: return@setOnClickListener
+                handleFavoriteDonutToggle(donut.donutId, isChecked, uuid)
+            }
+
             return view
+        }
+
+        private fun handleFavoriteDonutToggle(donutId: Int, isChecked: Boolean, uuid: String) {
+            val updatedFavoriteDonutsIds = favoriteDonutsIds.toMutableSet()
+
+            if (isChecked) {
+                updatedFavoriteDonutsIds.add(donutId)
+                favoriteDonutViewModel.upsertFavoriteDonut(FavoriteDonuts(uuid = uuid, donutId = donutId))
+            } else {
+                updatedFavoriteDonutsIds.remove(donutId)
+                favoriteDonutViewModel.removeFavoriteDonutById(uuid = uuid, donutId = donutId)
+            }
+
+            setFavoriteDonutsIds(updatedFavoriteDonutsIds)
         }
 
     }
 
-    private fun initializeViewModels(appContext: App) {
-        donutRepo = DbUtils.getDonutsRepository(appContext)
+    private fun initializeViewModels(){
+        donutRepo = RepositoryProvider.getDonutRepository()
         val donutFactory = ViewModelFactory(donutRepo)
         donutViewModel = ViewModelProvider(this, donutFactory)[DonutViewModel::class.java]
+
+        favoriteDonutRepo = RepositoryProvider.getFavoriteDonutsRepository()
+        val favoriteDonutFactory = ViewModelFactory(favoriteDonutRepo)
+        favoriteDonutsViewModel = ViewModelProvider(this, favoriteDonutFactory)[FavoriteDonutsViewModel::class.java]
     }
 
     private fun applyTheme(sharedPreferences: SharedPreferences) {

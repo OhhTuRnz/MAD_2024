@@ -106,8 +106,13 @@ class FetchDonutShopsWorker(
                         val country = tags.optString("addr:country", "")
 
                         // Extract coordinate details
-                        val elementLatitude = element.getDouble("lat")
-                        val elementLongitude = element.getDouble("lon")
+                        val elementLatitude = element.optDouble("lat", Double.POSITIVE_INFINITY)
+                        val elementLongitude = element.optDouble("lon", Double.POSITIVE_INFINITY)
+
+                        if(elementLatitude == Double.POSITIVE_INFINITY || elementLongitude == Double.POSITIVE_INFINITY){
+                            Log.d(TAG, "Element $i has no latitude or longitude")
+                            continue
+                        }
 
                         Log.d(TAG, "Upserting Coordinate")
 
