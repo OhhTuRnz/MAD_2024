@@ -1,4 +1,4 @@
-# MAD_2024
+# CopFinder
 ## Workspace
 
 Github:
@@ -8,27 +8,59 @@ Github:
 Workspace: https://upm365.sharepoint.com/sites/Logopedas/SitePages/Tracking.aspx
 
 ## Description
-Welcome to **LogoGPS**, a mobile application designed with real-time location tracking. Our app shows the nearest donuts shops around you as you move, along with some information about them. You can save your favorites shops and your favorites donuts and see them whenever you want.
+Welcome to **CopFinder**, a mobile application designed with real-time location tracking. Our app shows the nearest donuts shops around you as you move, along with some information about them. You can save your favorites shops and your favorites donuts and see them whenever you want.
 
 ## Screenshots and navigation
 
-Here are some snapshots of LogoGPS in action:
+Here are some snapshots of CopFinder in action:
 
 <table>
   <tr>
     <td>
-      <img src="https://i.gyazo.com/82e9977c6d9dbf2ab73e331950b113b1.png" alt="LogoGPS Main Menu" style="width: 100%;"/>
+      <img src="images/img1[1].jpg" alt="CopFinder Main Menu" style="width: 80%;"/>
     </td>
     <td>
-      <img src="https://i.gyazo.com/d7d3cd8b134be104a8c3a6651e5d0bea.png" alt="LogoGPS Map Interface" style="width: 100%;"/>
+      <img src="images/img3[1].jpg" alt="CopFinder Map Interface" style="width: 80%;"/>
     </td>
   </tr>
   <tr>
     <td style="text-align:center;">
-      LogoGPS Main Menu
+      CopFinder Main Menu. The nearest shops appear here, <br>you can select them as your favorites. You can also access the settings, the map and the recent visited shops from here.
     </td>
     <td style="text-align:center;">
-      LogoGPS Map Interface
+      CopFinder Drawer Menu. The main difference from the main menu is that you can access the login (or register), your personal data and the logout.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="images/img6[1].jpg" alt="CopFinder Login" style="width: 80%;"/>
+    </td>
+    <td>
+      <img src="images/img5[1].jpg" alt="CopFinder Recent" style="width: 80%;"/>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">
+      CopFinder Login. The first step is to create your own account, <br>you can do it pressing the word sign up here. Then you will <br>be able to login with the mail you used or with Google <br>thanks to Firebase. 
+    </td>
+    <td style="text-align:center;">
+      CopFinder Recent Visited Shops. The shops that you visit on our map can be seen in this section.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="images/img2[1].jpg" alt="CopFinder Map" style="width: 80%;"/>
+    </td>
+    <td>
+      <img src="images/img4[1].jpg" alt="CopFinder List" style="width: 80%;"/>
+    </td>
+  </tr>
+  <tr>
+    <td style="text-align:center;">
+      CopFinder Map. This is the main event of our app. <br> Here you can see your location and the shops markers. <br>If you press on one of them, it will display a message, <br>if you click on More, you can submit your valoration <br>and a comment, if you press on Go, your mobile will open <br>Google Maps and the location of the shop.
+    </td>
+    <td style="text-align:center;">
+      CopFinder Donuts List. You can see a list with lots of donuts. Select the ones you like more.
     </td>
   </tr>
 </table>
@@ -47,14 +79,19 @@ Functional features:
 Technical features:
 - Persistence in shared preferences.
 - Persistence in Room database.
+- Cache.
 - Firebase Realtime database.
 - Firebase authentication.
 - Maps: Openstreetmaps, with zoom function.
 - Menu: BottomMenu, DrawerMenu, TabMenu.
 - Implemented images with Glide.
 - Security with location permissions.
-- Sensors: GPS coordinates
-- Dark mode
+- Sensors: GPS coordinates.
+- Dark mode.
+- API ()
+- Recent shops visited
+- Ratting system and comments
+- Access to Google Maps
 
 ## How to Use
 
@@ -67,4 +104,4 @@ List of MAD developers:
 - ALEJANDRO CARRASCO ARAGON (alejandro.carrasco.aragon@alumnos.upm.es)
 - ALVARO TAJUELO GOMEZ (alvaro.tgomez@alumnos.upm.es)
 
-Join us and sweeten your life with LogoGPS!
+Join us and sweeten your life with CopFinder!
