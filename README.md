@@ -93,7 +93,7 @@ Here are some snapshots of CopFinder in action:
 </table>
 
 ## Demo Video
-https://youtu.be/Q4YtKjQ3BlQ?si=pgnJmsP8V6lAbFwh
+[![Video Title](http://img.youtube.com/vi/Q4YtKjQ3BlQ/0.jpg)](http://www.youtube.com/watch?v=Q4YtKjQ3BlQ "Video Title")
 
 ## Features
 Functional features:
