@@ -37,16 +37,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.SecondActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar">
-        </activity>
-        <activity
-            android:name=".Activities.ThirdActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar">
-        </activity>
-        <activity
             android:name=".Activities.OpenStreetMap"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             android:exported="true">

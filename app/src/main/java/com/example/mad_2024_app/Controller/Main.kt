@@ -17,17 +17,34 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.mad_2024_app.Activities.ILocationProvider
 import com.example.mad_2024_app.Activities.MainActivity
 import com.example.mad_2024_app.Activities.OpenStreetMap
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.Shop
+import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.DonutRepository
+import com.example.mad_2024_app.repositories.FavoriteShopsRepository
+import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
+import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.CoordinateViewModel
+import com.example.mad_2024_app.view_models.DonutViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
 import com.example.mad_2024_app.view_models.ShopViewModel
+import com.example.mad_2024_app.view_models.ShopVisitHistoryViewModel
+import com.example.mad_2024_app.view_models.UserViewModel
+import com.example.mad_2024_app.view_models.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -41,6 +58,18 @@ class Main : Fragment() {
     private lateinit var addressViewModel : AddressViewModel
     private lateinit var locationProvider : ILocationProvider
     private lateinit var context: Context
+
+    private lateinit var userViewModel: UserViewModel
+    private lateinit var donutsViewModel : DonutViewModel
+    private lateinit var shopVisitHistoryViewModel : ShopVisitHistoryViewModel
+
+    private lateinit var userRepo: UserRepository
+    private lateinit var shopRepo: ShopRepository
+    private lateinit var addressRepo: AddressRepository
+    private lateinit var favoriteShopsRepo : FavoriteShopsRepository
+    private lateinit var coordinateRepo: CoordinateRepository
+    private lateinit var donutsRepo: DonutRepository
+    private lateinit var shopVisitHistoryRepo : ShopVisitHistoryRepository
 
     private val TAG = "MainFragment"
 
@@ -58,18 +87,52 @@ class Main : Fragment() {
         // Initialize ListView
         listView = view.findViewById(R.id.lvNearShops)
 
+        initializeViewModels()
+
         // Setup ShopAdapter and ListView
         val shopAdapter = ShopAdapter(
-            context,
+            requireContext(),
             addressViewModel,
             favoriteShopsViewModel,
             coordinateViewModel,
-            sharedPreferences,
-            locationProvider)
+            requireActivity().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE),
+            requireActivity() as MainActivity
+        )
 
         listView.adapter = shopAdapter
 
         setupShopObserverForNearbyStores(context, shopAdapter, sharedPreferences)
+    }
+
+    private fun initializeViewModels(){
+        userRepo = RepositoryProvider.getUserRepository()
+        val userFactory = ViewModelFactory(userRepo)
+        userViewModel = ViewModelProvider(requireActivity(), userFactory)[UserViewModel::class.java]
+
+        shopRepo = RepositoryProvider.getShopRepository()
+        val shopFactory = ViewModelFactory(shopRepo)
+        shopViewModel = ViewModelProvider(requireActivity(), shopFactory)[ShopViewModel::class.java]
+
+        addressRepo = RepositoryProvider.getAddressRepository()
+        val addressFactory = ViewModelFactory(addressRepo)
+        addressViewModel = ViewModelProvider(requireActivity(), addressFactory).get(AddressViewModel::class.java)
+
+        favoriteShopsRepo = RepositoryProvider.getFavoriteShopsRepository()
+        val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
+        favoriteShopsViewModel = ViewModelProvider(requireActivity(), favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
+
+        coordinateRepo = RepositoryProvider.getCoordinateRepository()
+        val coordinateFactory = ViewModelFactory(coordinateRepo)
+        coordinateViewModel = ViewModelProvider(requireActivity(), coordinateFactory).get(CoordinateViewModel::class.java)
+
+        donutsRepo = RepositoryProvider.getDonutRepository()
+        val favoriteDonutsFactory = ViewModelFactory(donutsRepo)
+        donutsViewModel = ViewModelProvider(requireActivity(), favoriteDonutsFactory).get(DonutViewModel::class.java)
+
+        shopVisitHistoryRepo = RepositoryProvider.getShopVisitHistoryRepository()
+        val shopVisitHistoryFactory = ViewModelFactory(shopVisitHistoryRepo)
+        shopVisitHistoryViewModel = ViewModelProvider(requireActivity(), shopVisitHistoryFactory).get(
+            ShopVisitHistoryViewModel::class.java)
     }
 
     companion object {
@@ -99,9 +162,6 @@ class Main : Fragment() {
         val userId = sharedPreferences.getString("userId", null)
 
         if (userId != null) {
-            // Initialize an empty set to hold favorite shop IDs
-            val favoriteShops = mutableSetOf<Int>()
-
             favoriteShopsViewModel.getFavoriteShopsByUser(userId)
             // Observing favorite shops and updating the adapter's favorite shops set
             favoriteShopsViewModel.favoriteShops.observe(viewLifecycleOwner, Observer { favoriteShopsList ->
@@ -139,14 +199,17 @@ class Main : Fragment() {
 
         private lateinit var latestLocation : Location
 
-        private val executor: ExecutorService = Executors.newSingleThreadExecutor()
-
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
+
+            // Sort shops so that favorite shops come first
+            val sortedShops = newShops.sortedWith(compareBy { !favoriteShopsIds.contains(it.shopId) })
+
             shops.clear()
-            shops.addAll(newShops)
+            shops.addAll(sortedShops)
             notifyDataSetChanged()
+
+            Log.d(TAG, "Added ${shops.size} shop(s)")
         }
 
         fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
@@ -178,43 +241,17 @@ class Main : Fragment() {
             }
 
             // Find the like button (CheckBox) in the inflated view
-            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button) as CheckBox
+            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button)
 
             // Check if the shop is a favorite and update the checkbox state
             val isFavorite = shop.shopId in favoriteShopsIds
             likeButton.isChecked = isFavorite
 
             // Set OnCheckedChangeListener for the likeButton (CheckBox)
-            likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                // Inside this block, you can put your logic for handling the checkbox state change
-                Log.d(TAG, "Checkbox state changed: $isChecked")
-
-                val uuid = sharedPreferences.getString("userId", null)
-
-                if (uuid == null) {
-                    Log.e(TAG, "User ID is null.")
-                    return@setOnCheckedChangeListener
-                }
-
-                if (isChecked) {
-                    Log.d(TAG, "Adding shop ${shop.shopId} to favorites.")
-                    executor.execute {
-                        favoriteShopsViewModel.upsertFavoriteShop(
-                            FavoriteShops(
-                                uuid = uuid,
-                                shopId = shop.shopId
-                            )
-                        )
-                    }
-                } else {
-                    Log.d(TAG, "Removing shop ${shop.shopId} from favorites.")
-                    executor.execute {
-                        favoriteShopsViewModel.removeFavoriteShopById(
-                            uuid = uuid,
-                            shopId = shop.shopId
-                        )
-                    }
-                }
+            likeButton.setOnClickListener { view ->
+                val isChecked = likeButton.isChecked
+                val uuid = sharedPreferences.getString("userId", null) ?: return@setOnClickListener
+                handleFavoriteShopToggle(shop.shopId, isChecked, uuid)
             }
 
             // Find the map button (ImageView) in the inflated view
@@ -250,9 +287,18 @@ class Main : Fragment() {
             return listItemView
         }
 
-        private fun isShopFavorite(shopId: Int): Boolean {
-            val favoriteShopIds: Set<Int>? = favoriteShopsIds
-            return favoriteShopIds?.contains(shopId) ?: false
+        private fun handleFavoriteShopToggle(shopId: Int, isChecked: Boolean, uuid: String) {
+            val updatedFavoriteShopsIds = favoriteShopsIds.toMutableSet()
+
+            if (isChecked) {
+                updatedFavoriteShopsIds.add(shopId)
+                favoriteShopsViewModel.upsertFavoriteShop(FavoriteShops(uuid = uuid, shopId = shopId))
+            } else {
+                updatedFavoriteShopsIds.remove(shopId)
+                favoriteShopsViewModel.removeFavoriteShopById(uuid = uuid, shopId = shopId)
+            }
+
+            setFavoriteShopsIds(updatedFavoriteShopsIds)
         }
 
 

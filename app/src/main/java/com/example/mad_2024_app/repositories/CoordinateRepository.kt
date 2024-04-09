@@ -1,5 +1,6 @@
 package com.example.mad_2024_app.repositories
 
+import android.util.Log
 import com.example.mad_2024_app.DAOs.CoordinateDAO
 import com.example.mad_2024_app.database.Coordinate
 import com.google.common.cache.Cache
@@ -8,11 +9,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Singleton
+
+@Singleton
 class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val cache: Cache<String, Any>) : IRepository {
     private val TAG: String = "CoordinateRepo"
     private val modelName : String = "Coordinate"
 
-    fun getAllAddresses(): Flow<List<Coordinate>> = flow {
+    fun getAllCoordinates(): Flow<List<Coordinate>> = flow {
         // Check if addresses are present in cache
         val cachedAddresses = cache.getIfPresent("allCoordinates") as List<Coordinate>?
         if (cachedAddresses != null) {
@@ -27,37 +31,57 @@ class CoordinateRepository(private val coordinateDAO: CoordinateDAO, private val
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getAddressById(addressId: Int): Flow<Coordinate?> = flow {
-        // Check if address is present in cache
+    fun getCoordinateById(addressId: Int): Flow<Coordinate?> = flow {
         val cachedAddress = cache.getIfPresent(modelName+addressId.toString()) as Coordinate?
         if (cachedAddress != null) {
-            emit(cachedAddress) // Emit cached address if present
+            emit(cachedAddress)
         } else {
-            // If address is not in cache, fetch from database and emit result
             val address = coordinateDAO.getCoordinateById(addressId).firstOrNull()
             address?.let {
-                cache.put(modelName+addressId.toString(), it) // Cache the address if found
+                cache.put("$modelName@$addressId", it)
             }
-            emit(address) // Emit address from database or null if not found
+            emit(address)
         }
     }.flowOn(Dispatchers.IO)
 
-    suspend fun upsertAddress(coordinate: Coordinate) {
+    suspend fun upsertCoordinate(coordinate: Coordinate) : Long {
         val upsertedId = coordinateDAO.upsert(coordinate)
         if (upsertedId != -1L) {
-            cache.put(modelName + upsertedId.toString(), coordinate)
+            cache.put("$modelName@$upsertedId", coordinate)
         }
+        return upsertedId
     }
 
-    suspend fun deleteAddress(coordinate: Coordinate) {
+    suspend fun deleteCoordinate(coordinate: Coordinate) {
         coordinateDAO.delete(coordinate)
         // Remove address from cache after deletion
-        cache.invalidate(modelName+coordinate.coordinateId.toString())
+        cache.invalidate("$modelName@${coordinate.coordinateId}")
     }
 
-    suspend fun deleteAddressById(addressId: Int) {
-        coordinateDAO.deleteById(addressId)
+    suspend fun deleteCoordinateById(coordinateId: Int) {
+        coordinateDAO.deleteById(coordinateId)
         // Remove address from cache after deletion
-        cache.invalidate(modelName+addressId.toString())
+        cache.invalidate("$modelName@$coordinateId")
     }
+
+    fun getCoordinateByLatitudeAndLongitude(latitude: Double, longitude: Double): Flow<Coordinate?> = flow {
+        val coordinate = coordinateDAO.getCoordinateByLatitudeAndLongitude(latitude, longitude).firstOrNull()
+        coordinate?.let {
+            Log.d(TAG, "Coordinate found with ID: ${it.coordinateId}")
+            // Use the coordinate ID as part of the cache key
+            val cacheKey = "$modelName@${it.coordinateId}"
+            val cachedCoordinate = cache.getIfPresent(cacheKey) as Coordinate?
+
+            if (cachedCoordinate != null) {
+                emit(cachedCoordinate) // Emit the cached coordinate
+            } else {
+                cache.put(cacheKey, it) // Cache the new coordinate
+                emit(it) // Emit the new coordinate
+            }
+        } ?: run {
+            Log.d(TAG, "No coordinate found for latitude: $latitude and longitude: $longitude")
+            emit(null) // Emit null if the coordinate is not found
+        }
+    }.flowOn(Dispatchers.IO)
+
 }

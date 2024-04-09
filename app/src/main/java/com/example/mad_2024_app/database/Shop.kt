@@ -3,6 +3,7 @@ package com.example.mad_2024_app.database
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(foreignKeys = [
     ForeignKey(entity = Coordinate::class,
@@ -16,5 +17,6 @@ data class Shop (
     val name : String,
     val description : String? = null,
     val addressId: Int? = null,
-    val locationId : Int? = null
+    val locationId : Int? = null,
+    val lastAccessed: Long
 )

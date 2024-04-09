@@ -18,6 +18,9 @@ interface CoordinateDAO {
     @Query("SELECT * FROM Coordinate WHERE coordinateId = :coordinateId")
     fun getCoordinateById(coordinateId: Int): Flow<Coordinate>
 
+    @Query("SELECT * FROM Coordinate WHERE latitude = :latitude AND longitude = :longitude")
+    fun getCoordinateByLatitudeAndLongitude(latitude : Double, longitude : Double) : Flow<Coordinate>
+
     @Delete
     suspend fun delete(coordinate: Coordinate)
 

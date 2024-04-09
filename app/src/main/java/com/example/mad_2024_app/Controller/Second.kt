@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.mad_2024_app.Activities.ILocationProvider
+import com.example.mad_2024_app.Activities.MainActivity
 import com.example.mad_2024_app.Activities.OpenStreetMap
 import com.example.mad_2024_app.R
 import com.example.mad_2024_app.database.Address
@@ -65,13 +66,13 @@ class Second : Fragment() {
 
         // Setup ShopAdapter and ListView
         val shopAdapter = ShopAdapter(
-            context = context,
+            context = requireContext(),
             addressViewModel = addressViewModel,
             favoriteShopsViewModel = favoriteShopsViewModel,
             shopVisitHistoryViewModel = shopVisitHistoryViewModel,
             coordinateViewModel = coordinateViewModel,
-            sharedPreferences = sharedPreferences,
-            locationProvider = locationProvider
+            sharedPreferences = requireActivity().getSharedPreferences("AppPreferences", Context.MODE_PRIVATE),
+            locationProvider = requireActivity() as MainActivity
         )
 
         listView.adapter = shopAdapter
@@ -106,6 +107,22 @@ class Second : Fragment() {
 
     private fun setupShopObserverForNearbyStores(appContext: Context, shopAdapter: ShopAdapter, sharedPreferences: SharedPreferences) {
         val userId = sharedPreferences.getString("userId", null)
+
+        if (userId != null) {
+            favoriteShopsViewModel.getFavoriteShopsByUser(userId)
+            // Observing favorite shops and updating the adapter's favorite shops set
+            favoriteShopsViewModel.favoriteShops.observe(
+                viewLifecycleOwner,
+                Observer { favoriteShopsList ->
+                    if (favoriteShopsList != null) {
+                        // Extracting shop IDs from the favorite shops list
+                        val favoriteShopIds = favoriteShopsList.map { it.shopId }.toSet()
+                        Log.d(TAG, "Size of favorite shops: ${favoriteShopIds.size}")
+                        shopAdapter.setFavoriteShopsIds(favoriteShopIds)
+                    }
+                })
+        }
+
         if (userId != null) {
             shopVisitHistoryViewModel.getVisitsByUser(userId)
             shopVisitHistoryViewModel.userVisitHistory.observe(viewLifecycleOwner, Observer { shopVisits ->
@@ -155,9 +172,21 @@ class Second : Fragment() {
 
         fun setShops(newShops: List<Shop>) {
             Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
+
+            // Sort shops so that favorite shops come first
+            val sortedShops = newShops.sortedWith(compareBy { !favoriteShopsIds.contains(it.shopId) })
+
             shops.clear()
-            shops.addAll(newShops)
+            shops.addAll(sortedShops)
+            notifyDataSetChanged()
+
+            Log.d(TAG, "Added ${shops.size} shop(s)")
+        }
+
+        fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
+            Log.d(TAG, "Adding Favorite Shops")
+            Log.d(TAG, "Added ${newFavoriteShopsIds.size} shop(s)")
+            favoriteShopsIds = newFavoriteShopsIds
             notifyDataSetChanged()
         }
 
@@ -190,36 +219,10 @@ class Second : Fragment() {
             likeButton.isChecked = isFavorite
 
             // Set OnCheckedChangeListener for the likeButton (CheckBox)
-            likeButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                // Inside this block, you can put your logic for handling the checkbox state change
-                Log.d(TAG, "Checkbox state changed: $isChecked")
-
-                val uuid = sharedPreferences.getString("userId", null)
-
-                if (uuid == null) {
-                    Log.e(TAG, "User ID is null.")
-                    return@setOnCheckedChangeListener
-                }
-
-                if (isChecked) {
-                    Log.d(TAG, "Adding shop ${shop.shopId} to favorites.")
-                    executor.execute {
-                        favoriteShopsViewModel.upsertFavoriteShop(
-                            FavoriteShops(
-                                uuid = uuid,
-                                shopId = shop.shopId
-                            )
-                        )
-                    }
-                } else {
-                    Log.d(TAG, "Removing shop ${shop.shopId} from favorites.")
-                    executor.execute {
-                        favoriteShopsViewModel.removeFavoriteShopById(
-                            uuid = uuid,
-                            shopId = shop.shopId
-                        )
-                    }
-                }
+            likeButton.setOnClickListener { view ->
+                val isChecked = likeButton.isChecked
+                val uuid = sharedPreferences.getString("userId", null) ?: return@setOnClickListener
+                handleFavoriteShopToggle(shop.shopId, isChecked, uuid)
             }
 
             // Find the map button (ImageView) in the inflated view
@@ -253,6 +256,22 @@ class Second : Fragment() {
             }
 
             return listItemView
+        }
+
+        private fun handleFavoriteShopToggle(shopId: Int, isChecked: Boolean, uuid: String) {
+            val updatedFavoriteShopsIds = favoriteShopsIds.toMutableSet()
+
+            if (isChecked) {
+                updatedFavoriteShopsIds.add(shopId)
+                favoriteShopsViewModel.upsertFavoriteShop(FavoriteShops(uuid = uuid, shopId = shopId))
+            } else {
+                updatedFavoriteShopsIds.remove(shopId)
+                favoriteShopsViewModel.removeFavoriteShopById(uuid = uuid, shopId = shopId)
+            }
+
+            setFavoriteShopsIds(updatedFavoriteShopsIds)
+
+            notifyDataSetChanged()
         }
 
         private fun isShopFavorite(shopId: Int): Boolean {

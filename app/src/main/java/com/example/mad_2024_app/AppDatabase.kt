@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [User::class, Shop::class, Coordinate::class, Donut::class, Address::class,
-        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 8
+        FavoriteDonuts::class, FavoriteShops::class, ShopVisitHistory::class], version = 13
 )
 @TypeConverters(Converters::class) // Correct placement of annotation
 abstract class AppDatabase : RoomDatabase() {
@@ -116,7 +116,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Same-day delivery",
                             addressId = addressId.toInt(),
-                            locationId = coordinateId1.toInt()
+                            locationId = coordinateId1.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId = shopDao.upsert(tresOlivosShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId")
@@ -157,7 +158,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Delivery",
                             addressId = addressId2.toInt(),
-                            locationId = coordinateId2.toInt()
+                            locationId = coordinateId2.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId2 = shopDao.upsert(montecarmeloShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId2")
@@ -202,7 +204,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId3.toInt(),
-                            locationId = coordinateId3.toInt()
+                            locationId = coordinateId3.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId3 = shopDao.upsert(retiroShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId3")
@@ -247,7 +250,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId4.toInt(),
-                            locationId = coordinateId4.toInt()
+                            locationId = coordinateId4.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId4 = shopDao.upsert(argandaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId4")
@@ -290,7 +294,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId5.toInt(),
-                            locationId = coordinateId5.toInt()
+                            locationId = coordinateId5.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId5 = shopDao.upsert(plazaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId5")
@@ -331,7 +336,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId6.toInt(),
-                            locationId = coordinateId6.toInt()
+                            locationId = coordinateId6.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId6 = shopDao.upsert(palmerasShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId6")
@@ -372,7 +378,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Kerbside pickup",
                             addressId = addressId7.toInt(),
-                            locationId = coordinateId7.toInt()
+                            locationId = coordinateId7.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId7 = shopDao.upsert(rosaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId7")
@@ -413,7 +420,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Dine-in",
                             addressId = addressId8.toInt(),
-                            locationId = coordinateId8.toInt()
+                            locationId = coordinateId8.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId8 = shopDao.upsert(familiarShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId8")
@@ -450,7 +458,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId9.toInt(),
-                            locationId = coordinateId9.toInt()
+                            locationId = coordinateId9.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId9 = shopDao.upsert(mercadonaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId9")
@@ -489,7 +498,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId10.toInt(),
-                            locationId = coordinateId10.toInt()
+                            locationId = coordinateId10.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId10 = shopDao.upsert(supecoShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId10")
@@ -533,7 +543,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId11.toInt(),
-                            locationId = coordinateId11.toInt()
+                            locationId = coordinateId11.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId11 = shopDao.upsert(robertsShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId11")
@@ -576,7 +587,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId12.toInt(),
-                            locationId = coordinateId12.toInt()
+                            locationId = coordinateId12.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId12 = shopDao.upsert(briocherieShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId12")
@@ -613,7 +625,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "In-store shopping",
                             addressId = addressId13.toInt(),
-                            locationId = coordinateId13.toInt()
+                            locationId = coordinateId13.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId13 = shopDao.upsert(bergueShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId13")
@@ -656,7 +669,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Takeaway",
                             addressId = addressId14.toInt(),
-                            locationId = coordinateId14.toInt()
+                            locationId = coordinateId14.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId14 = shopDao.upsert(panariaShop1)
                         Log.d(TAG, "Inserted shop with ID: $shopId14")
@@ -702,7 +716,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     "\n" +
                                     "Wine",
                             addressId = addressId15.toInt(),
-                            locationId = coordinateId15.toInt()
+                            locationId = coordinateId15.toInt(),
+                            lastAccessed = System.currentTimeMillis()
                         )
                         val shopId15 = shopDao.upsert(carrascosaShop)
                         Log.d(TAG, "Inserted shop with ID: $shopId15")
@@ -773,7 +788,8 @@ abstract class AppDatabase : RoomDatabase() {
                                         "\n" +
                                         "Good for kids",
                                 addressId = addressId16.toInt(),
-                                locationId = coordinateId16.toInt()
+                                locationId = coordinateId16.toInt(),
+                                lastAccessed = System.currentTimeMillis()
                             )
                             val shopId16 = shopDao.upsert(dunkinZambrano)
                             Log.d(TAG, "Inserted shop with ID: $shopId16")
@@ -782,25 +798,25 @@ abstract class AppDatabase : RoomDatabase() {
                 }
 
                 val donutsList = listOf(
-                    Donut(name = "Glazed Donut", type = "Classic", color = "Golden"),
-                    Donut(name = "Chocolate Donut", type = "Chocolate", color = "Brown"),
-                    Donut(name = "Jelly Donut", type = "Filled", color = "Assorted"),
-                    Donut(name = "Boston Cream Donut", type = "Filled", color = "Chocolate"),
-                    Donut(name = "Maple Bar Donut", type = "Bar", color = "Golden"),
-                    Donut(name = "Old Fashioned Donut", type = "Classic", color = "Golden"),
-                    Donut(name = "Blueberry Donut", type = "Fruit", color = "Blue"),
-                    Donut(name = "Vanilla Cream Donut", type = "Filled", color = "White"),
-                    Donut(name = "Strawberry Donut", type = "Fruit", color = "Red"),
-                    Donut(name = "Cinnamon Sugar Donut", type = "Classic", color = "Brown"),
-                    Donut(name = "Lemon Donut", type = "Citrus", color = "Yellow"),
-                    Donut(name = "Raspberry Donut", type = "Fruit", color = "Pink"),
-                    Donut(name = "Coconut Donut", type = "Coconut", color = "White"),
-                    Donut(name = "Red Velvet Donut", type = "Red Velvet", color = "Red"),
-                    Donut(name = "Pistachio Donut", type = "Nut", color = "Green"),
-                    Donut(name = "Powdered Sugar Donut", type = "Classic", color = "White"),
-                    Donut(name = "Caramel Donut", type = "Filled", color = "Brown"),
-                    Donut(name = "Apple Fritter Donut", type = "Fritter", color = "Assorted"),
-                    Donut(name = "Peanut Butter Donut", type = "Nut", color = "Brown")
+                    Donut(name = "Glazed Donut", type = "Classic", color = "Golden", image = R.drawable.glazeddonut),
+                    Donut(name = "Chocolate Donut", type = "Chocolate", color = "Brown", image = R.drawable.chocolate_donuts),
+                    Donut(name = "Jelly Donut", type = "Filled", color = "Assorted", image = R.drawable.jelly_donut),
+                    Donut(name = "Boston Cream Donut", type = "Filled", color = "Chocolate", image = R.drawable.boston_cream_doughnuts),
+                    Donut(name = "Maple Bar Donut", type = "Bar", color = "Golden", image = R.drawable.maple_bars_donut),
+                    Donut(name = "Old Fashioned Donut", type = "Classic", color = "Golden", image = R.drawable.old_fashioned_glazeddonuts),
+                    Donut(name = "Blueberry Donut", type = "Fruit", color = "Blue", image = R.drawable.blueberry_donut),
+                    Donut(name = "Vanilla Cream Donut", type = "Filled", color = "White", image = R.drawable.vanilla_cream_filleddonuts),
+                    Donut(name = "Strawberry Donut", type = "Fruit", color = "Red", image = R.drawable.strawberry_donut),
+                    Donut(name = "Cinnamon Sugar Donut", type = "Classic", color = "Brown", image = R.drawable.cinnamon_sugardonuts),
+                    Donut(name = "Lemon Donut", type = "Citrus", color = "Yellow", image = R.drawable.lemonglazeddonuts),
+                    Donut(name = "Raspberry Donut", type = "Fruit", color = "Pink", image = R.drawable.raspberrydoughnuts),
+                    Donut(name = "Coconut Donut", type = "Coconut", color = "White", image = R.drawable.coconut_donut),
+                    Donut(name = "Red Velvet Donut", type = "Red Velvet", color = "Red", image = R.drawable.red_velvet_donuts),
+                    Donut(name = "Pistachio Donut", type = "Nut", color = "Green", image = R.drawable.pistachiodonuts),
+                    Donut(name = "Powdered Sugar Donut", type = "Classic", color = "White", image = R.drawable.powderedsugardonuts),
+                    Donut(name = "Caramel Donut", type = "Filled", color = "Brown", image = R.drawable.caramel_cream_filled_doughnuts),
+                    Donut(name = "Apple Fritter Donut", type = "Fritter", color = "Assorted", image = R.drawable.apple_fritter_donuts),
+                    Donut(name = "Peanut Butter Donut", type = "Nut", color = "Brown", image = R.drawable.peanut_butter_glazeddonuts)
                 )
 
                 for (donut in donutsList) {

@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.mad_2024_app.App
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.repositories.UserRepository
 import com.example.mad_2024_app.view_models.UserViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
@@ -42,9 +43,7 @@ class ProfileActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_profile)
 
-        val appContext = application as App
-
-        initializeViewModels(appContext)
+        initializeViewModels()
 
         editName = findViewById(R.id.edit_name) // Initialize after setContentView
 
@@ -69,8 +68,8 @@ class ProfileActivity : AppCompatActivity() {
         //migrateSharedPreferences()
     }
 
-    private fun initializeViewModels(appContext: Context){
-        userRepo = DbUtils.getUserRepository(appContext)
+    private fun initializeViewModels(){
+        userRepo = RepositoryProvider.getUserRepository()
         val userFactory = ViewModelFactory(userRepo)
         userViewModel = ViewModelProvider(this, userFactory)[UserViewModel::class.java]
     }

@@ -12,7 +12,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
+import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -22,17 +23,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.mad_2024_app.App
+import androidx.lifecycle.lifecycleScope
 import com.example.mad_2024_app.R
+import com.example.mad_2024_app.RepositoryProvider
 import com.example.mad_2024_app.database.Address
 import com.example.mad_2024_app.database.Shop
 import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.FavoriteShopsRepository
+import com.example.mad_2024_app.repositories.ShopRepository
 import com.example.mad_2024_app.view_models.AddressViewModel
 import com.example.mad_2024_app.view_models.FavoriteShopsViewModel
+import com.example.mad_2024_app.view_models.ShopViewModel
 import com.example.mad_2024_app.view_models.ViewModelFactory
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-
+import kotlinx.coroutines.launch
+import okhttp3.internal.notifyAll
 
 class FavoriteShopsActivity : AppCompatActivity() {
 
@@ -41,61 +47,94 @@ class FavoriteShopsActivity : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var favoriteShopsViewModel: FavoriteShopsViewModel
     private lateinit var addressViewModel: AddressViewModel
+    private lateinit var shopViewModel: ShopViewModel
+    private lateinit var addressRepo: AddressRepository
+    private lateinit var favoriteShopsRepo: FavoriteShopsRepository
+    private lateinit var shopRepo: ShopRepository
 
-    private lateinit var addressRepo : AddressRepository
+    private lateinit var shopAdapter: FavoriteShopAdapter
+
     @SuppressLint("MissingInflatedId")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Check user login status using Firebase Auth
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            // User not logged in, redirect to LoginActivity
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+
         val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
         applyTheme(sharedPreferences)
+
+        initializeViewModels()
 
         setContentView(R.layout.activity_favorite_shops)
 
         toggleDrawer()
 
-        val appContext = application as App
-
-        addressRepo = DbUtils.getAddressRepository(appContext)
-        val addressFactory = ViewModelFactory(addressRepo)
-        addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
-
-        setupShopObserverForNearbyStores(appContext,sharedPreferences)
+        setupShopObserverForFavoriteShops(sharedPreferences)
     }
 
-    private fun setupShopObserverForNearbyStores(appContext: Context, sharedPreferences: SharedPreferences) {
+
+    private fun setupShopObserverForFavoriteShops(sharedPreferences: SharedPreferences) {
         val userId = sharedPreferences.getString("userId", null)
-
         if (userId != null) {
-            // Initialize an empty set to hold favorite shop IDs
-            val favoriteShops = mutableSetOf<Int>()
-
-            // Initialize the ListView and adapter
-            val listView = findViewById<ListView>(R.id.lvShops)
-            val shopAdapter = FavoriteShopAdapter(
-                this,
-                addressViewModel,
-            )
-            listView.adapter = shopAdapter
-
             favoriteShopsViewModel.getFavoriteShopsByUser(userId)
-            // Observing favorite shops and updating the adapter's favorite shops set
             favoriteShopsViewModel.favoriteShops.observe(this, Observer { favoriteShopsList ->
                 if (favoriteShopsList != null) {
-                    // Extracting shop IDs from the favorite shops list
-                    val favoriteShopIds = favoriteShopsList.map { it.shopId }.toSet()
-                    Log.d(TAG, "Size of favorite shops: ${favoriteShopIds.size}")
-                    shopAdapter.setFavoriteShopsIds(favoriteShopIds)
+                    val favoriteShopsIds = favoriteShopsList.map { it.shopId }
+                    fetchFavoriteShopsDetails(favoriteShopsIds)
                 }
             })
         } else {
-            // Handle case where user ID is not available
             Log.e(TAG, "User ID not found in SharedPreferences.")
         }
     }
 
+
+    private fun fetchFavoriteShopsDetails(favoriteShopsIds: List<Int>) {
+        val favoriteShops = mutableListOf<Shop>()
+
+        lifecycleScope.launch {
+            for (id in favoriteShopsIds) {
+                shopViewModel.getShopByIdPreCollect(id).collect { shop ->
+                    shop?.let {
+                        favoriteShops.add(it)
+                        if (favoriteShops.size == favoriteShopsIds.size) {
+                            updateUIWithFavoriteShops(favoriteShops)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateUIWithFavoriteShops(favoriteShops: List<Shop>) {
+        val listView = findViewById<ListView>(R.id.lvShops)
+        shopAdapter = FavoriteShopAdapter(this, favoriteShops, favoriteShopsViewModel, addressViewModel)
+        listView.adapter = shopAdapter
+    }
+
+    private fun initializeViewModels(){
+        shopRepo = RepositoryProvider.getShopRepository()
+        val shopFactory = ViewModelFactory(shopRepo)
+        shopViewModel = ViewModelProvider(this, shopFactory)[ShopViewModel::class.java]
+
+        addressRepo = RepositoryProvider.getAddressRepository()
+        val addressFactory = ViewModelFactory(addressRepo)
+        addressViewModel = ViewModelProvider(this, addressFactory).get(AddressViewModel::class.java)
+
+        favoriteShopsRepo = RepositoryProvider.getFavoriteShopsRepository()
+        val favoriteShopsFactory = ViewModelFactory(favoriteShopsRepo)
+        favoriteShopsViewModel = ViewModelProvider(this, favoriteShopsFactory).get(FavoriteShopsViewModel::class.java)
+    }
 
     private fun applyTheme(sharedPreferences: SharedPreferences) {
         val isDarkModeEnabled = sharedPreferences.getBoolean("darkModeEnabled", false)
@@ -247,31 +286,29 @@ class FavoriteShopsActivity : AppCompatActivity() {
     }
 
 
-    class FavoriteShopAdapter(
-        private val context: Context,
-        private val addressViewModel: AddressViewModel
-    ) : BaseAdapter() {
-        private var shops: MutableList<Shop> = mutableListOf()
+    class FavoriteShopAdapter(context: Context, private var shops: List<Shop>, private val favoriteShopsViewModel: FavoriteShopsViewModel, val addressViewModel: AddressViewModel) :
+        ArrayAdapter<Shop>(context, 0, shops) {
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+
         private var favoriteShopsIds: Set<Int> = emptySet()
 
-        private val TAG = "ShopAdapter"
-        fun setShops(newShops: List<Shop>) {
-            Log.d(TAG, "Adding Shops")
-            Log.d(TAG, "Added ${shops.size} shop(s)")
-            shops.clear()
-            shops.addAll(newShops)
+        fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
+            this.favoriteShopsIds = newFavoriteShopsIds
             notifyDataSetChanged()
         }
 
-        override fun getCount(): Int = shops.size
-
-        override fun getItem(position: Int): Any = shops[position]
-
-        override fun getItemId(position: Int): Long = position.toLong()
-
+        private fun updateShops(){
+            val shopList = mutableListOf<Shop>()
+            for (shop in shops) {
+                if (shop.shopId in favoriteShopsIds) {
+                    shopList.add(shop)
+                }
+            }
+            shops = shopList
+            notifyDataSetChanged()
+        }
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            var listItemView = convertView
-                ?: LayoutInflater.from(context).inflate(R.layout.shop_list_item, parent, false)
+            val listItemView = convertView ?: inflater.inflate(R.layout.shop_list_item, parent, false)
 
             val shop = getItem(position) as Shop
             listItemView.findViewById<TextView>(R.id.shop_name).text = shop.name
@@ -280,23 +317,29 @@ class FavoriteShopsActivity : AppCompatActivity() {
             shop.addressId?.let { addressId ->
                 addressViewModel.getAddressById(addressId) { address ->
                     address?.let {
-                        // Update the UI with the address
-                        listItemView.findViewById<TextView>(R.id.shop_address).text =
-                            formatAddressString(it)
+                        listItemView.findViewById<TextView>(R.id.shop_address).text = formatAddressString(it)
                     }
+                }
+            }
+
+            val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
+            val uuid = sharedPreferences.getString("userId", null)
+
+            val likeButton = listItemView.findViewById<CheckBox>(R.id.like_button)
+            likeButton.isChecked = true // Since all displayed shops are favorites
+
+            likeButton.setOnClickListener {
+                if (!likeButton.isChecked) {
+                    // Remove from favorite
+                    favoriteShopsViewModel.removeFavoriteShopById(uuid, shop.shopId)
+                    remove(shop)
+                    notifyDataSetChanged()
                 }
             }
 
             return listItemView
         }
-
-        fun setFavoriteShopsIds(newFavoriteShopsIds: Set<Int>) {
-            Log.d(TAG, "Adding Favorite Shops")
-            Log.d(TAG, "Added ${newFavoriteShopsIds.size} shop(s)")
-            favoriteShopsIds = newFavoriteShopsIds
-            notifyDataSetChanged()
-        }
-
         private fun formatAddressString(address: Address): String {
             return "${address.street}, ${address.number}\n${address.city}, ${address.zipCode}\n${address.country}"
         }
