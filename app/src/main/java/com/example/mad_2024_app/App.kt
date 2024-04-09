@@ -6,9 +6,16 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.example.mad_2024_app.database.FavoriteShops
 import com.example.mad_2024_app.database.User
+import com.example.mad_2024_app.repositories.AddressRepository
+import com.example.mad_2024_app.repositories.CoordinateRepository
+import com.example.mad_2024_app.repositories.FavoriteDonutsRepository
+import com.example.mad_2024_app.repositories.FavoriteShopsRepository
 import com.example.mad_2024_app.repositories.ShopRepository
+import com.example.mad_2024_app.repositories.ShopVisitHistoryRepository
 import com.example.mad_2024_app.repositories.UserRepository
+import com.example.mad_2024_app.Network.OverpassAPIService
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
@@ -16,6 +23,8 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class App : Application() {
     private var activityCount = 0
@@ -26,6 +35,16 @@ class App : Application() {
         private set
     lateinit var shopRepo : ShopRepository
         private set
+    lateinit var addressRepo : AddressRepository
+        private set
+    lateinit var coordinateRepo : CoordinateRepository
+        private set
+    lateinit var favoriteShopsRepo : FavoriteShopsRepository
+        private set
+    lateinit var favoriteDonutsRepository: FavoriteDonutsRepository
+        private set
+    lateinit var shopVisitHistoryRepository: ShopVisitHistoryRepository
+        private set
 
     val cache: Cache<String, Any> by lazy {
         CacheBuilder.newBuilder()
@@ -33,6 +52,20 @@ class App : Application() {
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build()
     }
+
+    val retrofitOverpass = Retrofit.Builder()
+        .baseUrl("https://overpass-api.de/api/")
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .build()
+
+    val overpassApi = retrofitOverpass.create(OverpassAPIService::class.java)
+
+    companion object {
+        fun getRetrofit(context: Context): Retrofit {
+            return (context.applicationContext as App).retrofitOverpass
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -47,10 +80,20 @@ class App : Application() {
         // Instantiate DAOs
         val userDao = database.userDao()
         val shopDao = database.shopDao()
+        val addressDao = database.addressDao()
+        val coordinateDao = database.coordinateDao()
+        val favoriteShopsDao = database.favoriteShopsDao()
+        val favoriteDonutsDao = database.favoriteDonutsDao()
+        val shopVisitHistoryDao = database.shopVisitHistoryDao()
 
         // Instantiate Repos
         userRepo = UserRepository(userDao, cache)
         shopRepo = ShopRepository(shopDao, cache)
+        addressRepo = AddressRepository(addressDao, cache)
+        coordinateRepo = CoordinateRepository(coordinateDao, cache)
+        favoriteShopsRepo = FavoriteShopsRepository(favoriteShopsDao, cache)
+        favoriteDonutsRepository = FavoriteDonutsRepository(favoriteDonutsDao, cache)
+        shopVisitHistoryRepository = ShopVisitHistoryRepository(shopVisitHistoryDao, cache)
 
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -80,5 +123,13 @@ class App : Application() {
                 activityCount--
             }
         })
+
+        /*
+        val workRequest = PeriodicWorkRequestBuilder<FetchStoresWorker>(1, TimeUnit.HOURS)
+                // Additional constraints like network type can be specified here
+                .build()
+
+        WorkManager.getInstance(context).enqueue(workRequest)
+         */
     }
 }
