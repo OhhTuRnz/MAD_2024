@@ -18,6 +18,7 @@
     <color name="textColorLight">@color/black</color> <!-- black -->
     <color name="drawerBackgroundLight">#F44336</color> <!-- strong orange -->
     <color name="buttonColorLight">#EF5350</color> <!-- weak orange -->
+    <color name="cardBackgroundColorLight">@color/white</color>
 
     <!-- Colors for dark theme -->
     <color name="primaryDarkColor">#37474F</color> <!-- Dark theme primary color -->
@@ -27,6 +28,7 @@
     <color name="textColorDark">@color/white</color> <!-- white -->
     <color name="drawerBackgroundDark">@color/purple_300</color> <!-- purple 300 -->
     <color name="buttonColorDark">@color/purple_200</color> <!-- weak orange -->
+    <color name="cardBackgroundColorDark">#424242</color>
 
     <color name="googleSignInColor">#EF5350</color> <!-- weak orange -->
     <color name="Star">#EF5350</color> <!-- weak orange -->
