@@ -52,7 +52,7 @@
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             app:menu="@menu/bottom_menu"
-            android:backgroundTint="?attr/mainBackgroundColor"/>
+            android:background="?attr/bottomNavBackgroundColor"/>
 
 
         <com.google.android.material.tabs.TabLayout

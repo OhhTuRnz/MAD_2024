@@ -5,4 +5,5 @@
     <attr name="buttonColor" format="reference|color" />
     <attr name="textColor" format="reference|color" />
     <attr name="textBackgroundColor" format="reference|color" />
+    <attr name="bottomNavBackgroundColor" format="reference|color" />
 </resources>

@@ -9,6 +9,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="light_gray">#FFE0E0E0</color>
+    <color name="pink">#FF4081</color>
 
     <!-- Colors for light theme -->
     <color name="primaryColor">#FF4081</color> <!-- Replace with your desired primary color -->
