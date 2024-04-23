@@ -38,6 +38,7 @@ class ShopVisitHistoryRepository(
         if (insertedId != -1L) {
             cache.put("$modelName@$insertedId", shopVisit)
         }
+        cache.invalidate("$modelName@$shopVisit.visitorUuid@$shopVisit.visitedShopId@$shopVisit.timestamp")
     }
 
     suspend fun removeVisit(shopVisit: ShopVisitHistory) {
